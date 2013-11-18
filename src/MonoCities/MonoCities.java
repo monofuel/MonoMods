@@ -24,7 +24,7 @@ public class MonoCities extends JavaPlugin{
 		MonoConf.init();
 		config = new MonoConf(configLoc);
 		
-		pop = new CityPopulator();
+		pop = new CityPopulator(this);
 		
 		
 		World world = Bukkit.getWorld("World");

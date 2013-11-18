@@ -1,0 +1,25 @@
+Error enabling MonoMobs
+
+java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Boolean
+        at japura.MonoMobs.onEnable(Unknown Source)
+        at org.bukkit.plugin.java.JavaPlugin.setEnabled(JavaPlugin.java:217)
+
+
+Error enabling MonoChat
+
+03:16:29 [SEVERE] Error occurred while enabling MonoChat v1.0 (Is it up to date?)
+java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.Long
+        at japura.MonoChat.IRCListener.init(Unknown Source)
+        at japura.MonoChat.IRCListener.<init>(Unknown Source)
+        at japura.MonoChat.MonoChat.onEnable(Unknown Source)
+        at org.bukkit.plugin.java.JavaPlugin.setEnabled(JavaPlugin.java:217)
+
+Error enabling plugins:
+
+java.lang.NullPointerException
+        at japura.MonoPerms.MonoPerms.log(Unknown Source)
+        at japura.MonoPerms.MonoConf.<init>(Unknown Source)
+        at japura.MonoPerms.MonoConf.<init>(Unknown Source)
+        at japura.MonoPerms.MonoPerms.onEnable(Unknown Source)
+        at org.bukkit.plugin.java.JavaPlugin.setEnabled(JavaPlugin.java:217)
+

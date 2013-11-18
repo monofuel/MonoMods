@@ -6,7 +6,9 @@ import java.util.Random;
 import java.util.Set;
 import java.io.File;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -19,10 +21,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class CityPopulator extends BlockPopulator{
-	
+
+
+	//TODO: If there are no schematics, shut off the plugin.
 	HashMap<String,Schematic> schems = new HashMap<String,Schematic>();
 
-	public CityPopulator() {
+	public CityPopulator(JavaPlugin plugin) {
 		File folder = new File("plugins/MonoCities/schematics/");
 		File[] listOfFiles = folder.listFiles();
 		if (listOfFiles == null) {
@@ -31,6 +35,13 @@ public class CityPopulator extends BlockPopulator{
 			return;
 		}
 		MonoCities.log("found " + listOfFiles.length + " files");
+		//If there are no schematics, report this and exit.
+		if (listOfFiles.length == 0) {
+			MonoCities.log("No Schematics found, Disabling MonoCities");
+			Bukkit.getPluginManager().disablePlugin(plugin);
+			return;
+		}
+		//load all the schematics	
 		for (File item : listOfFiles) {
 			String fileName = item.getName();
 			if (!fileName.endsWith(".schematic")) continue;

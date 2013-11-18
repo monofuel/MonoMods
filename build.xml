@@ -122,7 +122,20 @@
                 </jar>
         </target>
 
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,docs">
+
+	<target name="NoWither" depends="build">
+		<manifestclasspath property="NoWither.classpath" jarfile="${dist.dir}/NoWither.jar">
+			<classpath refid="compile.classpath"/>
+     		</manifestclasspath>		
+	        <jar destfile="${dist.dir}/NoWither.jar" basedir="${build.dir}">
+			<fileset file="${src.dir}/NoWither/plugin.yml"/>
+                        <manifest>
+				<attribute name="Class-Path" value="${NoWither.classpath}"/>
+                        </manifest>
+                </jar>
+        </target>
+
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,docs">
 		<description> Main target</description>
 	</target>
 

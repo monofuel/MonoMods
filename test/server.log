@@ -1,0 +1,122 @@
+2013-11-18 01:26:24 [INFO] Starting minecraft server version 1.6.4
+2013-11-18 01:26:24 [INFO] Loading properties
+2013-11-18 01:26:24 [WARNING] server.properties does not exist
+2013-11-18 01:26:24 [INFO] Generating new properties file
+2013-11-18 01:26:24 [INFO] Default game type: SURVIVAL
+2013-11-18 01:26:24 [INFO] Generating keypair
+2013-11-18 01:26:25 [INFO] Starting Minecraft server on *:25565
+2013-11-18 01:26:25 [INFO] This server is running CraftBukkit version git-Bukkit-1.6.4-R2.0-1-g988f599-b2919jnks (MC: 1.6.4) (Implementing API version 1.6.4-R2.1-SNAPSHOT)
+2013-11-18 01:26:25 [WARNING] Failed to load operators list: java.io.FileNotFoundException: ./ops.txt (No such file or directory)
+2013-11-18 01:26:25 [WARNING] Failed to load white-list: java.io.FileNotFoundException: ./white-list.txt (No such file or directory)
+2013-11-18 01:26:25 [INFO] Preparing level "world"
+2013-11-18 01:26:26 [INFO] ----- Bukkit Auto Updater -----
+2013-11-18 01:26:26 [INFO] It appears that you're running a Development Build, when you've specified in bukkit.yml that you prefer to run Recommended Builds.
+2013-11-18 01:26:26 [INFO] If you would like to be kept informed about new Development Build releases, it is recommended that you change 'preferred-channel' in your bukkit.yml to 'dev'.
+2013-11-18 01:26:26 [INFO] With that set, you will be told whenever a new version is available for download, so that you can always keep up to date and secure with the latest fixes.
+2013-11-18 01:26:26 [INFO] If you would like to disable this warning, simply set 'suggest-channels' to false in bukkit.yml.
+2013-11-18 01:26:26 [INFO] ----- ------------------- -----
+2013-11-18 01:26:26 [INFO] Preparing start region for level 0 (Seed: 4132459746298712204)
+2013-11-18 01:26:27 [INFO] Preparing spawn area: 6%
+2013-11-18 01:26:28 [INFO] Preparing spawn area: 13%
+2013-11-18 01:26:29 [INFO] Preparing spawn area: 25%
+2013-11-18 01:26:30 [INFO] Preparing spawn area: 36%
+2013-11-18 01:26:31 [INFO] Preparing spawn area: 48%
+2013-11-18 01:26:32 [INFO] Preparing spawn area: 59%
+2013-11-18 01:26:33 [INFO] Preparing spawn area: 68%
+2013-11-18 01:26:34 [INFO] Preparing spawn area: 80%
+2013-11-18 01:26:35 [INFO] Preparing spawn area: 91%
+2013-11-18 01:26:36 [INFO] Preparing spawn area: 99%
+2013-11-18 01:26:36 [INFO] Preparing start region for level 1 (Seed: 4132459746298712204)
+2013-11-18 01:26:37 [INFO] Preparing spawn area: 9%
+2013-11-18 01:26:38 [INFO] Preparing spawn area: 24%
+2013-11-18 01:26:39 [INFO] Preparing spawn area: 37%
+2013-11-18 01:26:40 [INFO] Preparing spawn area: 50%
+2013-11-18 01:26:41 [INFO] Preparing spawn area: 58%
+2013-11-18 01:26:42 [INFO] Preparing spawn area: 70%
+2013-11-18 01:26:43 [INFO] Preparing spawn area: 81%
+2013-11-18 01:26:45 [INFO] Preparing spawn area: 88%
+2013-11-18 01:26:45 [INFO] Preparing start region for level 2 (Seed: 4132459746298712204)
+2013-11-18 01:26:46 [INFO] Preparing spawn area: 24%
+2013-11-18 01:26:48 [INFO] Preparing spawn area: 50%
+2013-11-18 01:26:49 [INFO] Preparing spawn area: 91%
+2013-11-18 01:26:49 [INFO] Done (23.690s)! For help, type "help" or "?"
+2013-11-18 01:27:18 [INFO] CONSOLE: Stopping the server..[m
+2013-11-18 01:27:18 [INFO] Stopping server
+2013-11-18 01:27:18 [INFO] Saving players
+2013-11-18 01:27:18 [WARNING] DSCT: Socket closed
+2013-11-18 01:27:18 [INFO] Saving worlds
+2013-11-18 01:27:18 [INFO] Closing listening thread
+2013-11-18 01:27:18 [INFO] Saving chunks for level 'world'/Overworld
+2013-11-18 01:27:19 [INFO] Saving chunks for level 'world_nether'/Nether
+2013-11-18 01:27:19 [INFO] Saving chunks for level 'world_the_end'/The End
+2013-11-18 01:28:15 [INFO] Starting minecraft server version 1.6.4
+2013-11-18 01:28:15 [INFO] Loading properties
+2013-11-18 01:28:15 [INFO] Default game type: SURVIVAL
+2013-11-18 01:28:15 [INFO] Generating keypair
+2013-11-18 01:28:15 [INFO] Starting Minecraft server on *:25565
+2013-11-18 01:28:16 [INFO] This server is running CraftBukkit version git-Bukkit-1.6.4-R2.0-1-g988f599-b2919jnks (MC: 1.6.4) (Implementing API version 1.6.4-R2.1-SNAPSHOT)
+2013-11-18 01:28:16 [SEVERE] Could not load 'plugins/MonoBugs.jar' in folder 'plugins'
+org.bukkit.plugin.InvalidDescriptionException: Invalid plugin.yml
+	at org.bukkit.plugin.java.JavaPluginLoader.getPluginDescription(JavaPluginLoader.java:247)
+	at org.bukkit.plugin.SimplePluginManager.loadPlugins(SimplePluginManager.java:132)
+	at org.bukkit.craftbukkit.v1_6_R3.CraftServer.loadPlugins(CraftServer.java:241)
+	at org.bukkit.craftbukkit.v1_6_R3.CraftServer.<init>(CraftServer.java:219)
+	at net.minecraft.server.v1_6_R3.PlayerList.<init>(PlayerList.java:56)
+	at net.minecraft.server.v1_6_R3.DedicatedPlayerList.<init>(SourceFile:11)
+	at net.minecraft.server.v1_6_R3.DedicatedServer.init(DedicatedServer.java:107)
+	at net.minecraft.server.v1_6_R3.MinecraftServer.run(MinecraftServer.java:393)
+	at net.minecraft.server.v1_6_R3.ThreadServerApplication.run(SourceFile:583)
+Caused by: java.io.FileNotFoundException: Jar does not contain plugin.yml
+	... 9 more
+2013-11-18 01:28:16 [INFO] Preparing level "world"
+2013-11-18 01:28:16 [INFO] Preparing start region for level 0 (Seed: 4132459746298712204)
+2013-11-18 01:28:17 [INFO] ----- Bukkit Auto Updater -----
+2013-11-18 01:28:17 [INFO] It appears that you're running a Development Build, when you've specified in bukkit.yml that you prefer to run Recommended Builds.
+2013-11-18 01:28:17 [INFO] If you would like to be kept informed about new Development Build releases, it is recommended that you change 'preferred-channel' in your bukkit.yml to 'dev'.
+2013-11-18 01:28:17 [INFO] With that set, you will be told whenever a new version is available for download, so that you can always keep up to date and secure with the latest fixes.
+2013-11-18 01:28:17 [INFO] If you would like to disable this warning, simply set 'suggest-channels' to false in bukkit.yml.
+2013-11-18 01:28:17 [INFO] ----- ------------------- -----
+2013-11-18 01:28:17 [INFO] Preparing spawn area: 57%
+2013-11-18 01:28:18 [INFO] Preparing start region for level 1 (Seed: 4132459746298712204)
+2013-11-18 01:28:19 [INFO] Preparing start region for level 2 (Seed: 4132459746298712204)
+2013-11-18 01:28:19 [INFO] Server permissions file permissions.yml is empty, ignoring it
+2013-11-18 01:28:19 [INFO] Done (3.205s)! For help, type "help" or "?"
+2013-11-18 01:33:38 [INFO] Starting minecraft server version 1.6.4
+2013-11-18 01:33:38 [INFO] Loading properties
+2013-11-18 01:33:38 [INFO] Default game type: SURVIVAL
+2013-11-18 01:33:38 [INFO] Generating keypair
+2013-11-18 01:33:39 [INFO] Starting Minecraft server on *:25565
+2013-11-18 01:33:39 [INFO] This server is running CraftBukkit version git-Bukkit-1.6.4-R2.0-1-g988f599-b2919jnks (MC: 1.6.4) (Implementing API version 1.6.4-R2.1-SNAPSHOT)
+2013-11-18 01:33:39 [INFO] [MonoBugs] Loading MonoBugs v1.0
+2013-11-18 01:33:39 [INFO] Preparing level "world"
+2013-11-18 01:33:39 [INFO] Preparing start region for level 0 (Seed: 4132459746298712204)
+2013-11-18 01:33:40 [INFO] ----- Bukkit Auto Updater -----
+2013-11-18 01:33:40 [INFO] It appears that you're running a Development Build, when you've specified in bukkit.yml that you prefer to run Recommended Builds.
+2013-11-18 01:33:40 [INFO] If you would like to be kept informed about new Development Build releases, it is recommended that you change 'preferred-channel' in your bukkit.yml to 'dev'.
+2013-11-18 01:33:40 [INFO] With that set, you will be told whenever a new version is available for download, so that you can always keep up to date and secure with the latest fixes.
+2013-11-18 01:33:40 [INFO] If you would like to disable this warning, simply set 'suggest-channels' to false in bukkit.yml.
+2013-11-18 01:33:40 [INFO] ----- ------------------- -----
+2013-11-18 01:33:40 [INFO] Preparing spawn area: 57%
+2013-11-18 01:33:41 [INFO] Preparing start region for level 1 (Seed: 4132459746298712204)
+2013-11-18 01:33:42 [INFO] Preparing start region for level 2 (Seed: 4132459746298712204)
+2013-11-18 01:33:42 [INFO] [MonoBugs] Enabling MonoBugs v1.0
+2013-11-18 01:33:42 [INFO] [MonoBugs] creating new config: plugins/MonoBugs/conf.json
+2013-11-18 01:33:42 [INFO] [MonoBugs] creating new data: plugins/MonoBugs/data.json
+2013-11-18 01:33:42 [INFO] [MonoBugs] there are 0 unsolved bug reports
+2013-11-18 01:33:42 [INFO] [MonoBugs] use /bug unresolved to see unsolved bugs
+2013-11-18 01:33:42 [INFO] [MonoBugs] MonoBugs has been enabled
+2013-11-18 01:33:42 [INFO] Server permissions file permissions.yml is empty, ignoring it
+2013-11-18 01:33:42 [INFO] Done (3.180s)! For help, type "help" or "?"
+2013-11-18 01:33:45 [INFO] CONSOLE: Stopping the server..[m
+2013-11-18 01:33:45 [INFO] Stopping server
+2013-11-18 01:33:45 [INFO] [MonoBugs] Disabling MonoBugs v1.0
+2013-11-18 01:33:45 [INFO] [MonoBugs] config successfully saved
+2013-11-18 01:33:45 [INFO] [MonoBugs] data successfully saved
+2013-11-18 01:33:45 [INFO] [MonoBugs] MonoBugs has been disabled
+2013-11-18 01:33:45 [INFO] Saving players
+2013-11-18 01:33:45 [WARNING] DSCT: Socket closed
+2013-11-18 01:33:45 [INFO] Saving worlds
+2013-11-18 01:33:45 [INFO] Closing listening thread
+2013-11-18 01:33:45 [INFO] Saving chunks for level 'world'/Overworld
+2013-11-18 01:33:46 [INFO] Saving chunks for level 'world_nether'/Nether
+2013-11-18 01:33:46 [INFO] Saving chunks for level 'world_the_end'/The End

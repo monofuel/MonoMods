@@ -1,0 +1,65 @@
+<project name="Cosmic-Infliction" default="main" basedir=".">
+
+
+	<property name="src.dir" location="src/" />
+	<property name="build.dir" location="build/" />
+	<property name="dist.dir" location="dist/" />
+	<property name="docs.dir" location="docs/" />
+	<property name="bin.dir" location="bin/" />
+
+	<path id="compile.classpath">
+		<fileset dir="${bin.dir}" includes="*.jar"/>
+	</path>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+		<delete dir="${docs.dir}" />
+	</target>
+
+	<target name="init">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${docs.dir}" />
+	</target>
+
+	<target name="build" depends="init">
+		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" fork="yes" >
+			<classpath refid="compile.classpath"/>
+		</javac>
+	</target>
+
+	<target name="docs" depends="build">
+		<javadoc packagenames="MonoMods" sourcepath="${src.dir}" destdir="${docs.dir}">
+			<classpath>
+				<fileset dir="${bin.dir}">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+			<link href="http://jd.bukkit.org/rb/apidocs/"/>
+			<fileset dir="${src.dir}">
+				<include name="MonoBugs/*.java" />
+				<include name="org/json/simple/*.java" />
+				<include name="org/json/simple/parser/*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<target name="MonoBugs" depends="build">
+		<manifestclasspath property="MonoBugs.classpath" jarfile="${dist.dir}/MonoBugs.jar">
+			<classpath refid="compile.classpath"/>
+     		</manifestclasspath>		
+	        <jar destfile="${dist.dir}/MonoBugs.jar" basedir="${build.dir}">
+			<fileset file="${src.dir}/MonoBugs/plugin.yml"/>
+                        <manifest>
+				<attribute name="Class-Path" value="${MonoBugs.classpath}"/>
+                        </manifest>
+                </jar>
+        </target>
+
+
+	<target name="main" depends="build,MonoBugs,docs">
+		<description> Main target</description>
+	</target>
+
+</project>

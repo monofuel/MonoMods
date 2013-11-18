@@ -58,7 +58,19 @@
         </target>
 
 
-	<target name="main" depends="build,MonoBugs,docs">
+	<target name="MonoChat" depends="build">
+		<manifestclasspath property="MonoChat.classpath" jarfile="${dist.dir}/MonoChat.jar">
+			<classpath refid="compile.classpath"/>
+     		</manifestclasspath>		
+	        <jar destfile="${dist.dir}/MonoChat.jar" basedir="${build.dir}">
+			<fileset file="${src.dir}/MonoChat/plugin.yml"/>
+                        <manifest>
+				<attribute name="Class-Path" value="${MonoChat.classpath}"/>
+                        </manifest>
+                </jar>
+        </target>
+
+	<target name="main" depends="build,MonoBugs,MonoChat,docs">
 		<description> Main target</description>
 	</target>
 

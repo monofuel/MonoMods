@@ -96,7 +96,20 @@
                 </jar>
         </target>
 
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,docs">
+
+	<target name="MonoMobs" depends="build">
+		<manifestclasspath property="MonoMobs.classpath" jarfile="${dist.dir}/MonoMobs.jar">
+			<classpath refid="compile.classpath"/>
+     		</manifestclasspath>		
+	        <jar destfile="${dist.dir}/MonoMobs.jar" basedir="${build.dir}">
+			<fileset file="${src.dir}/MonoMobs/plugin.yml"/>
+                        <manifest>
+				<attribute name="Class-Path" value="${MonoMobs.classpath}"/>
+                        </manifest>
+                </jar>
+        </target>
+
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,docs">
 		<description> Main target</description>
 	</target>
 

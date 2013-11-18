@@ -135,7 +135,20 @@
                 </jar>
         </target>
 
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,docs">
+
+	<target name="Tribes" depends="build">
+		<manifestclasspath property="Tribes.classpath" jarfile="${dist.dir}/Tribes.jar">
+			<classpath refid="compile.classpath"/>
+     		</manifestclasspath>		
+	        <jar destfile="${dist.dir}/Tribes.jar" basedir="${build.dir}">
+			<fileset file="${src.dir}/Tribes/plugin.yml"/>
+                        <manifest>
+				<attribute name="Class-Path" value="${Tribes.classpath}"/>
+                        </manifest>
+                </jar>
+        </target>
+
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,docs">
 		<description> Main target</description>
 	</target>
 

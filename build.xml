@@ -83,7 +83,20 @@
                 </jar>
         </target>
 
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,docs">
+
+	<target name="MonoLocks" depends="build">
+		<manifestclasspath property="MonoLocks.classpath" jarfile="${dist.dir}/MonoLocks.jar">
+			<classpath refid="compile.classpath"/>
+     		</manifestclasspath>		
+	        <jar destfile="${dist.dir}/MonoLocks.jar" basedir="${build.dir}">
+			<fileset file="${src.dir}/MonoLocks/plugin.yml"/>
+                        <manifest>
+				<attribute name="Class-Path" value="${MonoLocks.classpath}"/>
+                        </manifest>
+                </jar>
+        </target>
+
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,docs">
 		<description> Main target</description>
 	</target>
 

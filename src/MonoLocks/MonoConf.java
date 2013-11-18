@@ -1,4 +1,4 @@
-package japura.MonoChat;
+package japura.MonoLocks;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,14 +17,11 @@ public class MonoConf {
 	
 	private JSONObject config = null;
 	private String confDir = "";
+	private static String confName = "conf.json";
 	private boolean configError = false;
 	
 	public static void init() {
 		defaults = new JSONObject();
-		defaults.put("server","irc.japura.net");
-		defaults.put("channel","#minecraft");
-		defaults.put("username","MineBot");
-		defaults.put("port",6667);
 		//default settings go here
 		//defaults.put("world", "world");
 		//defaults.put("threads",4);
@@ -33,7 +30,7 @@ public class MonoConf {
 	}
 
 	public MonoConf(String dir) {
-		this(dir,"conf.json");
+		this(dir,confName);
 	}
 	
 	public MonoConf(String dir, String configName) {
@@ -45,14 +42,14 @@ public class MonoConf {
 				confDir.mkdir();
 			}
 			popNewConf();
-			MonoChat.log("creating new config: " + dir + "/" + configName);
+			MonoLocks.log("creating new config: " + dir + "/" + configName);
 		} else {
 			JSONParser parser = new JSONParser();
 			try {
 				config = (JSONObject) parser.parse(new FileReader(confFile));
 				checkNewOptions();
 				configError=false;
-				MonoChat.log("config successfully loaded");
+				MonoLocks.log("config successfully loaded");
 			} catch (IOException | ParseException e) {
 				
 				/*
@@ -62,7 +59,7 @@ public class MonoConf {
 				 * disable the plugin the config is NOT
 				 * written out to file. 
 				 */
-				MonoChat.log("Error reading config file");
+				MonoLocks.log("Error reading config file");
 				configError = true;
 				popNewConf();
 				e.printStackTrace();
@@ -74,7 +71,7 @@ public class MonoConf {
 	public void close() {
 		if (!configError && config != null) {
 			try {
-				File confFile = new File(confDir + ("/conf.json"));
+				File confFile = new File(confDir + "/" + confName);
 				PrintWriter confWriter = new PrintWriter(confFile);
 				
 				//separate each value by \n to make it user-friendly
@@ -89,11 +86,11 @@ public class MonoConf {
 				}
 					
 				confWriter.close();
-				MonoChat.log("config successfully saved");
+				MonoLocks.log("config successfully saved");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
-				MonoChat.log("Error writing to file");
-				MonoChat.log("Either delete file or fix error");
+				MonoLocks.log("Error writing to file");
+				MonoLocks.log("Either delete file or fix error");
 			}
 		}
 	}
@@ -136,6 +133,6 @@ public class MonoConf {
 			}
 		}
 		if (change)
-			MonoChat.log("defaults have been loaded for new config options");
+			MonoLocks.log("defaults have been loaded for new config options");
 	}
 }

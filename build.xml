@@ -70,7 +70,20 @@
                 </jar>
         </target>
 
-	<target name="main" depends="build,MonoBugs,MonoChat,docs">
+
+	<target name="MonoCities" depends="build">
+		<manifestclasspath property="MonoCities.classpath" jarfile="${dist.dir}/MonoCities.jar">
+			<classpath refid="compile.classpath"/>
+     		</manifestclasspath>		
+	        <jar destfile="${dist.dir}/MonoCities.jar" basedir="${build.dir}">
+			<fileset file="${src.dir}/MonoCities/plugin.yml"/>
+                        <manifest>
+				<attribute name="Class-Path" value="${MonoCities.classpath}"/>
+                        </manifest>
+                </jar>
+        </target>
+
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,docs">
 		<description> Main target</description>
 	</target>
 

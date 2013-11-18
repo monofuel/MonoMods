@@ -109,7 +109,20 @@
                 </jar>
         </target>
 
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,docs">
+
+	<target name="MonoPerms" depends="build">
+		<manifestclasspath property="MonoPerms.classpath" jarfile="${dist.dir}/MonoPerms.jar">
+			<classpath refid="compile.classpath"/>
+     		</manifestclasspath>		
+	        <jar destfile="${dist.dir}/MonoPerms.jar" basedir="${build.dir}">
+			<fileset file="${src.dir}/MonoPerms/plugin.yml"/>
+                        <manifest>
+				<attribute name="Class-Path" value="${MonoPerms.classpath}"/>
+                        </manifest>
+                </jar>
+        </target>
+
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,docs">
 		<description> Main target</description>
 	</target>
 

@@ -1,0 +1,9 @@
+name: MonoPerms
+main: japura.MonoPerms.MonoPerms
+version: 0.01
+commands:
+    perm:
+        description: primary MonoPerms command. use /perm help for info
+        usage: /perm help
+        permission: perm
+        permissions-message: You don't have permission

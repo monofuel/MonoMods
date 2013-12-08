@@ -29,9 +29,9 @@ public class LockCreateListener implements Listener{
 			e.setCancelled(true);
 			return;
 		}
-		
+
 		String[] lines = e.getLines();
-		if (lines[0].contains("[private]")) {
+		if (lines[0].toLowerCase().equals("[private]")) {
 			//this is a lock sign
 			
 			

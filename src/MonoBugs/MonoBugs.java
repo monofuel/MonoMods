@@ -213,6 +213,7 @@ public class MonoBugs extends JavaPlugin{
 		String report;
 		int bugsOnPage = 5;
 		if (myPage == pages) bugsOnPage = myBugs.size() % 5;
+		if (bugsOnPage == 0) bugsOnPage = 5;
 		for (int i = bugsOnPage-1; i >= 0; i--) {
 			report = myBugs.get((5*(myPage-1) + i)).toString();
 			sender.sendMessage(report);

@@ -75,7 +75,7 @@ public class Tribes extends JavaPlugin{
 			if (group.getLeader() == null) log("leader is null");
 			if (group.getLeader().getPlayer() == null) log("player is null");
 			item.put("leader" , group.getLeader().getPlayer());
-			
+
 			for (TribePlayer user : group.getPlayers()) {
 				playerList.add(user.getPlayer());
 			}
@@ -108,10 +108,14 @@ public class Tribes extends JavaPlugin{
 			String leader = (String) item.get("leader");
 			if (leader == null) log("leader is null");
 			//log(leader);
-			TribePlayerFactory.createNewPlayer(leader);
+			TribePlayer leaderPlayer = TribePlayerFactory.createNewPlayer(leader);
 			
 			TribeFactory.createNewTribe(name,leader);
 			Tribe group = getTribe(name);
+			//TODO: cludgy fix
+			leaderPlayer.setTribe(group);
+			group.setLeader(leaderPlayer);
+			
 			
 			JSONArray playerList = (JSONArray) item.get("players");
 			for (int i = 0; i < playerList.size(); i++) {
@@ -165,6 +169,8 @@ public class Tribes extends JavaPlugin{
 			config.close();
 			config = new MonoConf(configLoc);
 			saveData();
+			data.close();
+			data = new TribeData(configLoc);
 			return true;
 		} else if (args[0].equalsIgnoreCase("list")) {
 			StringBuilder list = new StringBuilder();
@@ -286,11 +292,10 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("Spaces are not allowed in a tribe name");
 				return true;
 			}
-			String name = args[1];
+			String name = args[1].toLowerCase();
 			if (getTribe(name) != null) {
 				sender.sendMessage("Tribe already exists");
 			}
-			
 			Player founder = Bukkit.getPlayer(sender.getName());
 			TribeFactory.createNewTribe(name,founder);
 			sender.sendMessage("Tribe " + name + " created");

@@ -37,6 +37,7 @@ public class Tribe {
 		emeralds.add(em);
 	}
 	public void checkEmerald(Block em) {
+		if (!em.getChunk().isLoaded()) return;
 		if (emeralds.contains(em)){
 			if (em.getType() != Material.EMERALD_BLOCK) emeralds.remove(em);
 		}
@@ -55,8 +56,8 @@ public class Tribe {
 		long claimSize = (long) Tribes.getConf().getConf("ClaimSize");
 		boolean YClaim = (boolean) Tribes.getConf().getConf("YAxisClaim");
 		for (Block em : emeralds) {
+			if (!loc.getWorld().equals(em.getWorld())) continue;	
 			tmp = em.getLocation().subtract(loc);
-			
 			if (Math.abs(tmp.getBlockX()) < claimSize &&
 			    Math.abs(tmp.getBlockZ()) < claimSize) {
 				if (YClaim) {
@@ -87,9 +88,13 @@ public class Tribe {
 	}
 	
 	public void addPlayer(TribePlayer user) {
-		if (users.contains(user)) {
-			user.setTribe(this);
-			return;
+		//TODO:
+		//for loop added becuse contains didn't work right
+		for (TribePlayer item : users) {
+			if (item.getPlayer().equalsIgnoreCase(user.getPlayer())) {
+				user.setTribe(this);
+				return;
+			}
 		}
 		users.add(user);
 		user.setTribe(this);

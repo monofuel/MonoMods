@@ -41,8 +41,10 @@ public class TribeProtectListener implements Listener {
 		
 		//get faction ownership of to location
 		Tribe fromGroup = TribeProtect.getBlockOwnership(from);
+
 		//get ownership of from location
 		Tribe toGroup = TribeProtect.getBlockOwnership(to);
+
 		//if !=, tell the user where
 		//they are entering.
 		if (fromGroup != toGroup) {

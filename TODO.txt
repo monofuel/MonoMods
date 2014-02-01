@@ -30,3 +30,16 @@ java.lang.NullPointerException
         at japura.MonoPerms.MonoPerms.onEnable(Unknown Source)
         at org.bukkit.plugin.java.JavaPlugin.setEnabled(JavaPlugin.java:217)
 
+Error with monocities:
+
+	div by 0 if there are no buildings available
+
+Error with monochat:
+	connecting to null:0
+	on initial start. requires a full restart to fix.
+
+Error with tribes:
+	acted funky with "could not pass event" on first load
+
+general plugin thing:
+	periodically flush to config

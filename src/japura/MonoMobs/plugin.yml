@@ -1,0 +1,9 @@
+name: MonoMobs
+main: japura.MonoMobs
+version: 0.01
+commands:
+    monomobs:
+        description: primary MonoMobs command. use /monomobs help for info
+        usage: /monomobs
+        permission: Monomobs
+        permissions-message: You don't have permission

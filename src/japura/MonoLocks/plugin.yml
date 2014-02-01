@@ -1,0 +1,9 @@
+name: MonoLocks
+main: japura.MonoLocks.MonoLocks
+version: 1.00
+commands:
+    MonoLocks:
+        description: primary MonoLocks command. use /MonoLocks help for info
+        usage: /MonoLocks
+        permission: MonoLocks
+        permissions-message: You don't have permission

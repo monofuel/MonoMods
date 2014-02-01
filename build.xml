@@ -1,4 +1,4 @@
-<project name="Cosmic-Infliction" default="main" basedir=".">
+<project name="Japura-Tribes" default="main" basedir=".">
 
 
 	<property name="src.dir" location="src/" />
@@ -38,7 +38,7 @@
 			</classpath>
 			<link href="http://jd.bukkit.org/rb/apidocs/"/>
 			<fileset dir="${src.dir}">
-				<include name="MonoBugs/*.java" />
+				<include name="japura/*/*.java" />
 				<include name="org/json/simple/*.java" />
 				<include name="org/json/simple/parser/*.java" />
 			</fileset>
@@ -50,7 +50,7 @@
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
 	        <jar destfile="${dist.dir}/MonoBugs.jar" basedir="${build.dir}">
-			<fileset file="${src.dir}/MonoBugs/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoBugs/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoBugs.classpath}"/>
                         </manifest>
@@ -63,7 +63,7 @@
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
 	        <jar destfile="${dist.dir}/MonoChat.jar" basedir="${build.dir}">
-			<fileset file="${src.dir}/MonoChat/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoChat/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoChat.classpath}"/>
                         </manifest>
@@ -76,7 +76,7 @@
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
 	        <jar destfile="${dist.dir}/MonoCities.jar" basedir="${build.dir}">
-			<fileset file="${src.dir}/MonoCities/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoCities/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoCities.classpath}"/>
                         </manifest>
@@ -89,7 +89,7 @@
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
 	        <jar destfile="${dist.dir}/MonoLocks.jar" basedir="${build.dir}">
-			<fileset file="${src.dir}/MonoLocks/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoLocks/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoLocks.classpath}"/>
                         </manifest>
@@ -102,7 +102,7 @@
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
 	        <jar destfile="${dist.dir}/MonoMobs.jar" basedir="${build.dir}">
-			<fileset file="${src.dir}/MonoMobs/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoMobs/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoMobs.classpath}"/>
                         </manifest>
@@ -115,7 +115,7 @@
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
 	        <jar destfile="${dist.dir}/MonoPerms.jar" basedir="${build.dir}">
-			<fileset file="${src.dir}/MonoPerms/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoPerms/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoPerms.classpath}"/>
                         </manifest>
@@ -128,7 +128,7 @@
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
 	        <jar destfile="${dist.dir}/NoWither.jar" basedir="${build.dir}">
-			<fileset file="${src.dir}/NoWither/plugin.yml"/>
+			<fileset file="${src.dir}/japura/NoWither/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${NoWither.classpath}"/>
                         </manifest>
@@ -141,7 +141,7 @@
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
 	        <jar destfile="${dist.dir}/Tribes.jar" basedir="${build.dir}">
-			<fileset file="${src.dir}/Tribes/plugin.yml"/>
+			<fileset file="${src.dir}/japura/Tribes/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${Tribes.classpath}"/>
                         </manifest>

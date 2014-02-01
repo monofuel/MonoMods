@@ -1,9 +1,0 @@
-name: MonoChat
-main: japura.MonoChat.MonoChat
-version: 1.00
-commands:
-    monochat:
-        description: primary monochat command. use /monochat help for info
-        usage: /monochat
-        permission: monochat
-        permissions-message: You don't have permission

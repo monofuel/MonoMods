@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cp dist/* ~/current/plugins/
+cp dist/* test/plugins/

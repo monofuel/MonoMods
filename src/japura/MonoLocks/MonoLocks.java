@@ -205,7 +205,7 @@ public class MonoLocks extends JavaPlugin{
 		for (Sign cur : signs) {
 			for (String line : cur.getLines()) {
 				if (line.length() == 0) continue;
-				if (line.equals("[private]")){
+				if (line.equalsIgnoreCase("[private]")){
 					isPrivate = true;
 					continue;
 				}

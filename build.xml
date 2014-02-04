@@ -49,7 +49,8 @@
 		<manifestclasspath property="MonoBugs.classpath" jarfile="${dist.dir}/MonoBugs.jar">
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/MonoBugs.jar" basedir="${build.dir}">
+	        <jar destfile="${dist.dir}/MonoBugs.jar" basedir="${build.dir}"
+		     defaultexcludes="yes" includes="japura/MonoBugs/*">
 			<fileset file="${src.dir}/japura/MonoBugs/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoBugs.classpath}"/>
@@ -62,8 +63,10 @@
 		<manifestclasspath property="MonoChat.classpath" jarfile="${dist.dir}/MonoChat.jar">
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/MonoChat.jar" basedir="${build.dir}">
+	        <jar destfile="${dist.dir}/MonoChat.jar" basedir="${build.dir}"
+		     defaultexcludes="yes" includes="japura/MonoChat/*">
 			<fileset file="${src.dir}/japura/MonoChat/plugin.yml"/>
+
                         <manifest>
 				<attribute name="Class-Path" value="${MonoChat.classpath}"/>
                         </manifest>
@@ -75,7 +78,8 @@
 		<manifestclasspath property="MonoCities.classpath" jarfile="${dist.dir}/MonoCities.jar">
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/MonoCities.jar" basedir="${build.dir}">
+	        <jar destfile="${dist.dir}/MonoCities.jar" basedir="${build.dir}"
+		     defaultexcludes="yes" includes="japura/MonoCities/*">
 			<fileset file="${src.dir}/japura/MonoCities/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoCities.classpath}"/>
@@ -88,7 +92,8 @@
 		<manifestclasspath property="MonoLocks.classpath" jarfile="${dist.dir}/MonoLocks.jar">
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/MonoLocks.jar" basedir="${build.dir}">
+	        <jar destfile="${dist.dir}/MonoLocks.jar" basedir="${build.dir}"
+		     defaultexcludes="yes" includes="japura/MonoLocks/*">
 			<fileset file="${src.dir}/japura/MonoLocks/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoLocks.classpath}"/>
@@ -101,7 +106,8 @@
 		<manifestclasspath property="MonoMobs.classpath" jarfile="${dist.dir}/MonoMobs.jar">
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/MonoMobs.jar" basedir="${build.dir}">
+	        <jar destfile="${dist.dir}/MonoMobs.jar" basedir="${build.dir}"
+		     defaultexcludes="yes" includes="japura/MonoMobs/*">
 			<fileset file="${src.dir}/japura/MonoMobs/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoMobs.classpath}"/>
@@ -114,7 +120,8 @@
 		<manifestclasspath property="MonoPerms.classpath" jarfile="${dist.dir}/MonoPerms.jar">
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/MonoPerms.jar" basedir="${build.dir}">
+	        <jar destfile="${dist.dir}/MonoPerms.jar" basedir="${build.dir}"
+		     defaultexcludes="yes" includes="japura/MonoPerms/*">
 			<fileset file="${src.dir}/japura/MonoPerms/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoPerms.classpath}"/>
@@ -127,7 +134,8 @@
 		<manifestclasspath property="NoWither.classpath" jarfile="${dist.dir}/NoWither.jar">
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/NoWither.jar" basedir="${build.dir}">
+	        <jar destfile="${dist.dir}/NoWither.jar" basedir="${build.dir}"
+		     defaultexcludes="yes" includes="japura/NoWither/*">
 			<fileset file="${src.dir}/japura/NoWither/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${NoWither.classpath}"/>
@@ -140,7 +148,8 @@
 		<manifestclasspath property="Tribes.classpath" jarfile="${dist.dir}/Tribes.jar">
 			<classpath refid="compile.classpath"/>
      		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/Tribes.jar" basedir="${build.dir}">
+	        <jar destfile="${dist.dir}/Tribes.jar" basedir="${build.dir}"
+		     defaultexcludes="yes" includes="japura/Tribes/*">
 			<fileset file="${src.dir}/japura/Tribes/plugin.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${Tribes.classpath}"/>
@@ -148,7 +157,18 @@
                 </jar>
         </target>
 
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,docs">
+
+	<target name="MonoUtil" depends="build">
+		<manifestclasspath property="MonoUtil.classpath" jarfile="${dist.dir}/MonoUtil.jar">
+			<classpath refid="compile.classpath"/>
+     		</manifestclasspath>		
+	        <jar destfile="${dist.dir}/MonoUtil.jar" basedir="${build.dir}"
+		     defaultexcludes="yes" includes="japura/MonoUtil/*">
+			<fileset file="${src.dir}/japura/MonoUtil/plugin.yml"/>
+                </jar>
+        </target>
+
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,MonoUtil,docs">
 		<description> Main target</description>
 	</target>
 

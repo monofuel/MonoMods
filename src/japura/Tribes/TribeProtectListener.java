@@ -172,7 +172,7 @@ public class TribeProtectListener implements Listener {
 		Tribe group;
 		
 		for (Entity tnt : tntIgnites.toArray(new Entity[tntIgnites.size()])) {
-			if (event.getEntity().equals(tnt)) {
+			if (event.getEntity().equals(tnt) || event.getEntityType().equals(EntityType.CREEPER)) {
 				//Tribes.log("ignite matched");
 				for(Block item : array) {
 					group = TribeProtect.getBlockOwnership(item.getLocation());

@@ -43,6 +43,9 @@ public class Tribes extends JavaPlugin{
 	}
 
 	public void onEnable() {
+
+		//TODO: probably should log and crashing plugin instead of using asserts.
+
 		//set the logger
 		assert TribeLogger == null;
 		TribeLogger = getLogger();

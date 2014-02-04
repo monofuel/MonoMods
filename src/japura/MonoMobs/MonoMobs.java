@@ -1,4 +1,4 @@
-package japura;
+package japura.MonoMobs;
 
 //TODO
 //boolean config options
@@ -34,7 +34,12 @@ public class MonoMobs extends JavaPlugin{
 		config = new MonoConf("plugins/MonoMobs");
 		
 		//check if we want wither disabled, and if so, disable
-		if((boolean) config.getConf("wither disabled")) {
+		//sometimes the boolean gets saved as a string to the config?
+		//not sure why, but might as well be prepared for it.
+		Object wither_setting = config.getConf("wither disabled");
+		
+		if( (wither_setting instanceof Boolean && wither_setting == true)
+		  || (wither_setting instanceof String && ((String) wither_setting).equalsIgnoreCase("true")) ) {
 			//create anti-wither listener
 			log("wither disabled");
 			new WitherListener(this);

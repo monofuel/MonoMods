@@ -1,5 +1,5 @@
 name: MonoMobs
-main: japura.MonoMobs
+main: japura.MonoMobs.MonoMobs
 version: 0.01
 commands:
     monomobs:

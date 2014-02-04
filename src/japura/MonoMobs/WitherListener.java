@@ -1,4 +1,4 @@
-package japura;
+package japura.MonoMobs;
 
 
 import org.bukkit.entity.LivingEntity;

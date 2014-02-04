@@ -1,9 +1,27 @@
+configs not always loading default settings right
+
+Bug help
+
 vote rewards
+
+strubs for unused commands
+eg:
+	/kit
+
+monomobs:
+sometimes :true gets changed to :"true" in json config
+zedcheckrunner errors
+	
 
 anti spawnkilling
 
 kick from tribe
 
+teleport diamonds
+
+mailing system
+
+donor colors
 
 Error enabling MonoMobs
 

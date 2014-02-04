@@ -1,4 +1,4 @@
-package japura;
+package japura.MonoMobs;
 
 import java.io.File;
 import java.io.FileNotFoundException;

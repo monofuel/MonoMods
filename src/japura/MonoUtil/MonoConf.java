@@ -116,7 +116,10 @@ public class MonoConf {
 				
 				//separate each value by \n to make it user-friendly
 				String confString = config.toJSONString();
-				String[] confArray = confString.split(",");
+
+				//big ugly .split shamelessly stolen from stack overflow
+				//it splits by commas not included in quotes
+				String[] confArray = confString.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				for (int i = 0; i < confArray.length; i++) {
 					if (i != confArray.length-1) {
 					confWriter.println(confArray[i] + ",");
@@ -134,19 +137,32 @@ public class MonoConf {
 			}
 		}
 	}
-	//TODO: IMPORVE THIS
-	private volatile boolean lock = false;
 	
 	public Object getConf(Object key) {
-		Object item;
-		while (true) {
-			if (lock == false) {
-				lock = true;
-				item = config.get(key);
-				lock = false;
-				return item;
-			}
+
+		if (key == null) {
+			//garbage in and garbage out
+			StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+			String methodName = stackTraceElements[stackTraceElements.length-1].getMethodName();
+			int lineNo = stackTraceElements[stackTraceElements.length-1].getLineNumber();
+			logger.log(Level.INFO,"method " + methodName + " called getConf at line " + lineNo + " and gave null");
+			return null;
 		}
+
+		Object item;
+		item = config.get(key);
+
+		//if we're returning null, let's do some logging.
+		if (item == null) {
+			StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+			logger.log(Level.INFO,"key: " + key);
+			String methodName = stackTraceElements[stackTraceElements.length-1].getMethodName();
+			int lineNo = stackTraceElements[stackTraceElements.length-1].getLineNumber();
+			logger.log(Level.INFO,"method " + methodName + " called getConf at line " + lineNo + " and we're returning null");
+		}
+		return item;
+
+	
 	}
 	
 	/*

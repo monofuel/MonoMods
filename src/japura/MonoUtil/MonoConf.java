@@ -68,6 +68,7 @@ public class MonoConf {
 		//remember the plugin that owns this config, and get its logger
 		this.master = plugin;
 		this.logger = master.getLogger();
+		this.defaults = defaults;
 
 		//TODO modularize this better
 		this.confDir = confDir;
@@ -101,10 +102,6 @@ public class MonoConf {
 				e.printStackTrace();
 			}
 		}
-
-
-		//assign the default configuration options
-		this.defaults = defaults;
 	}
 
 	

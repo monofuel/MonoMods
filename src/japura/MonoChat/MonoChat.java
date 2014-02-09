@@ -22,7 +22,7 @@ public class MonoChat extends JavaPlugin{
 		JSONObject defaults = new JSONObject();
 
 		defaults.put("server","irc.japura.net");
-		defaults.put("channel","#minecraft");
+		defaults.put("channel","#minecrafttesting");
 		defaults.put("username","TestingBot");
 		defaults.put("port",6667L);
 		return defaults;

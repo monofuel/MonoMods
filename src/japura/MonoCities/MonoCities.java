@@ -17,15 +17,22 @@ public class MonoCities extends JavaPlugin{
 	private static final String configLoc = "plugins/MonoCities";
 	private static WorldInit listener = null;
 
+	//used to disable the plugin before it fully loads if it 
+	//cannot find any schematic files.
+	private boolean disabled = true;
+
 	public void onEnable() {
 		citiesLogger = getLogger();
 		
 		//load configuration
 		MonoConf.init();
 		config = new MonoConf(configLoc);
-		
+
+		disabled = false;
 		pop = new CityPopulator(this);
-		
+		//if no schematics are found, disabled will be set true.
+		//this means we should probably not continue enabling.
+		if (disabled) return;
 		
 		World world = Bukkit.getWorld("World");
 		if (world == null) {
@@ -40,12 +47,15 @@ public class MonoCities extends JavaPlugin{
 	public void onDisable() {
 		
 		//remove populator
-		Bukkit.getWorld("World").getPopulators().remove(pop);
+		//do an extra check to make sure we aren't being disabled
+		//before the world is initialized
+		if (Bukkit.getWorld("World") != null)
+			Bukkit.getWorld("World").getPopulators().remove(pop);
 		
 		//write config back out to file
 		//if there were no errors reading config in
-
-		config.close();
+		if (config != null)
+			config.close();
 		if (listener != null)
 			listener.stop();
 		
@@ -55,6 +65,7 @@ public class MonoCities extends JavaPlugin{
 		
 		log("MonoCities has been disabled");
 		citiesLogger = null;
+		disabled = true;
 	}
 	
 	

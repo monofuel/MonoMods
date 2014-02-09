@@ -1,25 +1,38 @@
 package japura.MonoChat;
 
+import japura.MonoUtil.MonoConf;
+
 import java.util.logging.Logger;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 public class MonoChat extends JavaPlugin{
 	
 	private static Logger templateLogger = null;
 	
 	private static MonoConf config = null;
-	private static final String configLoc = "plugins/MonoChat";
 	private static IRCListener irc;
+
+	public JSONObject genDefaultConf() {
+		JSONObject defaults = new JSONObject();
+
+		defaults.put("server","irc.japura.net");
+		defaults.put("channel","#minecraft");
+		defaults.put("username","TestingBot");
+		defaults.put("port",6667L);
+		return defaults;
+	}
 
 	public void onEnable() {
 		templateLogger = getLogger();
 		
 		//load configuration
-		MonoConf.init();
-		config = new MonoConf(configLoc);
+		config = new MonoConf(this,genDefaultConf());
 		
 		log("MonoChat has been enabled");
 		
@@ -49,11 +62,11 @@ public class MonoChat extends JavaPlugin{
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
 				//GARBAGE EVERYWHERE
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
 				config.close();
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
 				String help = "Help stuff goes here";

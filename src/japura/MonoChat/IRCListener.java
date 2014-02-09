@@ -34,9 +34,7 @@ public class IRCListener implements Listener {
 	
 	private void init(JavaPlugin plugin) {
 		nick = (String) MonoChat.getConf().getConf("username");
-		//getConf returns an int, not a long.
-		long tmp = (int) MonoChat.getConf().getConf("port");
-		port = (int) tmp;
+		port = (int) (long) MonoChat.getConf().getConf("port");
 		host = (String) MonoChat.getConf().getConf("server");
 		channel = (String) MonoChat.getConf().getConf("channel");
 		

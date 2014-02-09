@@ -1,5 +1,6 @@
 package japura.MonoMobs;
 
+import japura.MonoUtil.MonoConf;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -70,7 +71,6 @@ public class ZedCheckRunner extends BukkitRunnable{
 		if (Bukkit.getWorld((String) config.getConf("world")).getTime() < 13187 &&
 				Bukkit.getWorld((String) config.getConf("world")).getTime() > 22812) return;
 	
-		
 		maxLight = (long) config.getConf("max light to spawn");
 		
 		

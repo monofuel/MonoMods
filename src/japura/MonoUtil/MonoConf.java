@@ -71,13 +71,15 @@ public class MonoConf {
 		this.defaults = defaults;
 
 		//TODO modularize this better
+		confDir = "plugins/" + confDir;
 		this.confDir = confDir;
+		this.confName = configName;
 		File confFile = new File(confDir + "/" +  configName);
 		File folder = new File(confDir);
+		if (!folder.exists()) {
+			folder.mkdir();
+		}
 		if (!confFile.exists()) {
-			if (!folder.isDirectory()) {
-				folder.mkdir();
-			}
 			popNewConf();
 			logger.log(Level.INFO,"creating new config: " + confDir + "/" + configName);
 		} else {

@@ -44,10 +44,14 @@ public class MonoCities extends JavaPlugin{
 		
 		//write config back out to file
 		//if there were no errors reading config in
+
 		config.close();
 		if (listener != null)
 			listener.stop();
-		pop.close();
+		
+		//If no schematics are found, pop will not have been initialized.
+		if (pop != null)
+			pop.close();
 		
 		log("MonoCities has been disabled");
 		citiesLogger = null;

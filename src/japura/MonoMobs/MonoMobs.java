@@ -1,8 +1,6 @@
 package japura.MonoMobs;
 
-//TODO
-//boolean config options
-
+import japura.MonoUtil.MonoConf;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -15,6 +13,8 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
 
 public class MonoMobs extends JavaPlugin{
 
@@ -22,6 +22,22 @@ public class MonoMobs extends JavaPlugin{
 	private static MonoConf config = null;
 	private static ZedCheckRunner zedChecker;
 
+	public JSONObject genDefaultConf() {
+		JSONObject defaults =  new JSONObject();
+		defaults.put("world","world");
+		defaults.put("threads",4L);
+		defaults.put("zombie cap",2000L);
+		defaults.put("zed per player",50L);
+		defaults.put("zed distance",100L);
+		defaults.put("zed y distance",50L);
+		defaults.put("zed spawn tick offset",40L);
+		defaults.put("max light to spawn",7L);
+		defaults.put("zed spawn tick length",52L);
+		//TODO boolean conf options
+		defaults.put("wither disabled","true");
+
+		return defaults;
+	}
 	
 	public void onEnable() {
 		mobLogger = getLogger();
@@ -30,8 +46,7 @@ public class MonoMobs extends JavaPlugin{
 		new WitherListener(this);
 		
 		//load configuration
-		MonoConf.init();
-		config = new MonoConf("plugins/MonoMobs");
+		config = new MonoConf(this,genDefaultConf());
 		
 		//check if we want wither disabled, and if so, disable
 		//sometimes the boolean gets saved as a string to the config?
@@ -84,11 +99,11 @@ public class MonoMobs extends JavaPlugin{
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
 				//GARBAGE EVERYWHERE
-				config = new MonoConf("plugins/MonoMobs");
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
 				config.close();
-				config = new MonoConf("plugins/MonoMobs");
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
 				String help = "Welcome to MonoMobs! Here are the available MonoMob commands. " +

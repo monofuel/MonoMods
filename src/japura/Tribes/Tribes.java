@@ -85,18 +85,21 @@ public class Tribes extends JavaPlugin{
 		//set a spawn point
 		if ((boolean) config.getConf("Tribe Spawn")) {
 			
-			int x = (int) config.getConf("SpawnX");
-			int y = (int) config.getConf("SpawnY");
-			int z = (int) config.getConf("SpawnZ");
-
-			World world = Bukkit.getWorld("World");
-			if (world != null) {
+			//TODO: why must i do these crazy casts
+			int x = (int) ((long) config.getConf("SpawnX"));
+			int y = (int) ((long) config.getConf("SpawnY"));
+			int z = (int) ((long) config.getConf("SpawnZ"));
+			//TODO:should set a config option for this
+			World world = Bukkit.getWorld("world");
+			if (world == null) {
 				log("invalid world!");
 			} else {
 				log("spawn set to " + x + "," + y + "," + z);
 				world.setSpawnLocation(x,y,z);
 			}
 			
+		} else {
+			log("not using tribes to set world spawn");
 		}
 
 		//TODO:teleport listener

@@ -1,5 +1,7 @@
 package japura.MonoBugs;
 
+import japura.MonoUtil.MonoConf;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -16,18 +18,28 @@ public class MonoBugs extends JavaPlugin{
 	
 	private static MonoConf config = null;
 	private static BugData data = null;
+	//should not be needed anymore
+	//configLoc is still used for BugData
 	private static final String configLoc = "plugins/MonoBugs";
 	enum status {open,fixed,closed,spam};
 	
 	HashMap<Integer,bug> bugs = new HashMap<Integer,bug>();
 	int bugCount = 0;
 
+	public JSONObject genDefaultConf() {
+
+		JSONObject defaults = new JSONObject();
+
+		//this is where i'd put config options. IF I HAD THEM
+
+		return defaults;
+	}
+
 	public void onEnable() {
 		bugsLogger = getLogger();
 		
 		//load configuration
-		MonoConf.init();
-		config = new MonoConf(configLoc);
+		config = new MonoConf(this,genDefaultConf());
 		data.init();
 		data = new BugData(configLoc);
 		loadData();
@@ -130,11 +142,11 @@ public class MonoBugs extends JavaPlugin{
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
 				//GARBAGE EVERYWHERE
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
 				config.close();
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
 				String help = "Help stuff goes here";

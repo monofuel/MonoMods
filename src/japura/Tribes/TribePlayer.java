@@ -8,6 +8,7 @@ public class TribePlayer {
 	
 	public TribePlayer(Player user) {
 		this.user = user.getName();
+		
 	}
 	
 	public TribePlayer(Player user, Tribe group) {
@@ -32,4 +33,5 @@ public class TribePlayer {
 	public Tribe getTribe() {
 		return group;
 	}
+
 }

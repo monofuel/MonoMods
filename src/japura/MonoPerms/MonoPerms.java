@@ -1,5 +1,9 @@
 package japura.MonoPerms;
 
+import japura.MonoUtil.MonoConf;
+
+import org.json.simple.JSONObject;
+
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -23,13 +27,20 @@ public class MonoPerms extends JavaPlugin{
 	private static JavaPlugin plugin;
 	private static final String configLoc = "plugins/MonoPerms";
 
+	public JSONObject genDefaultConf() {
+		JSONObject defaults = new JSONObject();
+
+		//this is where i'd put my config options. IF I HAD ANY
+		
+		return defaults;
+	}
+
 	public void onEnable() {
 		templateLogger = getLogger();
 		plugin = this;
 		
 		//load configuration
-		MonoConf.init();
-		config = new MonoConf(configLoc);
+		config = new MonoConf(this,genDefaultConf());
 		PermData.init();
 		data = new PermData(configLoc);
 		
@@ -86,12 +97,12 @@ public class MonoPerms extends JavaPlugin{
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
 				//GARBAGE EVERYWHERE
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				loadData();
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
 				config.close();
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
 				String help = "Help stuff goes here";

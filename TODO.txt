@@ -1,4 +1,8 @@
-configs not always loading default settings right
+configs not always loading default settings right //done, needs testing
+
+BIG ONE: unify command output paging. currently several plugins
+do it in several different ways. a unique solution should be created in
+monoutil.
 
 Bug help
 
@@ -10,12 +14,11 @@ eg:
 
 monomobs:
 sometimes :true gets changed to :"true" in json config
-zedcheckrunner errors
-	
+zedcheckrunner errors	
 
 anti spawnkilling
 
-kick from tribe
+kick from tribe //done, needs testing
 
 teleport diamonds
 

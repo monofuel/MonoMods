@@ -1,5 +1,9 @@
 package japura.NoWither;
 
+import japura.MonoUtil.MonoConf;
+
+import org.json.simple.JSONObject;
+
 import java.util.logging.Logger;
 
 import org.bukkit.command.Command;
@@ -13,14 +17,22 @@ public class NoWither extends JavaPlugin{
 	private static MonoConf config = null;
 	private static final String configLoc = "plugins/NoWither";
 
+	public JSONObject genDefaultConf() {
+		JSONObject defaults = new JSONObject();
+
+		//this is where default config settings go
+		defaults.put("wither disabled",true);
+		
+		return defaults;
+	}
+
 	public void onEnable() {
 		WitherLogger = getLogger();
 		
 		new WitherListener(this);
 		
 		//load configuration
-		MonoConf.init();
-		config = new MonoConf(configLoc);
+		config = new MonoConf(this,genDefaultConf());
 		
 		log("NoWither has been enabled");
 		
@@ -56,11 +68,11 @@ public class NoWither extends JavaPlugin{
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
 				//GARBAGE EVERYWHERE
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
 				config.close();
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
 				String help = "NoWither is configured from the config.\n" +

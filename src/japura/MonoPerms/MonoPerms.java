@@ -1,3 +1,11 @@
+/**
+ *      author: Monofuel
+ *      website: japura.net
+ *      this file is distributed under the modified BSD license
+ *      that should have been included with it.
+ */
+
+
 package japura.MonoPerms;
 
 import japura.MonoUtil.MonoConf;
@@ -15,6 +23,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.simple.JSONArray;
+
+/**
+ *	This plugin was built for the sake of having 100% custom plugins
+ *	for japura.net. i actually highly recommend against using this
+ *	for permissions, as there are currently no commands, and players
+ * 	have to be set in a picky json format.
+ */
 
 public class MonoPerms extends JavaPlugin{
 	

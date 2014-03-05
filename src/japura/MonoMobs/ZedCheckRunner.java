@@ -1,3 +1,23 @@
+/**
+ *      author: Monofuel
+ *      website: japura.net
+ *      this file is distributed under the modified BSD license
+ *      that should have been included with it.
+ */
+
+
+//ATTENTION ALL YE WHO COME
+//THAR BE DRAGONS.
+
+//this whole process was intended to be threaded, however
+//i quickly discovered that this was actually a terrible idea
+//as i could not actually spawn zombies in a multithreaded fashion.
+//threading is probably not even needed in this case, i just
+//was hoping to do it because i've seen poor performance with other
+//spawning plugins. A single-threaded solution should be benchmarked
+//against other potential multithread solutions.
+//TODO: clean up this stuff.
+
 package japura.MonoMobs;
 
 import japura.MonoUtil.MonoConf;

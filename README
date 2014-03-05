@@ -3,6 +3,8 @@
 This "MonoMods" package is a custom package of plugins for the japura.net server. In the interest of code quality, the complete code
 and build process will be public on github to encourage critiqueing and improvements.
 
+Unfortunately, some of this code was rushed together with the hopes to 'just get it working' and could use improvements.
+
 included files and directories:
 
 TODO.txt: list of things on the to-do list

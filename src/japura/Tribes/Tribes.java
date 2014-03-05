@@ -85,9 +85,9 @@ public class Tribes extends JavaPlugin{
 		//set a spawn point
 		if ((boolean) config.getConf("Tribe Spawn")) {
 			
-			int x = config.getConf("SpawnX");
-			int y = config.getConf("SpawnY");
-			int z = config.getConf("SpawnZ");
+			int x = (int) config.getConf("SpawnX");
+			int y = (int) config.getConf("SpawnY");
+			int z = (int) config.getConf("SpawnZ");
 
 			World world = Bukkit.getWorld("World");
 			if (world != null) {

@@ -83,6 +83,10 @@ public class TribeProtectListener implements Listener {
 		Tribe userGroup,group1,group2,group3,group4;
 		
 		userGroup = user.getTribe();
+		if (userGroup == null) {
+			event.getPlayer().sendMessage("You are not in a tribe");
+			return;
+		}
 		
 		long claimSize = (long) Tribes.getConf().getConf("ClaimSize");
 		loc = event.getBlock().getLocation();

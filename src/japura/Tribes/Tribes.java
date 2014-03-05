@@ -48,6 +48,10 @@ public class Tribes extends JavaPlugin{
 
 		defaults.put("ClaimSize",8);
 		defaults.put("YAxisClaim",false);
+		defaults.put("Tribe Spawn",false);
+		defaults.put("SpawnX",184);
+		defaults.put("SpawnY",77);
+		defaults.put("SpawnZ",255);
 		return defaults;
 
 	}
@@ -78,6 +82,22 @@ public class Tribes extends JavaPlugin{
 		protector = new TribeProtect(this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,200,200);
 		
+		//set a spawn point
+		if ((boolean) config.getConf("Tribe Spawn")) {
+			
+			long x = (long) config.getConf("SpawnX");
+			long y = (long) config.getConf("SpawnY");
+			long z = (long) config.getConf("SpawnZ");
+
+			World world = Bukkit.getWorld("World");
+			if (world != null) {
+				log("invalid world!");
+			} else {
+				world.setSpawnLocation((int)x,(int)y,(int)z);
+			}
+			
+		}
+
 		//TODO:teleport listener
 
 		//TODO: autosave runnable
@@ -190,6 +210,7 @@ public class Tribes extends JavaPlugin{
 			item.put("leader" , group.getLeader().getPlayer());
 			
 			for (TribePlayer user : group.getPlayers()) {
+				if (user == group.getLeader()) continue;
 				playerList.add(user.getPlayer());
 			}
 			
@@ -221,11 +242,11 @@ public class Tribes extends JavaPlugin{
 			String leader = (String) item.get("leader");
 			if (leader == null) log("leader is null");
 			//log(leader);
-			TribePlayerFactory.createNewPlayer(leader);
+			TribePlayer tribeLeader = TribePlayerFactory.createNewPlayer(leader);
 			
 			TribeFactory.createNewTribe(name,leader);
 			Tribe group = getTribe(name);
-			
+			group.addPlayer(tribeLeader);
 			JSONArray playerList = (JSONArray) item.get("players");
 			for (int i = 0; i < playerList.size(); i++) {
 				TribePlayer user = TribePlayerFactory.createNewPlayer((String) playerList.get(i));

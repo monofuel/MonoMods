@@ -1,7 +1,11 @@
 package japura.MonoLocks;
 
+import japura.MonoUtil.MonoConf;
+
 import java.util.ArrayList;
 import java.util.logging.Logger;
+
+import org.json.simple.JSONObject;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -22,13 +26,20 @@ public class MonoLocks extends JavaPlugin{
 	private static MonoConf config = null;
 	private static final String configLoc = "plugins/MonoLocks";
 
+	public JSONObject genDefaultConf() {
+		JSONObject defaults = new JSONObject();
+
+		//this is where i'd put config options. IF I HAD ANY
+
+		return defaults;
+	}
+
 
 	public void onEnable() {
 		templateLogger = getLogger();
 		
 		//load configuration
-		MonoConf.init();
-		config = new MonoConf(configLoc);
+		config = new MonoConf(this,genDefaultConf());
 		
 		new LockCreateListener(this);
 		new LockAccessListener(this);
@@ -60,11 +71,11 @@ public class MonoLocks extends JavaPlugin{
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
 				//GARBAGE EVERYWHERE
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
 				config.close();
-				config = new MonoConf(configLoc);
+				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
 				String help = "Help stuff goes here";

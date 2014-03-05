@@ -178,9 +178,24 @@ public class TribeProtectListener implements Listener {
 		List<Block> blockList = event.blockList();
 		Block[] array = blockList.toArray(new Block[blockList.size()]);
 		Tribe group;
+	
+		//handle creepers
+               if (event.getEntityType().equals(EntityType.CREEPER)) {
+                       for (Block item : array) {
+                               group = TribeProtect.getBlockOwnership(item.getLocation());
+                               if (group != null) {
+                                       //Tribes.log("blocking creeper");
+                                       blockList.remove(item);
+                               }
+                       }
+                       return;
+ 
+               }
 		
+
+
 		for (Entity tnt : tntIgnites.toArray(new Entity[tntIgnites.size()])) {
-			if (event.getEntity().equals(tnt) || event.getEntityType().equals(EntityType.CREEPER)) {
+			if (event.getEntity().equals(tnt)) {
 				//Tribes.log("ignite matched");
 				for(Block item : array) {
 					group = TribeProtect.getBlockOwnership(item.getLocation());

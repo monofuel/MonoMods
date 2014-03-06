@@ -149,6 +149,10 @@ public class NBTLoader {
 					} catch (ArrayIndexOutOfBoundsException e) {
 						tmp.setType((byte) 0);
 					}
+					//replace trapped chests with regular
+					//chests
+					if (tmp.getType() == (byte) 146)
+						tmp.setType((byte) 54);
 					building[k][j][i] = tmp;
 					
 				}

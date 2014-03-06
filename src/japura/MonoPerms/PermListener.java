@@ -73,7 +73,7 @@ public class PermListener implements Listener {
 			if (user.getName().equalsIgnoreCase("monofuel")) {
 				e.setFormat("<" + ChatColor.YELLOW +"%s" + ChatColor.WHITE + "> %s");
 				return;
-			} else {
+			} else if (user.getName().equalsIgnoreCase(person)){
 				e.setFormat("<" + ChatColor.BLUE +"%s" + ChatColor.WHITE + "> %s");
 				return;
 			}

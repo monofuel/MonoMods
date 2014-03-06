@@ -605,10 +605,10 @@ public class Tribes extends JavaPlugin{
 			if (tPlayer != null) {
 				group = tPlayer.getTribe();
 				if (group != null) {
-					sender.sendMessage(tPlayer.toString() + " is in the tribe " + group.toString());
+					sender.sendMessage(tPlayer.getPlayer() + " is in the tribe " + group.toString());
 					return true;
 				} else {
-					sender.sendMessage(tPlayer.toString() + " is not in a tribe");
+					sender.sendMessage(tPlayer.getPlayer() + " is not in a tribe");
 					return true;
 				}
 			} else {

@@ -251,6 +251,7 @@ public class Tribes extends JavaPlugin{
 			TribeFactory.createNewTribe(name,leader);
 			Tribe group = getTribe(name);
 			group.addPlayer(tribeLeader);
+			tribeLeader.setTribe(group);
 			JSONArray playerList = (JSONArray) item.get("players");
 			for (int i = 0; i < playerList.size(); i++) {
 				TribePlayer user = TribePlayerFactory.createNewPlayer((String) playerList.get(i));
@@ -592,15 +593,26 @@ public class Tribes extends JavaPlugin{
 			
 		} else if (args[0].equalsIgnoreCase("show")) {
 			if (args.length < 2) {
-				sender.sendMessage("You need to specify a faction to show");
+				sender.sendMessage("You need to specify a faction or player to show");
 				return true;
 			}
 			group = getTribe(args[1]);
 			if (group != null) {
 				sender.sendMessage(group.toString()); 
 				return true;
+			}
+			tPlayer = getPlayer(args[1]);
+			if (tPlayer != null) {
+				group = tPlayer.getTribe();
+				if (group != null) {
+					sender.sendMessage(tPlayer.toString() + " is in the tribe " + group.toString());
+					return true;
+				} else {
+					sender.sendMessage(tPlayer.toString() + " is not in a tribe");
+					return true;
+				}
 			} else {
-				sender.sendMessage("Tribe does not exist");
+				sender.sendMessage("User or tribe does not exist");
 				return true;
 			}
 				
@@ -690,7 +702,7 @@ public class Tribes extends JavaPlugin{
 		if (user == null) return null;
 		
 		for (int i = 0; i < users.size(); i++) {
-			if (users.get(i).getPlayer().equals(user.getName())) return users.get(i);
+			if (users.get(i).getPlayer().equalsIgnoreCase(user.getName())) return users.get(i);
 		}
 		return null;
 	}

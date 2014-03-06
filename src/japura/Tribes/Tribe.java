@@ -85,6 +85,7 @@ public class Tribe {
 	
 	public void setLeader(TribePlayer user) {
 		leader = user;
+		user.setTribe(this);
 		addPlayer(user);
 	}
 	

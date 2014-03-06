@@ -605,7 +605,7 @@ public class Tribes extends JavaPlugin{
 			if (tPlayer != null) {
 				group = tPlayer.getTribe();
 				if (group != null) {
-					sender.sendMessage(tPlayer.getPlayer() + " is in the tribe " + group.toString());
+					sender.sendMessage(tPlayer.getPlayer() + " is in the tribe " + group.getName());
 					return true;
 				} else {
 					sender.sendMessage(tPlayer.getPlayer() + " is not in a tribe");

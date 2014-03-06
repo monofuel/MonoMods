@@ -11,6 +11,7 @@ package japura.MonoPerms;
 import japura.MonoUtil.MonoConf;
 
 import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
 
 import java.util.Set;
 import java.util.logging.Logger;
@@ -22,7 +23,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.simple.JSONArray;
+import org.bukkit.ChatColor;
 
 /**
  *	This plugin was built for the sake of having 100% custom plugins
@@ -42,11 +43,11 @@ public class MonoPerms extends JavaPlugin{
 	private static JavaPlugin plugin;
 	private static final String configLoc = "plugins/MonoPerms";
 
+	private static String[] donors;
+
 	public JSONObject genDefaultConf() {
 		JSONObject defaults = new JSONObject();
 
-		//this is where i'd put my config options. IF I HAD ANY
-		
 		return defaults;
 	}
 
@@ -62,6 +63,8 @@ public class MonoPerms extends JavaPlugin{
 		loadData();
 		listener = new PermListener(this);
 		log("MonoPerms has been enabled");
+
+		setDonors();
 	}
 	
 	public void onDisable() {
@@ -84,7 +87,7 @@ public class MonoPerms extends JavaPlugin{
 			Player user = Bukkit.getPlayer(key);
 			if (user == null) continue;
 			if (user.getName().equals(key)) {
-				JSONArray permList = (JSONArray) MonoPerms.getData().getConf(key);
+				JSONArray permList = (JSONArray) data.getConf(key);
 				for (int i = 0; i < permList.size(); i++) {
 					addPerm(user,(String) permList.get(i));
 				}
@@ -131,8 +134,35 @@ public class MonoPerms extends JavaPlugin{
 		return false;
 	}
 	
+	public static String[] getDonors() {
+		
+		return donors;
+	}
+
 	//let other objects call our logger
 	public static void log(String line) {
 		templateLogger.info(line);
+	}
+
+	public static void setDonors() {
+
+		//for each player under donor in the config
+		JSONArray jsonDonors = (JSONArray) data.getConf("donors");
+		//hold them in an array
+		donors = new String[jsonDonors.size()];
+		for (int i = 0; i < jsonDonors.size(); i++) {
+			donors[i] = (String) jsonDonors.get(i);
+			OfflinePlayer offlineDonor = Bukkit.getOfflinePlayer((String) donors[i]);
+			Player donor = offlineDonor.getPlayer();
+			if (donor == null) continue; //that means they are offline
+			if (donor.getName().equalsIgnoreCase("monofuel"))
+				donor.setPlayerListName(ChatColor.YELLOW + donor.getName());
+			else    donor.setPlayerListName(ChatColor.BLUE + donor.getName());
+
+
+
+
+		}
+
 	}
 }

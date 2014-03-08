@@ -248,7 +248,7 @@ public class Tribes extends JavaPlugin{
 			//log(leader);
 			TribePlayer tribeLeader = TribePlayerFactory.createNewPlayer(leader);
 			
-			TribeFactory.createNewTribe(name,leader);
+			TribeFactory.createNewTribe(name,tribeLeader);
 			Tribe group = getTribe(name);
 			group.addPlayer(tribeLeader);
 			tribeLeader.setTribe(group);

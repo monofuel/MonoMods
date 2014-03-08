@@ -608,6 +608,8 @@ public class Tribes extends JavaPlugin{
 					sender.sendMessage(tPlayer.getPlayer() + " is in the tribe " + group.getName());
 					return true;
 				} else {
+					//TODO: this will typically never be reached.
+					//players who are not in a tribe will probably not have tribeplayer objects.
 					sender.sendMessage(tPlayer.getPlayer() + " is not in a tribe");
 					return true;
 				}
@@ -693,18 +695,17 @@ public class Tribes extends JavaPlugin{
 
 	
 	public static TribePlayer getPlayer(String name) {
-		
-		Player user = Bukkit.getPlayer(name);
-		return getPlayer(user);
+		if (name == null) return null;
+		for (int i = 0; i < users.size(); i++) {
+			if(users.get(i).getPlayer().equalsIgnoreCase(name)) return users.get(i);
+		}
+		return null;
+
 	}
 	
 	public static TribePlayer getPlayer(Player user) {
 		if (user == null) return null;
-		
-		for (int i = 0; i < users.size(); i++) {
-			if (users.get(i).getPlayer().equalsIgnoreCase(user.getName())) return users.get(i);
-		}
-		return null;
+		return getPlayer(user.getName());
 	}
 	
 	public static MonoConf getConf() {

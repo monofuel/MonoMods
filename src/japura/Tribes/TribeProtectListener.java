@@ -70,7 +70,7 @@ public class TribeProtectListener implements Listener {
 	public void getEmeralds(BlockPlaceEvent event) {
 		//check if the block is an emerald
 		if (event.getBlock().getType() != Material.EMERALD_BLOCK) return;
-		
+		if (event.isCancelled()) return;
 		
 		TribePlayer user = Tribes.getPlayer(event.getPlayer());
 		//check if they are in a tribe faction

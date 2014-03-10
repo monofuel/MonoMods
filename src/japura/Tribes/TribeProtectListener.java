@@ -106,6 +106,7 @@ public class TribeProtectListener implements Listener {
 			
 			event.setCancelled(true);
 			event.getPlayer().sendMessage("You're too close to another faction");
+			return;
 		}
 		
 		user.getTribe().addEmerald(event.getBlock());

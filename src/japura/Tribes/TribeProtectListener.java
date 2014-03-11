@@ -90,10 +90,10 @@ public class TribeProtectListener implements Listener {
 		
 		long claimSize = (long) Tribes.getConf().getConf("ClaimSize");
 		loc = event.getBlock().getLocation();
-		corner1 = loc.add(claimSize, claimSize, 0);
-		corner2 = loc.add(-claimSize,claimSize, 0);
-		corner3 = loc.add(claimSize,-claimSize, 0);
-		corner4 = loc.add(-claimSize,-claimSize, 0);
+		corner1 = loc.clone().add(claimSize,0, claimSize);
+		corner2 = loc.clone().add(-claimSize,0,claimSize);
+		corner3 = loc.clone().add(claimSize,0,-claimSize);
+		corner4 = loc.clone().add(-claimSize,0,-claimSize);
 		group1 = TribeProtect.getBlockOwnership(corner1);
 		group2 = TribeProtect.getBlockOwnership(corner2);
 		group3 = TribeProtect.getBlockOwnership(corner3);
@@ -105,7 +105,7 @@ public class TribeProtectListener implements Listener {
 			(group4 != null && group4 != userGroup)) {
 			
 			event.setCancelled(true);
-			event.getPlayer().sendMessage("You're too close to another faction");
+			event.getPlayer().sendMessage("You're too close to another tribe");
 			return;
 		}
 		
@@ -116,6 +116,7 @@ public class TribeProtectListener implements Listener {
 	
 	@EventHandler (priority = EventPriority.HIGHEST)
 	public void blockPlace(BlockPlaceEvent event) {
+		if (event.isCancelled()) return;
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
 		TribePlayer user = Tribes.getPlayer(event.getPlayer());
 		if (group != null) {
@@ -141,13 +142,14 @@ public class TribeProtectListener implements Listener {
 	}
 	
 	@EventHandler (priority = EventPriority.HIGHEST)
-	public void blockPlace(BlockBreakEvent event) {
+	public void blockBreak(BlockBreakEvent event) {
+		if (event.isCancelled()) return;
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
 		TribePlayer user = Tribes.getPlayer(event.getPlayer());
 		if (group != null) {
 			if (user == null || user.getTribe() != group) {
 				event.setCancelled(true);
-				event.getPlayer().sendMessage("You are not allowed to build here");
+				event.getPlayer().sendMessage("You are not allowed to destroy here");
 			}
 		}
 		
@@ -155,8 +157,8 @@ public class TribeProtectListener implements Listener {
 	
 	
 	//catch emerald break events
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void blockBreak(BlockBreakEvent event) {
+	@EventHandler
+	public void emeraldBreak(BlockBreakEvent event) {
 		//check if the block is an emerald
 		if (event.getBlock().getType() != Material.EMERALD_BLOCK) return;
 		
@@ -164,6 +166,12 @@ public class TribeProtectListener implements Listener {
 		
 		if (group == null) return;
 		if (event.isCancelled()) return;
+		TribePlayer user = Tribes.getPlayer(event.getPlayer().getName());
+		if (user.getTribe() != group) {
+			event.getPlayer().sendMessage("You are not allowed to break here");
+			event.setCancelled(true);
+			return;
+		}
 		
 		group.delEmerald(event.getBlock());
 		

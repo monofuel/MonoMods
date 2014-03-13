@@ -53,7 +53,9 @@ public class LockBreakListener implements Listener{
 			
 			if (MonoLocks.isAllowed(user,block)) {
 				MonoLocks.log("lock broken");
-				e.setCancelled(false);
+				//commented out to not break other mods.
+				//implicitly not setting cancelled to true.
+				//e.setCancelled(false);
 				return;
 				
 			} else {

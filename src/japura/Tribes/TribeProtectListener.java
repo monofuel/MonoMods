@@ -161,18 +161,24 @@ public class TribeProtectListener implements Listener {
 	public void emeraldBreak(BlockBreakEvent event) {
 		//check if the block is an emerald
 		if (event.getBlock().getType() != Material.EMERALD_BLOCK) return;
+		if (event.isCancelled())  return;
+		//assume cancelled
+		event.setCancelled(true);
 		
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
 		
 		if (group == null) return;
-		if (event.isCancelled()) return;
 		TribePlayer user = Tribes.getPlayer(event.getPlayer().getName());
-		if (user.getTribe() != group) {
+		if (user == null || user.getTribe() != group) {
 			event.getPlayer().sendMessage("You are not allowed to break here");
 			event.setCancelled(true);
 			return;
 		}
-		
+
+		Tribes.log("Player " + user.getPlayer() + " broke " + user.getTribe().getName() + "'s emerald at " +
+			event.getBlock().getLocation().getX() + "," + event.getBlock().getLocation().getY() + "," + 
+			event.getBlock().getLocation().getZ());
+		event.setCancelled(false);
 		group.delEmerald(event.getBlock());
 		
 	}

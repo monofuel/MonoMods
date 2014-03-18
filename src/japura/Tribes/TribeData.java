@@ -130,7 +130,7 @@ public class TribeData {
 	 * and populates it with default
 	 * values
 	 */
-	private void popNewConf() {
+	public void popNewConf() {
 		config = defaults;
 	}
 	

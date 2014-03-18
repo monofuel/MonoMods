@@ -205,6 +205,13 @@ public class Tribes extends JavaPlugin{
 	}
 	
 	public void saveData() {
+
+		//run a verification
+		verifyTribes();
+
+		//clear out old tribes first
+		data.popNewConf();
+
 		for (Tribe group : groups) {
 			JSONObject item = new JSONObject();
 			JSONArray playerList = new JSONArray();

@@ -42,6 +42,8 @@ public class Tribes extends JavaPlugin{
 	private static ArrayList<Tribe> groups = new ArrayList<Tribe>();
 	private static ArrayList<TribePlayer> users = new ArrayList<TribePlayer>();
 	private static TribeProtect protector;
+	private static TribeDisbandRunner disbander;
+	private static TribeDisbandListener loginListener;
 	
 	public JSONObject genDefaultConf() {
 		JSONObject defaults = new JSONObject();
@@ -52,6 +54,9 @@ public class Tribes extends JavaPlugin{
 		defaults.put("SpawnX",184);
 		defaults.put("SpawnY",77);
 		defaults.put("SpawnZ",255);
+		defaults.put("Disband after time",true);
+		defaults.put("Days before disband",60);
+		
 		return defaults;
 
 	}
@@ -80,7 +85,13 @@ public class Tribes extends JavaPlugin{
 		//and starts listeners
 		assert protector == null;
 		protector = new TribeProtect(this);
+		disbander = new TribeDisbandRunner(this);
+		loginListener = new TribeDisbandListener(this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,200,200);
+		if ((boolean) config.getConf("Disband after time"))
+			Bukkit.getScheduler().scheduleSyncRepeatingTask(this,disbander,0,2400);
+		else
+			log("Tribes will be lasting forever");
 		
 		//set a spawn point
 		if ((boolean) config.getConf("Tribe Spawn")) {
@@ -236,6 +247,7 @@ public class Tribes extends JavaPlugin{
 			
 			item.put("players",playerList);
 			item.put("emeralds",emeraldList);
+			item.put("lastlog",group.getLastLogTime());
 			data.setConf(group.getName(),item);
 						
 		}
@@ -275,6 +287,15 @@ public class Tribes extends JavaPlugin{
 				y = (long) em.get("y");
 				z = (long) em.get("z");
 				group.addEmerald(new Location(emeraldWorld,x,y,z).getBlock());
+			}
+
+			//last login time
+			Object lastLogTime = item.get("lastlog");
+			if (lastLogTime == null) {
+				//if the config is outdated
+				group.setLastLogTime(System.currentTimeMillis());
+			} else {
+				group.setLastLogTime((long) lastLogTime);
 			}
 		
 		}

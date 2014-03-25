@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 public class Tribe {
 	String name;
 	TribePlayer leader;
+	long lastLogTime = 0;
 	ArrayList<TribePlayer> users = new ArrayList<TribePlayer>();
 	ArrayList<Player> invites = new ArrayList<Player>();
 	ArrayList<Block> emeralds = new ArrayList<Block>();
@@ -33,6 +34,15 @@ public class Tribe {
 		this.leader = founder;
 		
 		users.add(founder);
+	}
+
+	public long getLastLogTime() {
+		if (lastLogTime == 0) lastLogTime = System.currentTimeMillis();
+		return lastLogTime;
+	}
+
+	public void setLastLogTime(long lastLogTime) {
+		this.lastLogTime = lastLogTime;
 	}
 	
 	public Block[] getEmeralds() {

@@ -10,6 +10,11 @@ commands:
         aliases: tribes
         permission: tribes
         permissions-message: You don't have permission to use tribes
+    ttp:
+        description: primary teleport command. use /ttp help for into
+        usage: /ttp help to display help
+        permission:tribes.tp
+        permissions-message: You don't have permissions for tribes teleport
     tadmin:
         description: Admin functions for tribes
         usage: /tadmin
@@ -20,6 +25,9 @@ permissions:
     tribes:
         description: Basic tribes permissions 
         default: true
+    tribes.tp:
+        description: Tribes teleport permission
+        default:true
     tribes.admin:
         description: Full admin permissions
         default: false

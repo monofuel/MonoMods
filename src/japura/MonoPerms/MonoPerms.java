@@ -89,6 +89,10 @@ public class MonoPerms extends JavaPlugin{
 			if (user.getName().equals(key)) {
 				JSONArray permList = (JSONArray) data.getConf(key);
 				for (int i = 0; i < permList.size(); i++) {
+					if (((String) permList.get(i)).length() > 16) {
+						log("got invalid username " + permList.get(i));
+						continue;
+					}
 					addPerm(user,(String) permList.get(i));
 				}
 			}
@@ -157,7 +161,8 @@ public class MonoPerms extends JavaPlugin{
 			if (donor == null) continue; //that means they are offline
 			if (donor.getName().equalsIgnoreCase("monofuel"))
 				donor.setPlayerListName(ChatColor.YELLOW + donor.getName());
-			else    donor.setPlayerListName(ChatColor.BLUE + donor.getName());
+			else if (donor.getName().length() < 14) //fix bug where chatcolor makes their name too long
+			        donor.setPlayerListName(ChatColor.BLUE + donor.getName());
 
 
 

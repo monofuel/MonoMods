@@ -263,6 +263,7 @@ public class Tribes extends JavaPlugin{
 			for (int i = 0; i < playerList.size(); i++) {
 				TribePlayer user = TribePlayerFactory.createNewPlayer((String) playerList.get(i));
 				user.setTribe(group);
+				group.addPlayer(user); //FOR SOME REASON THIS IS REQUIRED. TODO: WHY?
 			}
 			
 			JSONArray emeraldList = (JSONArray) item.get("emeralds");

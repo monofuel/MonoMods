@@ -167,7 +167,10 @@ public class TribeProtectListener implements Listener {
 		
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
 		
-		if (group == null) return;
+		if (group == null) {
+			event.setCancelled(false);
+			return;
+		}
 		TribePlayer user = Tribes.getPlayer(event.getPlayer().getName());
 		if (user == null || user.getTribe() != group) {
 			event.getPlayer().sendMessage("You are not allowed to break here");
@@ -199,7 +202,8 @@ public class TribeProtectListener implements Listener {
 		Tribe group;
 	
 		//handle creepers
-               if (event.getEntityType().equals(EntityType.CREEPER)) {
+               if (event.getEntityType().equals(EntityType.CREEPER) ||
+			event.getEntityType().equals(EntityType.MINECART_TNT)) {
                        for (Block item : array) {
                                group = TribeProtect.getBlockOwnership(item.getLocation());
                                if (group != null) {

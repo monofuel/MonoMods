@@ -78,9 +78,10 @@ public class Tribes extends JavaPlugin{
 		//TODO review data storage
 		TribeData.init();
 		data = new TribeData(configLoc);
-
+		log("loading tribes...");
 		//load all the tribe data
 		loadData();
+		log("done loading tribes!");
 		
 		//protector checks all emerald blocks
 		//and starts listeners
@@ -242,7 +243,8 @@ public class Tribes extends JavaPlugin{
 			
 			for (Block emerald : group.getEmeralds()) {
 				JSONObject em = new JSONObject();
-
+				em.put("world",emerald.getWorld().getName());
+				em.put("x", emerald.getLocation().getBlockX());
 				em.put("y", emerald.getLocation().getBlockY());
 				em.put("z", emerald.getLocation().getBlockZ());
 				emeraldList.add(em);
@@ -263,7 +265,6 @@ public class Tribes extends JavaPlugin{
 		Set<String> keys = data.getKeys();
 		for (String name : keys) {
 			JSONObject item = (JSONObject) data.getConf(name);
-
 			//log(name);
 			String leader = (String) item.get("leader");
 			if (leader == null) log("leader is null");
@@ -280,19 +281,28 @@ public class Tribes extends JavaPlugin{
 				user.setTribe(group);
 				group.addPlayer(user); //FOR SOME REASON THIS IS REQUIRED. TODO: WHY?
 			}
-			
 			JSONArray emeraldList = (JSONArray) item.get("emeralds");
 			World emeraldWorld;
 			long x,y,z;
 			for (int i = 0; i < emeraldList.size(); i++) {
 				JSONObject em = (JSONObject) emeraldList.get(i);
-				emeraldWorld = Bukkit.getWorld((String) em.get("world"));
+				String worldName = (String) em.get("world");
+				if (worldName == null) {
+					worldName = "world";
+					log("found emerald's world set as null?");
+				}
+				emeraldWorld = Bukkit.getWorld(worldName);
+				if (emeraldWorld == null) log("error getting world");
 				x = (long) em.get("x");
 				y = (long) em.get("y");
 				z = (long) em.get("z");
-				group.addEmerald(new Location(emeraldWorld,x,y,z).getBlock());
-			}
 
+				Location loc = new Location(emeraldWorld,x,y,z);
+				if (loc == null) {
+					log("error getting location");
+				}
+				group.addEmerald(loc.getBlock());
+			}
 			//last login time
 			Object lastLogTime = item.get("lastlog");
 			if (lastLogTime == null) {
@@ -301,7 +311,6 @@ public class Tribes extends JavaPlugin{
 			} else {
 				group.setLastLogTime((long) lastLogTime);
 			}
-		
 		}
 		
 	}

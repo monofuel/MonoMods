@@ -13,7 +13,7 @@ commands:
     ttp:
         description: primary teleport command. use /ttp help for into
         usage: /ttp help to display help
-        permission:tribes.tp
+        permission: tribes.tp
         permissions-message: You don't have permissions for tribes teleport
     tadmin:
         description: Admin functions for tribes
@@ -27,7 +27,7 @@ permissions:
         default: true
     tribes.tp:
         description: Tribes teleport permission
-        default:true
+        default: true
     tribes.admin:
         description: Full admin permissions
         default: false

@@ -16,6 +16,8 @@ the japura.net plugins are typically built and tested against the dev builds.
 no warrenty is given for building on a windows system, however the build.xml
 file should be perfectly fine for importing into an IDE like netbeans or eclipse.
 
+place the latest version of the bukkit API in bin/
+
 to TEST:
 
 remember, the aperture science bring your daughter to work day is the perfect

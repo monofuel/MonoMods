@@ -42,6 +42,7 @@ public class Tribes extends JavaPlugin{
 	private static ArrayList<Tribe> groups = new ArrayList<Tribe>();
 	private static ArrayList<TribePlayer> users = new ArrayList<TribePlayer>();
 	private static TribeProtect protector;
+	private static LoginListener loginListener;
 	
 	public JSONObject genDefaultConf() {
 		JSONObject defaults = new JSONObject();
@@ -52,6 +53,7 @@ public class Tribes extends JavaPlugin{
 		defaults.put("SpawnX",184);
 		defaults.put("SpawnY",77);
 		defaults.put("SpawnZ",255);
+		defaults.put("MOTD","Welcome to Japura.net!");
 		return defaults;
 
 	}
@@ -81,6 +83,9 @@ public class Tribes extends JavaPlugin{
 		assert protector == null;
 		protector = new TribeProtect(this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,200,200);
+
+		//trigger events on player login
+		loginListener = new LoginListener(this);
 		
 		//set a spawn point
 		if ((boolean) config.getConf("Tribe Spawn")) {

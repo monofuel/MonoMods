@@ -1,0 +1,29 @@
+TO BUILD:
+
+dependencies:
+	ant
+	JDK
+
+any JDK should work, this project was developed and tested on IcedTea 1.7.0
+compiled on a gentoo system.
+
+if you have and and the jdk installed and properly on your path,
+you should be able to build by simply running 'ant'.
+
+It's recommended that you keep the latest bukkit API jar in bin/
+the japura.net plugins are typically built and tested against the dev builds.
+
+no warrenty is given for building on a windows system, however the build.xml
+file should be perfectly fine for importing into an IDE like netbeans or eclipse.
+
+to TEST:
+
+remember, the aperture science bring your daughter to work day is the perfect
+time to have her tested.
+
+include the latest bukkit jar in test/
+after you've built the plugins, you can copy the plugins into test/plugins
+or use push.sh to simply copy them all over.
+
+then you should just have to execute the bukkit jar in the testing directory
+to start up a server on your machine to test it.

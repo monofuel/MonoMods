@@ -1,0 +1,35 @@
+name: Tribes
+main: japura.Tribes.Tribes
+version: 1.00
+author: monofuel
+
+commands:
+    t:
+        description: primary Tribes command. use /t help for info
+        usage: /t help to display help
+        aliases: tribes
+        permission: tribes
+        permissions-message: You don't have permission to use tribes
+    ttp:
+        description: primary teleport command. use /ttp help for into
+        usage: /ttp help to display help
+        permission:tribes.tp
+        permissions-message: You don't have permissions for tribes teleport
+    tadmin:
+        description: Admin functions for tribes
+        usage: /tadmin
+        permission: tribes.admin
+        permissions-message: You don't have admin permissions for tribes
+        
+permissions:
+    tribes:
+        description: Basic tribes permissions 
+        default: true
+    tribes.tp:
+        description: Tribes teleport permission
+        default:true
+    tribes.admin:
+        description: Full admin permissions
+        default: false
+        children:
+            tribes: true

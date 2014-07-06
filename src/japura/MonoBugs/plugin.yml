@@ -1,0 +1,20 @@
+name: MonoBugs
+main: japura.MonoBugs.MonoBugs
+version: 1.00
+commands:
+    bug:
+        description: primary bug command. use /bug help for info
+        usage: /bug help
+        permission: monobugs
+        permissions-message: You don't have permission
+        permissions:
+
+permissions:
+    monobugs:
+        description: the /bug command 
+        default: true
+    monobugs.admin:
+        description: Full admin permissions
+        default: false
+        children:
+            monobugs: true

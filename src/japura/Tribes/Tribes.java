@@ -43,6 +43,7 @@ public class Tribes extends JavaPlugin{
 	private static ArrayList<TribePlayer> users = new ArrayList<TribePlayer>();
 	private static TribeProtect protector;
 	private static LoginListener loginListener;
+	private static TribeDisbandRunner disbander;
 	
 	public JSONObject genDefaultConf() {
 		JSONObject defaults = new JSONObject();
@@ -54,6 +55,9 @@ public class Tribes extends JavaPlugin{
 		defaults.put("SpawnY",77);
 		defaults.put("SpawnZ",255);
 		defaults.put("MOTD","Welcome to Japura.net!");
+		defaults.put("Disband after time",true);
+		defaults.put("Days before disband",60);
+		
 		return defaults;
 
 	}
@@ -82,10 +86,16 @@ public class Tribes extends JavaPlugin{
 		//and starts listeners
 		assert protector == null;
 		protector = new TribeProtect(this);
+		disbander = new TribeDisbandRunner(this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,200,200);
 
 		//trigger events on player login
 		loginListener = new LoginListener(this);
+
+		if ((boolean) config.getConf("Disband after time"))
+			Bukkit.getScheduler().scheduleSyncRepeatingTask(this,disbander,0,2400);
+		else
+			log("Tribes will be lasting forever");
 		
 		//set a spawn point
 		if ((boolean) config.getConf("Tribe Spawn")) {
@@ -232,8 +242,7 @@ public class Tribes extends JavaPlugin{
 			
 			for (Block emerald : group.getEmeralds()) {
 				JSONObject em = new JSONObject();
-				em.put("world", emerald.getWorld().getName());
-				em.put("x", emerald.getLocation().getBlockX());
+
 				em.put("y", emerald.getLocation().getBlockY());
 				em.put("z", emerald.getLocation().getBlockZ());
 				emeraldList.add(em);
@@ -241,6 +250,7 @@ public class Tribes extends JavaPlugin{
 			
 			item.put("players",playerList);
 			item.put("emeralds",emeraldList);
+			item.put("lastlog",group.getLastLogTime());
 			data.setConf(group.getName(),item);
 						
 		}
@@ -282,6 +292,15 @@ public class Tribes extends JavaPlugin{
 				z = (long) em.get("z");
 				group.addEmerald(new Location(emeraldWorld,x,y,z).getBlock());
 			}
+
+			//last login time
+			Object lastLogTime = item.get("lastlog");
+			if (lastLogTime == null) {
+				//if the config is outdated
+				group.setLastLogTime(System.currentTimeMillis());
+			} else {
+				group.setLastLogTime((long) lastLogTime);
+			}
 		
 		}
 		
@@ -294,10 +313,105 @@ public class Tribes extends JavaPlugin{
 		}else if (cmd.getName().equalsIgnoreCase("t") ||
 				  cmd.getName().equalsIgnoreCase("tribes")) {
 			return tcmd(sender,cmd,label,args);
+		}else if (cmd.getName().equalsIgnoreCase("ttp")) {
+			return ttp(sender,cmd,label,args);
 		}
 		
 		return false;
 	}
+
+	public boolean ttp(CommandSender sender, Command cmd, String label, String[] args) {
+                if (args.length == 0) return false;
+                Tribe group;
+                Player player;
+                TribePlayer tPlayer;
+
+                player = Bukkit.getPlayer(sender.getName());
+                tPlayer = getPlayer(player);
+
+		if (args[0].equalsIgnoreCase("help")) {
+			sender.sendMessage("ttp can be used to modify teleport locations or to teleport.\n" +
+					   "/ttp [name]\n" + 
+					   "/ttp rename [old name] [new name]\n" +
+					   "/ttp permit [name] [tribe]\n" +
+					   "/ttp deny [name] [tribe]\n" +
+					   "/ttp info [name]\n" + 
+					   "/ttp list");
+			return true;
+
+		} else if (args[0].equalsIgnoreCase("rename")) {
+			if ((tPlayer == null) || (tPlayer.getTribe() == null)) {
+				sender.sendMessage("You are not in a tribe");
+				return true;
+			}
+			group = tPlayer.getTribe();
+			if (args.length != 3) {
+				sender.sendMessage("you must specify an existing teleport and a new name. no spaces!");
+				return true;
+			}
+			
+			TeleportData teleData = getttp(args[1],group);
+			if (teleData == null) {
+				sender.sendMessage("Teleport location " + args[1] + " does not exist");
+				return true;
+			}
+			if (getttp(args[2],group) != null) {
+				sender.sendMessage("Teleport location " + args[2] + " already exists");
+			} else {
+				teleData.rename(args[2]);
+				sender.sendMessage(args[1] + " was renamed to " + args[2] + " successfully");
+			}
+			
+			return true;
+		} else if (args[0].equalsIgnoreCase("permit")) {
+
+
+			return true;
+		} else if (args[0].equalsIgnoreCase("deny")) {
+
+
+			return true;
+		} else if (args[0].equalsIgnoreCase("info")) {
+
+
+			return true;
+		} else if (args[0].equalsIgnoreCase("list")) {
+
+			return true;
+		} else {
+			//teleport to location and return true
+
+			return true;
+		}
+		//return false;
+
+
+	}
+
+	public TeleportData getttp(String name, Tribe group) {
+		//first search for a teleport in our tribe
+		TeleportData teleData;
+		Block[] diamonds = group.getDiamonds();
+		for (Block item : diamonds) {
+			teleData = group.getTeleData(item);
+			if (teleData.getName().equalsIgnoreCase(name))
+				return teleData;
+		}
+
+		//if our tribe does not have this point, see if another tribe does
+		//and if they have allowed us to use it
+		for (Tribe otherGroup : getTribes()) {
+			diamonds = otherGroup.getDiamonds();
+			for (Block item : diamonds) {
+				teleData = otherGroup.getTeleData(item);
+				if (teleData.isAllowed(group) && teleData.getName().equalsIgnoreCase(name))
+					return teleData;
+			}
+		}
+		return null;
+
+	}
+
 	//should be split into separate commands, probably in another class
 	public boolean tadmin(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length < 1) return false;

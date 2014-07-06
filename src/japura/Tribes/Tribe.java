@@ -9,6 +9,7 @@
 package japura.Tribes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,9 +19,12 @@ import org.bukkit.entity.Player;
 public class Tribe {
 	String name;
 	TribePlayer leader;
+	long lastLogTime = 0;
 	ArrayList<TribePlayer> users = new ArrayList<TribePlayer>();
 	ArrayList<Player> invites = new ArrayList<Player>();
 	ArrayList<Block> emeralds = new ArrayList<Block>();
+	ArrayList<Block> diamonds = new ArrayList<Block>();
+	HashMap<Block,TeleportData> teleports = new HashMap<Block,TeleportData>();
 	
 	//should only be used for safezone or special tribes
 	public Tribe(String name) {
@@ -34,9 +38,25 @@ public class Tribe {
 		
 		users.add(founder);
 	}
+
+	public long getLastLogTime() {
+		if (lastLogTime == 0) lastLogTime = System.currentTimeMillis();
+		return lastLogTime;
+	}
+
+	public void setLastLogTime(long lastLogTime) {
+		this.lastLogTime = lastLogTime;
+	}
 	
 	public Block[] getEmeralds() {
 		return emeralds.toArray(new Block[emeralds.size()]);
+	}
+
+	public Block[] getDiamonds() {
+		return diamonds.toArray(new Block[diamonds.size()]);
+	}
+	public TeleportData getTeleData(Block em) {
+		return teleports.get(em);
 	}
 	
 	public void addEmerald(Block em) {
@@ -44,16 +64,39 @@ public class Tribe {
 		
 		emeralds.add(em);
 	}
+	public void addDiamond(Block em,Player user) {
+		if (em.getType() != Material.DIAMOND_BLOCK) return;
+		diamonds.add(em);
+		String name = "diamond_" + teleports.size();
+		TeleportData data = new TeleportData(em,name,this);
+		data.addAllowed(this);
+		teleports.put(em,data);
+		user.sendMessage("created new teleporter named " + name);
+	}
+
 	public void checkEmerald(Block em) {
 		if (!em.getChunk().isLoaded()) return;
 		if (emeralds.contains(em)){
 			if (em.getType() != Material.EMERALD_BLOCK) emeralds.remove(em);
 		}
 	}
+
+	public void checkDiamond(Block em) {
+		if (!em.getChunk().isLoaded()) return;
+		if (diamonds.contains(em)) {
+			if (em.getType() != Material.DIAMOND_BLOCK) diamonds.remove(em);
+		}
+
+	}
 	
 	public void delEmerald(Block em) {
 		if (emeralds.contains(em)){
 			emeralds.remove(em);
+		}
+	}
+	public void delDiamond(Block em) {
+		if (diamonds.contains(em)){
+			diamonds.remove(em);
 		}
 	}
 	

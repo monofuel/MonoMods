@@ -13,11 +13,12 @@ import java.util.List;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LoginListener implements Listener {
@@ -30,9 +31,18 @@ public class LoginListener implements Listener {
 	public void PlayerLogin(PlayerJoinEvent user) {
 		String motd = (String) Tribes.getConf().getConf("MOTD");
 		Tribes.log("Sending motd to user " + motd);
-		user.getPlayer().sendMessage(motd);
-
-		
+		user.getPlayer().sendMessage(motd);	
 
 	}
-}	
+
+	public void TimestampLogin(PlayerLoginEvent event) {
+                TribePlayer user = Tribes.getPlayer(event.getPlayer().getName());
+                if (user == null) return;
+                Tribe group = user.getTribe();
+                if (group == null) return;
+                group.setLastLogTime(System.currentTimeMillis());
+        }
+
+}
+
+

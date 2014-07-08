@@ -44,6 +44,7 @@ public class Tribes extends JavaPlugin{
 	private static TribeProtect protector;
 	private static LoginListener loginListener;
 	private static TribeDisbandRunner disbander;
+	private static TribeTeleportListener teleportListener;
 	
 	public JSONObject genDefaultConf() {
 		JSONObject defaults = new JSONObject();
@@ -88,6 +89,7 @@ public class Tribes extends JavaPlugin{
 		assert protector == null;
 		protector = new TribeProtect(this);
 		disbander = new TribeDisbandRunner(this);
+		teleportListener = new TribeTeleportListener(this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,200,200);
 
 		//trigger events on player login
@@ -373,23 +375,41 @@ public class Tribes extends JavaPlugin{
 			
 			return true;
 		} else if (args[0].equalsIgnoreCase("permit")) {
-
+			sender.sendMessage("not done yet");
 
 			return true;
 		} else if (args[0].equalsIgnoreCase("deny")) {
-
+			sender.sendMessage("not done yet");
 
 			return true;
 		} else if (args[0].equalsIgnoreCase("info")) {
 
+			sender.sendMessage("not done yet");
 
 			return true;
 		} else if (args[0].equalsIgnoreCase("list")) {
 
+			sender.sendMessage("not done yet");
 			return true;
 		} else {
 			//teleport to location and return true
-
+			
+			if ((tPlayer == null) || (tPlayer.getTribe() == null)) {
+				sender.sendMessage("You are not in a tribe");
+				return true;
+			}
+			group = tPlayer.getTribe();
+			if (args.length != 1) {
+				sender.sendMessage("you must specify an existing teleport.");
+				return true;
+			}
+			
+			TeleportData teleData = getttp(args[0],group);
+			if (teleData == null) {
+				sender.sendMessage("Teleport location " + args[1] + " does not exist");
+				return true;
+			}
+			teleData.teleportPlayer(player);
 			return true;
 		}
 		//return false;
@@ -404,6 +424,7 @@ public class Tribes extends JavaPlugin{
 		for (Block item : diamonds) {
 			teleData = group.getTeleData(item);
 			if (teleData.getName().equalsIgnoreCase(name))
+				log("found teleport in own tribe");
 				return teleData;
 		}
 
@@ -413,7 +434,12 @@ public class Tribes extends JavaPlugin{
 			diamonds = otherGroup.getDiamonds();
 			for (Block item : diamonds) {
 				teleData = otherGroup.getTeleData(item);
+				if (teleData == null) {
+					log("found null teleData somehow?");
+					return null;
+				}
 				if (teleData.isAllowed(group) && teleData.getName().equalsIgnoreCase(name))
+					log("found teleport in other tribe");
 					return teleData;
 			}
 		}

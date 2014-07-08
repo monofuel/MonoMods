@@ -49,10 +49,11 @@ public class TeleportData {
 		allowed.remove(group);
 	}
 	public boolean isAllowed(Tribe group) {
-		return allowed.contains(group);
+		return true;
+		//return allowed.contains(group);
 	}
 
-	public void TeleportPlayer(Player user) {
+	public void teleportPlayer(Player user) {
 		//check if the block is obscured
 		Location myloc = spot.getLocation();
 		if (spot.getType() != Material.DIAMOND_BLOCK) {

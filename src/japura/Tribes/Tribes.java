@@ -42,6 +42,7 @@ public class Tribes extends JavaPlugin{
 	private static ArrayList<Tribe> groups = new ArrayList<Tribe>();
 	private static ArrayList<TribePlayer> users = new ArrayList<TribePlayer>();
 	private static TribeProtect protector;
+	private static AutoSave autoSave;
 	private static LoginListener loginListener;
 	private static TribeDisbandRunner disbander;
 	private static TribeTeleportListener teleportListener;
@@ -55,7 +56,7 @@ public class Tribes extends JavaPlugin{
 		defaults.put("SpawnX",184);
 		defaults.put("SpawnY",77);
 		defaults.put("SpawnZ",255);
-		defaults.put("MOTD","Welcome to Japura.net!");
+		defaults.put("MOTD","&4Welcome to Japura.net!");
 		defaults.put("Disband after time",true);
 		defaults.put("Days before disband",60);
 		
@@ -88,9 +89,11 @@ public class Tribes extends JavaPlugin{
 		//and starts listeners
 		assert protector == null;
 		protector = new TribeProtect(this);
+		autoSave = new AutoSave(this);
 		disbander = new TribeDisbandRunner(this);
 		teleportListener = new TribeTeleportListener(this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,200,200);
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,autoSave,72000,72000);
 
 		//trigger events on player login
 		loginListener = new LoginListener(this);

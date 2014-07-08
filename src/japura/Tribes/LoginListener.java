@@ -30,7 +30,6 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void PlayerLogin(PlayerJoinEvent user) {
 		String motd = (String) Tribes.getConf().getConf("MOTD");
-		Tribes.log("Sending motd to user " + motd);
 		user.getPlayer().sendMessage(motd);	
 
 	}

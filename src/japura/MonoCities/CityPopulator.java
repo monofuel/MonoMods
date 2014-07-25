@@ -24,6 +24,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -91,23 +92,23 @@ public class CityPopulator extends BlockPopulator{
 		if (!checkFlat(chunk)) return;
 		
 		//otherwise, let's place a building.
-		MonoCities.log("found valid chunk at " + chunk.getX() + "," + chunk.getZ());
+		//MonoCities.log("found valid chunk at " + chunk.getX() + "," + chunk.getZ());
 		
 		if (chunk.getX() % 3 == 0 && chunk.getZ() % 3 == 0) {
 			//place 4way
-			MonoCities.log("placing 4way");
+			//MonoCities.log("placing 4way");
 			placeBuilding("4way.schematic",chunk,rand);
 		} else if (chunk.getX() % 3 == 0) {
-			MonoCities.log("placing a straight road");
+			//MonoCities.log("placing a straight road");
 			placeBuilding("straightroad.schematic",chunk,rand);
 		}else if (chunk.getZ() % 3 == 0) {
-			MonoCities.log("placing a rotated road");
+			//MonoCities.log("placing a rotated road");
 			placeBuilding("rightroad.schematic",chunk,rand);
 		} else {
 			//place random building
 			//TODO rotate to curb?
 			String name = getRandomBuilding(rand);
-			MonoCities.log("placing a " + name);
+			//MonoCities.log("placing a " + name);
 			placeBuilding(name,chunk,rand);
 		}
 		
@@ -175,7 +176,7 @@ public class CityPopulator extends BlockPopulator{
 				top.getType() != Material.WATER) return top;
 			top = top.getRelative(BlockFace.DOWN);
 		}
-		MonoCities.log("Populating empty chunk!");
+		//MonoCities.log("Populating empty chunk!");
 		return top;
 	}
 	
@@ -206,13 +207,6 @@ public class CityPopulator extends BlockPopulator{
 				Material.GOLD_HELMET,
 				Material.GOLD_LEGGINGS,
 				Material.GOLD_PICKAXE,
-				Material.DIAMOND_AXE,
-				Material.DIAMOND_SWORD,
-				Material.DIAMOND_BOOTS,
-				Material.DIAMOND_CHESTPLATE,
-				Material.DIAMOND_HELMET,
-				Material.DIAMOND_LEGGINGS,
-				Material.DIAMOND_PICKAXE,
 				Material.IRON_INGOT,
 				Material.GOLD_INGOT,
 				Material.DIAMOND,
@@ -236,7 +230,7 @@ public class CityPopulator extends BlockPopulator{
 			ItemStack is = new ItemStack(chestLoot[chance],amount);
 			inv.addItem(is);
 		}
-		MonoCities.log("populating chest");
+		//MonoCities.log("populating chest");
 		c.update();
 		
 	}
@@ -278,8 +272,14 @@ public class CityPopulator extends BlockPopulator{
 						tmp.setTypeId(type);
 						tmp.setData(blocks[k][j][i].getData());
 						if (type == 54){
-							MonoCities.log("populating road chest");
+							//MonoCities.log("populating road chest");
 							popChest(tmp,rand);
+						}
+						//TODO some of this should be modularized between road/building code
+						if (type == 52) { //if it's a spawner
+							CreatureSpawner spawner = (CreatureSpawner) tmp.getState();
+							spawner.setCreatureTypeByName("Zombie");
+							spawner.update();
 						}
 						
 					} else {
@@ -299,8 +299,13 @@ public class CityPopulator extends BlockPopulator{
 						tmp.setTypeId(type);
 						tmp.setData(blocks[k][j][i].getData());
 						if (type == 54) {
-							MonoCities.log("populating building chest");
+							//MonoCities.log("populating building chest");
 							popChest(tmp,rand);
+						}
+						if (type == 52) { //if it's a spawner
+							CreatureSpawner spawner = (CreatureSpawner) tmp.getState();
+							spawner.setCreatureTypeByName("Zombie");
+							spawner.update();
 						}
 					}
 				}

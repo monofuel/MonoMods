@@ -369,6 +369,12 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("Teleport location " + args[1] + " does not exist");
 				return true;
 			}
+			if (teleData.getOwner() != group) {
+				sender.sendMessage("You cannot rename another tribe's teleport");
+				return true;
+			}
+
+
 			if (getttp(args[2],group) != null) {
 				sender.sendMessage("Teleport location " + args[2] + " already exists");
 			} else {
@@ -378,21 +384,108 @@ public class Tribes extends JavaPlugin{
 			
 			return true;
 		} else if (args[0].equalsIgnoreCase("permit")) {
-			sender.sendMessage("not done yet");
+			if (tPlayer == null || tPlayer.getTribe() == null) {
+				sender.sendMessage("You are not in a tribe");
+				return true;
+			}
+			group = tPlayer.getTribe();
 
-			return true;
+
+			if (tPlayer != group.getLeader()) {
+				sender.sendMessage("You are not the leader of your tribe");
+				return true;
+			}
+			if (args.length != 3) {
+				sender.sendMessage("You must specify an existing teleport and the naeme of the tribe to give permission");
+				return true;
+			}
+			TeleportData teleData = getttp(args[1],group);
+			if (teleData == null) {
+				sender.sendMessage("Teleport location " + args[1] + " does not exist");
+				return true;
+			}
+			Tribe otherGroup = getTribe(args[2]);
+			if (otherGroup  == null) {
+				sender.sendMessage("The tribe " + args[2] + " does not exist");
+				return true;
+			} else {
+				teleData.addAllowed(otherGroup);
+				sender.sendMessage("You have granted permission to " + args[2] + " to use the teleport location " + args[1]);
+				return true;
+			}
 		} else if (args[0].equalsIgnoreCase("deny")) {
-			sender.sendMessage("not done yet");
+			if (tPlayer == null || tPlayer.getTribe() == null) {
+				sender.sendMessage("You are not in a tribe");
+				return true;
+			}
+			group = tPlayer.getTribe();
 
+			if (tPlayer != group.getLeader()) {
+				sender.sendMessage("You are not the leader of your tribe");
+				return true;
+			}
+			if (args.length != 3) {
+				sender.sendMessage("You must specify an existing teleport and the naeme of the tribe to deny permission");
+				return true;
+			}
+			TeleportData teleData = getttp(args[1],group);
+			if (teleData == null) {
+				sender.sendMessage("Teleport location " + args[1] + " does not exist");
+				return true;
+			}
+			Tribe otherGroup = getTribe(args[2]);
+			if (otherGroup  == null) {
+				sender.sendMessage("The tribe " + args[2] + " does not exist");
+				return true;
+			} else {
+				teleData.rmAllowed(otherGroup);
+				sender.sendMessage("You have removed permission to " + args[2] + " to use the teleport location " + args[1]);
+			}
 			return true;
 		} else if (args[0].equalsIgnoreCase("info")) {
+			if (args.length != 2) {
+				sender.sendMessage("You must specify the name of a teleport");
+				return true;
+			}
+			TeleportData teleData;
+			if (tPlayer == null || tPlayer.getTribe() == null) {
+				teleData = getttp(args[1],getTribe("safezone"));
+			} else {
+				group = tPlayer.getTribe();
+				teleData = getttp(args[1],group);
+			}
 
-			sender.sendMessage("not done yet");
+			sender.sendMessage(teleData.getName() + " is owned by " + teleData.getOwner().getName());
+			Tribe[] allowed = teleData.getAllowed();
+			String allowedTribes = allowed[0].getName();
+			for (int i = 1; i < allowed.length; i++) {
+				allowedTribes += "," + allowed[i].getName();
+			}
+			sender.sendMessage("The tribes that may use this are: " + allowedTribes);
+	
+
 
 			return true;
 		} else if (args[0].equalsIgnoreCase("list")) {
 
-			sender.sendMessage("not done yet");
+			sender.sendMessage("You are allowed to use the following teleports:");
+			String teleportNames = "from the tribe safezone: ";
+			Tribe safeTribe = getTribe("safezone");
+			TeleportData teleData;
+			
+			
+			Block[] diamonds = safeTribe.getDiamonds();
+			for (Block item : diamonds) {
+				teleData = safeTribe.getTeleData(item);
+				if (teleData == null) {
+					log("error in looking up a tribe teleport location");
+				}
+				teleportNames += teleData.getName();	
+			}
+			sender.sendMessage(teleportNames);
+			sender.sendMessage("command WIP: only shows safezone's teleports");
+			//TODO add listing for all allowed teleports from the user
+
 			return true;
 		} else {
 			//teleport to location and return true
@@ -426,14 +519,19 @@ public class Tribes extends JavaPlugin{
 		Block[] diamonds = group.getDiamonds();
 		for (Block item : diamonds) {
 			teleData = group.getTeleData(item);
+			if (teleData == null) {
+				log("error in looking up a tribe teleport location");
+			}
 			if (teleData.getName().equalsIgnoreCase(name))
-				log("found teleport in own tribe");
 				return teleData;
 		}
 
 		//if our tribe does not have this point, see if another tribe does
 		//and if they have allowed us to use it
 		for (Tribe otherGroup : getTribes()) {
+			//don't re-scan the same group
+			if (otherGroup == group) continue;
+
 			diamonds = otherGroup.getDiamonds();
 			for (Block item : diamonds) {
 				teleData = otherGroup.getTeleData(item);
@@ -441,9 +539,12 @@ public class Tribes extends JavaPlugin{
 					log("found null teleData somehow?");
 					return null;
 				}
-				if (teleData.isAllowed(group) && teleData.getName().equalsIgnoreCase(name))
-					log("found teleport in other tribe");
-					return teleData;
+				//allow anyone to use safezone spots
+				if (teleData.isAllowed(group) || otherGroup.getName().equalsIgnoreCase("safezone")) {
+					if (teleData.getName().equalsIgnoreCase(name))
+						return teleData;
+				}
+					
 			}
 		}
 		return null;

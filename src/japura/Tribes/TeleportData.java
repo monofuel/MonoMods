@@ -53,6 +53,10 @@ public class TeleportData {
 		//return allowed.contains(group);
 	}
 
+	public Tribe[] getAllowed() {
+		return allowed.toArray(new Tribe[allowed.size()]);
+	}
+
 	public void teleportPlayer(Player user) {
 		//check if the block is obscured
 		Location myloc = spot.getLocation();

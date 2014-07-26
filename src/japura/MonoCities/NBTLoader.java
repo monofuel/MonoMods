@@ -78,7 +78,7 @@ public class NBTLoader {
 				buf = new byte[1];
 			}
 			buffer = new byte[totalLen];
-			MonoCities.log("Allocating " + totalLen + " byte buffer for building");
+			//MonoCities.log("Allocating " + totalLen + " byte buffer for building");
 			int copied = 0;
 			for (int i = 0; i < superBuf.size(); i++) {
 				for (int j = 0; j < 1; j++) {
@@ -94,7 +94,7 @@ public class NBTLoader {
 			e.printStackTrace();
 			return null;
 		}
-		MonoCities.log("Byte buffer filled");
+		//MonoCities.log("Byte buffer filled");
 		
 		short length = fetchLength();
 		short width = fetchWidth();
@@ -108,8 +108,8 @@ public class NBTLoader {
 		}
 		
 		MonoBlock[][][] building = fetchBlock(length,width,height);
-		MonoCities.log("loaded " + (building.length * building[0].length * building[0][0].length) +
-					" blocks");
+		//MonoCities.log("loaded " + (building.length * building[0].length * building[0][0].length) +
+		//			" blocks");
 		
 		Schematic item = new Schematic(length,width,height,building);
 		return item;

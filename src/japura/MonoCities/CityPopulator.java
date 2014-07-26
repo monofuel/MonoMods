@@ -54,7 +54,7 @@ public class CityPopulator extends BlockPopulator{
 		for (File item : listOfFiles) {
 			String fileName = item.getName();
 			if (!fileName.endsWith(".schematic")) continue;
-			MonoCities.log("loading " + fileName);
+			//MonoCities.log("loading " + fileName);
 			NBTLoader loader = new NBTLoader();
 			
 			Schematic tmp = loader.loadSchematic("plugins/MonoCities/schematics/" + fileName);

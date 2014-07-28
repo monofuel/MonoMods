@@ -37,7 +37,7 @@ public class AutoSave extends BukkitRunnable{
 		plugin.verifyTribes();
 
 
-		Tribes.log("tribe autosave starting");	
+		Tribes.log("tribe autosave ending");	
 		for (Player user : users)
 			user.sendMessage("&6Tribes save complete.");
 

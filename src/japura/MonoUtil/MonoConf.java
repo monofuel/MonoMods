@@ -115,6 +115,10 @@ public class MonoConf {
 
 	
 	public void close() {
+		write();
+	}
+	
+	public void write() {
 		if (!configError && config != null) {
 			try {
 				File confFile = new File(confDir + "/" + confName);

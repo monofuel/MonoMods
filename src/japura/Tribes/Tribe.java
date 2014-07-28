@@ -58,7 +58,7 @@ public class Tribe {
 	public TeleportData getTeleData(Block em) {
 		return teleports.get(em);
 	}
-	
+
 	public void addEmerald(Block em) {
 		if (em.getType() != Material.EMERALD_BLOCK) return;
 		
@@ -72,6 +72,12 @@ public class Tribe {
 		data.addAllowed(this);
 		teleports.put(em,data);
 		user.sendMessage("created new teleporter named " + name);
+	}
+
+	public void addTeleport(TeleportData teleData) {
+		teleData.addAllowed(this);
+		diamonds.add(teleData.getSpot());
+		teleports.put(teleData.getSpot(),teleData);
 	}
 
 	public void checkEmerald(Block em) {

@@ -187,6 +187,8 @@ public class CityPopulator extends BlockPopulator{
 				Material.BOW,
 				Material.STICK,
 				Material.MUSHROOM_SOUP,
+				Material.BROWN_MUSHROOM,
+				Material.RED_MUSHROOM,
 				Material.BUCKET,
 				Material.EXP_BOTTLE,
 				Material.REDSTONE,
@@ -209,7 +211,30 @@ public class CityPopulator extends BlockPopulator{
 				Material.GOLD_PICKAXE,
 				Material.IRON_INGOT,
 				Material.GOLD_INGOT,
+				Material.SAPLING,
+				Material.SEEDS,
+				Material.LEATHER_HELMET,
+				Material.LEATHER_CHESTPLATE,
+				Material.LEATHER_LEGGINGS,
+				Material.LEATHER_BOOTS,
 				Material.DIAMOND,
+				Material.OBSIDIAN,
+				Material.MELON_SEEDS,
+				Material.PUMPKIN_SEEDS,
+				Material.SUGAR_CANE,
+				Material.CARROT_ITEM,
+				Material.COCOA,
+				Material.EGG,
+				Material.ENDER_PEARL,
+				Material.FIREWORK,
+				Material.FISHING_ROD,
+				Material.INK_SACK,
+				Material.LAVA_BUCKET,
+				Material.WATER_BUCKET,
+				Material.MILK_BUCKET,
+				Material.POTATO_ITEM,
+				Material.YELLOW_FLOWER,
+				Material.RED_ROSE,
 				Material.EMERALD,
 				Material.EMERALD_BLOCK
 				};
@@ -220,12 +245,12 @@ public class CityPopulator extends BlockPopulator{
 		Chest c = (Chest) item.getState();
 		Inventory inv = c.getInventory();
 		
-		int count = Math.abs(rand.nextInt()) % 10;
+		int count = Math.abs(rand.nextInt()) % 3;
 		
 		
 		for (int i = 1; i < count; i++) {
 			int chance = Math.abs(rand.nextInt()) % chestLoot.length;
-			int amount = Math.abs(rand.nextInt()) % 5;
+			int amount = Math.abs(rand.nextInt()) % 1;
 			amount++;
 			ItemStack is = new ItemStack(chestLoot[chance],amount);
 			inv.addItem(is);

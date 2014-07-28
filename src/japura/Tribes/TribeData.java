@@ -81,6 +81,10 @@ public class TribeData {
 	}
 	
 	public void close() {
+		write();
+	}
+
+	public void write() {
 		if (!configError && config != null) {
 			try {
 				File confFile = new File(confDir + ("/data.json"));

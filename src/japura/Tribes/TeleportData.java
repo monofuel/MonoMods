@@ -38,19 +38,23 @@ public class TeleportData {
 		return name;
 	}
 
+	public Block getSpot() {
+		return spot;
+	}
+
 	public void rename(String name) {
 		this.name = name;
 	}
 
 	public void addAllowed(Tribe group) {
-		allowed.add(group);
+		if (!allowed.contains(group))
+			allowed.add(group);
 	}
 	public void rmAllowed(Tribe group) {
 		allowed.remove(group);
 	}
 	public boolean isAllowed(Tribe group) {
-		return true;
-		//return allowed.contains(group);
+		return allowed.contains(group);
 	}
 
 	public Tribe[] getAllowed() {
@@ -60,7 +64,7 @@ public class TeleportData {
 	public void teleportPlayer(Player user) {
 		//check if the block is obscured
 		Location myloc = spot.getLocation();
-		if (spot.getType() != Material.DIAMOND_BLOCK) {
+		if (spot.getType() != Material.DIAMOND_BLOCK && spot.getChunk().isLoaded()) {
 			user.sendMessage("teleporter was destroyed");
 			return;
 		}

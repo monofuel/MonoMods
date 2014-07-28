@@ -56,7 +56,8 @@ public class Tribes extends JavaPlugin{
 		defaults.put("SpawnX",184);
 		defaults.put("SpawnY",77);
 		defaults.put("SpawnZ",255);
-		defaults.put("MOTD","&4Welcome to Japura.net!");
+		defaults.put("World","world");
+		defaults.put("MOTD","Welcome to Japura.net!");
 		defaults.put("Disband after time",true);
 		defaults.put("Days before disband",60);
 		
@@ -110,8 +111,9 @@ public class Tribes extends JavaPlugin{
 			int x = (int) ((long) config.getConf("SpawnX"));
 			int y = (int) ((long) config.getConf("SpawnY"));
 			int z = (int) ((long) config.getConf("SpawnZ"));
+			String worldName = (String) config.getConf("World");
 			//TODO:should set a config option for this
-			World world = Bukkit.getWorld("world");
+			World world = Bukkit.getWorld(worldName);
 			if (world == null) {
 				log("invalid world!");
 			} else {
@@ -237,6 +239,7 @@ public class Tribes extends JavaPlugin{
 			JSONObject item = new JSONObject();
 			JSONArray playerList = new JSONArray();
 			JSONArray emeraldList = new JSONArray();
+			JSONArray diamondList = new JSONArray();
 			if (group.getLeader() == null) log("leader is null");
 			if (group.getLeader().getPlayer() == null) log("player is null");
 			item.put("leader" , group.getLeader().getPlayer());
@@ -254,9 +257,31 @@ public class Tribes extends JavaPlugin{
 				em.put("z", emerald.getLocation().getBlockZ());
 				emeraldList.add(em);
 			}
+
+
+			for (Block diamond : group.getDiamonds()) {
+				JSONObject em = new JSONObject();
+				em.put("world",diamond.getWorld().getName());
+				em.put("x", diamond.getLocation().getBlockX());
+				em.put("y", diamond.getLocation().getBlockY());
+				em.put("z", diamond.getLocation().getBlockZ());
+
+				TeleportData teleData = group.getTeleData(diamond);
+				em.put("name",teleData.getName());
+				JSONArray allowedTribes = new JSONArray();	
+
+				Tribe[] allowed = teleData.getAllowed();
+				for (int i = 0; i < allowed.length; i++) {
+					allowedTribes.add(allowed[i].getName());
+				}
+				em.put("allowed tribes",allowedTribes);
+
+				diamondList.add(em);
+			}
 			
 			item.put("players",playerList);
 			item.put("emeralds",emeraldList);
+			item.put("diamonds",diamondList);
 			item.put("lastlog",group.getLastLogTime());
 			data.setConf(group.getName(),item);
 						
@@ -286,6 +311,7 @@ public class Tribes extends JavaPlugin{
 				user.setTribe(group);
 				group.addPlayer(user); //FOR SOME REASON THIS IS REQUIRED. TODO: WHY?
 			}
+
 			JSONArray emeraldList = (JSONArray) item.get("emeralds");
 			World emeraldWorld;
 			long x,y,z;
@@ -308,6 +334,45 @@ public class Tribes extends JavaPlugin{
 				}
 				group.addEmerald(loc.getBlock());
 			}
+
+
+			JSONArray diamondList = (JSONArray) item.get("diamonds");
+			World diamondWorld;
+			for (int i = 0; i < diamondList.size(); i++) {
+				JSONObject em = (JSONObject) diamondList.get(i);
+				String worldName = (String) em.get("world");
+				if (worldName == null) {
+					worldName = "world";
+					log("found diamond's world set as null?");
+				}
+				diamondWorld = Bukkit.getWorld(worldName);
+				if (diamondWorld == null) log("error getting world");
+				x = (long) em.get("x");
+				y = (long) em.get("y");
+				z = (long) em.get("z");
+
+				Location loc = new Location(diamondWorld,x,y,z);
+				if (loc == null) {
+					log("error getting diamond location");
+				}
+				String teleName = (String) em.get("name");
+
+				TeleportData teleData = new TeleportData(loc.getBlock(),teleName, group);
+				JSONArray allowedList = (JSONArray) em.get("allowed tribes");
+				for (int j = 0; j < allowedList.size(); j++) {
+					Tribe allowedGroup = getTribe((String) allowedList.get(j));
+					if (allowedGroup == null) {
+						log("the alloweed tribe for a diamond does not exist yet");
+						continue;
+					}
+					teleData.addAllowed(allowedGroup);
+				
+				}
+
+
+				group.addTeleport(teleData);
+			}
+
 			//last login time
 			Object lastLogTime = item.get("lastlog");
 			if (lastLogTime == null) {
@@ -454,7 +519,10 @@ public class Tribes extends JavaPlugin{
 				group = tPlayer.getTribe();
 				teleData = getttp(args[1],group);
 			}
-
+			if (teleData == null) {
+				sender.sendMessage("teleport does not exist");
+				return true;
+			}
 			sender.sendMessage(teleData.getName() + " is owned by " + teleData.getOwner().getName());
 			Tribe[] allowed = teleData.getAllowed();
 			String allowedTribes = allowed[0].getName();
@@ -480,7 +548,7 @@ public class Tribes extends JavaPlugin{
 				if (teleData == null) {
 					log("error in looking up a tribe teleport location");
 				}
-				teleportNames += teleData.getName();	
+				teleportNames += " " +  teleData.getName();	
 			}
 			sender.sendMessage(teleportNames);
 			sender.sendMessage("command WIP: only shows safezone's teleports");
@@ -491,10 +559,10 @@ public class Tribes extends JavaPlugin{
 			//teleport to location and return true
 			
 			if ((tPlayer == null) || (tPlayer.getTribe() == null)) {
-				sender.sendMessage("You are not in a tribe");
-				return true;
+				group = getTribe("safezone");
+			} else {
+				group = tPlayer.getTribe();
 			}
-			group = tPlayer.getTribe();
 			if (args.length != 1) {
 				sender.sendMessage("you must specify an existing teleport.");
 				return true;
@@ -502,7 +570,7 @@ public class Tribes extends JavaPlugin{
 			
 			TeleportData teleData = getttp(args[0],group);
 			if (teleData == null) {
-				sender.sendMessage("Teleport location " + args[1] + " does not exist");
+				sender.sendMessage("Teleport location " + args[0] + " does not exist");
 				return true;
 			}
 			teleData.teleportPlayer(player);
@@ -577,6 +645,7 @@ public class Tribes extends JavaPlugin{
 			config.close();
 			config = new MonoConf(this,genDefaultConf());
 			saveData();
+			data.write();
 			return true;
 		} else if (args[0].equalsIgnoreCase("list")) {
 			StringBuilder list = new StringBuilder();
@@ -976,6 +1045,9 @@ public class Tribes extends JavaPlugin{
 	
 	public static MonoConf getConf() {
 		return config;
+	}
+	public static TribeData getData() {
+		return data;
 	}
 	
 	//let other objects call our logger

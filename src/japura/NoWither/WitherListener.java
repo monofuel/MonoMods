@@ -30,7 +30,7 @@ public class WitherListener implements Listener{
 		if (mob instanceof Wither) {
 			
 			event.setCancelled(true);
-			NoWither.log("Wither spawn averted");
+			NoWither.log("[INFO] Wither spawn averted");
 		}
 	}
 	

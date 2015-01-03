@@ -137,6 +137,7 @@
 	        <jar destfile="${dist.dir}/NoWither.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/NoWither/*">
 			<fileset file="${src.dir}/japura/NoWither/plugin.yml"/>
+			<fileset file="${src.dir}/japura/NoWither/config.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${NoWither.classpath}"/>
                         </manifest>

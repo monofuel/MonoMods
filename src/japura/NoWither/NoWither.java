@@ -8,8 +8,6 @@
 
 package japura.NoWither;
 
-import japura.MonoUtil.MonoConf;
-
 import org.json.simple.JSONObject;
 
 import java.util.logging.Logger;
@@ -17,35 +15,26 @@ import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.FileConfiguration;
 
 public class NoWither extends JavaPlugin{
 	
 	private static Logger WitherLogger = null;
-	
-	private static MonoConf config = null;
-	private static final String configLoc = "plugins/NoWither";
-
-	public JSONObject genDefaultConf() {
-		JSONObject defaults = new JSONObject();
-
-		//this is where default config settings go
-		defaults.put("wither disabled",true);
-		
-		return defaults;
-	}
+	private boolean enabled = true;
 
 	public void onEnable() {
 		WitherLogger = getLogger();
 		
 		new WitherListener(this);
 		
-		//load configuration
-		config = new MonoConf(this,genDefaultConf());
+		//set defaults if they do not exist
+		saveDefaultConfig();
+		enabled = getConfig().getBoolean("wither disabled");
 		
 		log("NoWither has been enabled");
 		
 		//check if we want wither disabled, and if so, disable
-		if((boolean) config.getConf("wither disabled")) {
+		if((enabled)) {
 			//create anti-wither listener
 			log("wither disabled");
 			new WitherListener(this);
@@ -56,10 +45,6 @@ public class NoWither extends JavaPlugin{
 	
 	public void onDisable() {
 		
-		
-		//write config back out to file
-		//if there were no errors reading config in
-		config.close();
 		
 		log("NoWither has been disabled");
 		WitherLogger = null;
@@ -74,17 +59,17 @@ public class NoWither extends JavaPlugin{
 			} else if (args[0].equalsIgnoreCase("unload")) {
 				this.getServer().getPluginManager().disablePlugin(this);
 				return true;
-			} else if (args[0].equalsIgnoreCase("load")) {
-				//GARBAGE EVERYWHERE
-				config = new MonoConf(this,genDefaultConf());
+			} else if (args[0].equalsIgnoreCase("load")) {			
+				//TODO
+				reloadConfig();
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
-				config.close();
-				config = new MonoConf(this,genDefaultConf());
+				//TODO
+				saveConfig();
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
 				String help = "NoWither is configured from the config.\n" +
-							"/nowither load will reload the config.";
+					      "/nowither load will reload the config.";
 				sender.sendMessage(help);
 				
 				return true;
@@ -96,7 +81,16 @@ public class NoWither extends JavaPlugin{
 	}
 	
 	//let other objects call our logger
-	public static void log(String line) {
+	/**
+	 * easy method any class in this plugin can use to log information.
+	 * for consistenty, try to prefix a line with the severity of the message.
+	 * [ERROR] means the server should probably sotp and have the issue fixed
+	 * [WARNING] not critical, but not good.
+	 * [INFO] purely for information reasons (eg: logs for if a player is a lieing git(my personal favorite))
+	 * @param line	Line to be logged.
+	 *
+	 */
+	protected static void log(String line) {
 		WitherLogger.info(line);
 	}
 }

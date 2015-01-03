@@ -1,3 +1,7 @@
+THINGS TO TEST:
+nowither
+
+
 configs not always loading default settings right //done, needs testing
 
 BIG ONE: unify command output paging. currently several plugins

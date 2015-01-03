@@ -5,6 +5,8 @@ and build process will be public on github to encourage critiqueing and improvem
 
 Unfortunately, some of this code was rushed together with the hopes to 'just get it working' and could use improvements.
 
+requires java 1.7
+
 included files and directories:
 
 TODO.txt: list of things on the to-do list

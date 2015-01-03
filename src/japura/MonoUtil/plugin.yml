@@ -1,4 +1,0 @@
-name: MonoUtil
-main: japura.MonoUtil.MonoUtil
-version: 0.01
-load: startup

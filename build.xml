@@ -158,17 +158,7 @@
         </target>
 
 
-	<target name="MonoUtil" depends="build">
-		<manifestclasspath property="MonoUtil.classpath" jarfile="${dist.dir}/MonoUtil.jar">
-			<classpath refid="compile.classpath"/>
-     		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/MonoUtil.jar" basedir="${build.dir}"
-		     defaultexcludes="yes" includes="japura/MonoUtil/*">
-			<fileset file="${src.dir}/japura/MonoUtil/plugin.yml"/>
-                </jar>
-        </target>
-
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,MonoUtil,docs">
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,docs">
 		<description> Main target</description>
 	</target>
 

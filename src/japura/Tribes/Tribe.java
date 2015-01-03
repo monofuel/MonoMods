@@ -17,46 +17,52 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 public class Tribe {
-	String name;
-	TribePlayer leader;
-	long lastLogTime = 0;
-	ArrayList<TribePlayer> users = new ArrayList<TribePlayer>();
-	ArrayList<Player> invites = new ArrayList<Player>();
-	ArrayList<Block> emeralds = new ArrayList<Block>();
-	ArrayList<Block> diamonds = new ArrayList<Block>();
-	HashMap<Block,TeleportData> teleports = new HashMap<Block,TeleportData>();
-	
+
+	DBObject myTribe;
+
 	//should only be used for safezone or special tribes
 	public Tribe(String name) {
-		this.name = name;
-		leader = new TribePlayer("");
+		BasicDBObject query = new BasicDBObject();
+		query.put("name",name);
+
+		DBCursor cursor = table.find(query);
+
+		myTribe = cursor.next();
+		if (cursor.hasNext()) {
+			Tribes.log("FATAL: multiple tribes with the same name " + name);
+		}
 	}
 	
-	public Tribe(String name,TribePlayer founder) {
-		this.name = name;
-		this.leader = founder;
-		
-		users.add(founder);
-	}
-
 	public long getLastLogTime() {
-		if (lastLogTime == 0) lastLogTime = System.currentTimeMillis();
-		return lastLogTime;
+
+		if(!myTribe.containsField("lastLogTime")) {
+			//only for importing old configs
+			//TODO update field
+			//System.currentTimeMillis();
+			return 0;
+		} else {
+			//i'm sure return statements in an if violates some coding standard
+			return myTribe.get("lastLogTime");
+		}
 	}
 
 	public void setLastLogTime(long lastLogTime) {
-		this.lastLogTime = lastLogTime;
+		//TODO stub
 	}
 	
 	public Block[] getEmeralds() {
-		return emeralds.toArray(new Block[emeralds.size()]);
+		//TODO fetch current list from db
+		//return emeralds.toArray(new Block[emeralds.size()]);
 	}
 
 	public Block[] getDiamonds() {
-		return diamonds.toArray(new Block[diamonds.size()]);
+		//TODO stub
+		//return diamonds.toArray(new Block[diamonds.size()]);
 	}
 	public TeleportData getTeleData(Block em) {
-		return teleports.get(em);
+		//TODO stub
+		//return teleports.get(em);
+		
 	}
 
 	public void addEmerald(Block em) {

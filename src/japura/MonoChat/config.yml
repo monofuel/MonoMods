@@ -1,0 +1,4 @@
+server: irc.japura.net
+channel: #minecrafttesting
+username: TestingBot
+port: 6667

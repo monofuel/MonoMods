@@ -66,6 +66,7 @@
 	        <jar destfile="${dist.dir}/MonoChat.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/MonoChat/*">
 			<fileset file="${src.dir}/japura/MonoChat/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoChat/config.yml"/>
 
                         <manifest>
 				<attribute name="Class-Path" value="${MonoChat.classpath}"/>

@@ -1,0 +1,10 @@
+ClaimSize: 8
+YAxisClaim: false
+Tribe Spawn: false
+SpawnX: 184
+SpawnY: 77
+SpawnZ: 255
+World: world
+MOTD: Welcome to Japura.net!
+Disband after time: true
+Days before disband: 60

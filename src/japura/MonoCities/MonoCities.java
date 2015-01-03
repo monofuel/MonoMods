@@ -20,9 +20,7 @@ public class MonoCities extends JavaPlugin{
 	
 	private static Logger citiesLogger = null;
 	
-	private static MonoConf config = null;
 	private static CityPopulator pop = null;
-	private static final String configLoc = "plugins/MonoCities";
 	private static WorldInit listener = null;
 
 	//used to disable the plugin before it fully loads if it 
@@ -32,16 +30,19 @@ public class MonoCities extends JavaPlugin{
 	public void onEnable() {
 		citiesLogger = getLogger();
 		
-		//load configuration
-		MonoConf.init();
-		config = new MonoConf(configLoc);
+		//save defaults if they do not exist
+		saveDefaultConfig();
 
 		disabled = false;
 		pop = new CityPopulator(this);
 		//if no schematics are found, disabled will be set true.
 		//this means we should probably not continue enabling.
+		//disabled will only be false if this onEnable function
+		//runs and succesfully runs CityPopulator
+		//(without CityPopulator disabling the plugin)
 		if (disabled) return;
 		
+		//TODO: read world from config
 		World world = Bukkit.getWorld("World");
 		if (world == null) {
 			listener = new WorldInit(this,pop);
@@ -60,10 +61,7 @@ public class MonoCities extends JavaPlugin{
 		if (Bukkit.getWorld("World") != null)
 			Bukkit.getWorld("World").getPopulators().remove(pop);
 		
-		//write config back out to file
-		//if there were no errors reading config in
-		if (config != null)
-			config.close();
+		//check if we aren't being disabled before fully initializing
 		if (listener != null)
 			listener.stop();
 		
@@ -71,6 +69,8 @@ public class MonoCities extends JavaPlugin{
 		if (pop != null)
 			pop.close();
 		
+		saveConfig();
+
 		log("MonoCities has been disabled");
 		citiesLogger = null;
 		disabled = true;
@@ -88,15 +88,13 @@ public class MonoCities extends JavaPlugin{
 				this.getServer().getPluginManager().disablePlugin(this);
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
-				//GARBAGE EVERYWHERE
-				config = new MonoConf(configLoc);
+				reloadConfig();
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
-				config.close();
-				config = new MonoConf(configLoc);
+				saveConfig();
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
-				String help = "Help stuff goes here";
+				String help = "MonoCities builds cities over the regular world";
 				sender.sendMessage(help);
 				
 				return true;
@@ -108,6 +106,15 @@ public class MonoCities extends JavaPlugin{
 	}
 	
 	//let other objects call our logger
+        /**
+         * easy method any class in this plugin can use to log information.
+         * for consistenty, try to prefix a line with the severity of the message.
+         * [ERROR] means the server should probably sotp and have the issue fixed
+         * [WARNING] not critical, but not good.
+         * [INFO] purely for information reasons (eg: logs for if a player is a lieing git(my personal favorite))
+         * @param line  Line to be logged.
+         *
+         */
 	public static void log(String line) {
 		citiesLogger.info(line);
 	}

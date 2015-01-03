@@ -8,9 +8,8 @@
 
 package japura.NoWither;
 
-import org.json.simple.JSONObject;
-
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class NoWither extends JavaPlugin{
+
 	
 	private static Logger WitherLogger = null;
 	private boolean enabled = true;
@@ -45,7 +45,8 @@ public class NoWither extends JavaPlugin{
 	
 	public void onDisable() {
 		
-		
+		saveConfig();
+
 		log("NoWither has been disabled");
 		WitherLogger = null;
 	}
@@ -60,14 +61,13 @@ public class NoWither extends JavaPlugin{
 				this.getServer().getPluginManager().disablePlugin(this);
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {			
-				//TODO
 				reloadConfig();
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
-				//TODO
 				saveConfig();
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
+				//TODO
 				String help = "NoWither is configured from the config.\n" +
 					      "/nowither load will reload the config.";
 				sender.sendMessage(help);
@@ -83,14 +83,20 @@ public class NoWither extends JavaPlugin{
 	//let other objects call our logger
 	/**
 	 * easy method any class in this plugin can use to log information.
-	 * for consistenty, try to prefix a line with the severity of the message.
-	 * [ERROR] means the server should probably sotp and have the issue fixed
-	 * [WARNING] not critical, but not good.
-	 * [INFO] purely for information reasons (eg: logs for if a player is a lieing git(my personal favorite))
 	 * @param line	Line to be logged.
 	 *
 	 */
 	protected static void log(String line) {
 		WitherLogger.info(line);
+	}
+
+	/**
+	 * easy method any class in this plugin can use to log information.
+	 * @param level severity of log
+	 * @param line	Line to be logged.
+	 *
+	 */
+	protected static void log(Level level, String line) {
+		WitherLogger.log(level,line);
 	}
 }

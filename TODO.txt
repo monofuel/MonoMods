@@ -1,5 +1,6 @@
 THINGS TO TEST:
 nowither
+MonoBugs
 
 
 configs not always loading default settings right //done, needs testing

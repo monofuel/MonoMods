@@ -8,39 +8,24 @@
 
 package japura.MonoChat;
 
-import japura.MonoUtil.MonoConf;
-
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 public class MonoChat extends JavaPlugin{
 	
-	private static Logger templateLogger = null;
+	private static Logger chatLogger = null;
 	
-	private static MonoConf config = null;
 	private static IRCListener irc;
 
-	public JSONObject genDefaultConf() {
-		JSONObject defaults = new JSONObject();
-
-		defaults.put("server","irc.japura.net");
-		defaults.put("channel","#minecrafttesting");
-		defaults.put("username","TestingBot");
-		defaults.put("port",6667L);
-		return defaults;
-	}
-
 	public void onEnable() {
-		templateLogger = getLogger();
+		chatLogger = getLogger();
 		
-		//load configuration
-		config = new MonoConf(this,genDefaultConf());
+		//set defaults if they do not exist
+		saveDefaultConfig();
 		
 		log("MonoChat has been enabled");
 		
@@ -51,12 +36,9 @@ public class MonoChat extends JavaPlugin{
 	public void onDisable() {
 		
 		irc.close();
-		//write config back out to file
-		//if there were no errors reading config in
-		config.close();
 		
 		log("MonoChat has been disabled");
-		templateLogger = null;
+		chatLogger = null;
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -68,15 +50,14 @@ public class MonoChat extends JavaPlugin{
 			} else if (args[0].equalsIgnoreCase("unload")) {
 				this.getServer().getPluginManager().disablePlugin(this);
 				return true;
+
 			} else if (args[0].equalsIgnoreCase("load")) {
-				//GARBAGE EVERYWHERE
-				config = new MonoConf(this,genDefaultConf());
+				reloadConfig();
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
-				config.close();
-				config = new MonoConf(this,genDefaultConf());
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
+				//TODO
 				String help = "Help stuff goes here";
 				sender.sendMessage(help);
 				
@@ -87,13 +68,25 @@ public class MonoChat extends JavaPlugin{
 		
 		return false;
 	}
-	
-	public static MonoConf getConf() {
-		return config;
-	}
-	
-	//let other objects call our logger
-	public static void log(String line) {
-		templateLogger.info(line);
-	}
+	//TODO investigate better way for logging. should it really be static?
+        //let other objects call our logger
+        /** 
+         * easy method any class in this plugin can use to log information.
+         * @param line  Line to be logged.
+         *
+         */
+        protected static void log(String line) {
+                chatLogger.info(line);
+        }   
+
+        /** 
+         * easy method any class in this plugin can use to log information.
+         * @param level severity of log
+         * @param line  Line to be logged.
+         *
+         */
+        protected static void log(Level level, String line) {
+                chatLogger.log(level,line);
+        }   
+
 }

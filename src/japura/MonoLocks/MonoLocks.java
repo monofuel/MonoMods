@@ -8,12 +8,8 @@
 
 package japura.MonoLocks;
 
-import japura.MonoUtil.MonoConf;
-
 import java.util.ArrayList;
 import java.util.logging.Logger;
-
-import org.json.simple.JSONObject;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -31,23 +27,10 @@ public class MonoLocks extends JavaPlugin{
 	
 	private static Logger templateLogger = null;
 	
-	private static MonoConf config = null;
-	private static final String configLoc = "plugins/MonoLocks";
-
-	public JSONObject genDefaultConf() {
-		JSONObject defaults = new JSONObject();
-
-		//this is where i'd put config options. IF I HAD ANY
-
-		return defaults;
-	}
-
-
 	public void onEnable() {
 		templateLogger = getLogger();
-		
-		//load configuration
-		config = new MonoConf(this,genDefaultConf());
+
+		//no configuration stuffs
 		
 		new LockCreateListener(this);
 		new LockAccessListener(this);
@@ -60,11 +43,7 @@ public class MonoLocks extends JavaPlugin{
 	public void onDisable() {
 		
 		
-		//write config back out to file
-		//if there were no errors reading config in
-		config.close();
-		
-		log("pluginTemplate has been disabled");
+		log("MonoLocks has been disabled");
 		templateLogger = null;
 	}
 	
@@ -78,14 +57,13 @@ public class MonoLocks extends JavaPlugin{
 				this.getServer().getPluginManager().disablePlugin(this);
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
-				//GARBAGE EVERYWHERE
-				config = new MonoConf(this,genDefaultConf());
+				//TODO stub
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
-				config.close();
-				config = new MonoConf(this,genDefaultConf());
+				//TODO stub
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
+				//TODO help stuff
 				String help = "Help stuff goes here";
 				sender.sendMessage(help);
 				

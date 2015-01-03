@@ -8,10 +8,8 @@
 
 package japura.Tribes;
 
-import japura.MonoUtil.MonoConf;
-
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -23,68 +21,33 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 public class Tribes extends JavaPlugin{
 	
 	//TODO: do we really need all these static values?
 
 	//TODO: perhaps rename this lowercase t?
 	private static Logger TribeLogger = null;
+	private static MongoClient mongo = null;
+	private static DB db = null;
+	private static DBCollection table = null;
 	
-	private static MonoConf config = null;
-	private static TribeData data = null;
-	//should not be needed anymore
-	//is still used for TribesData
-	private static final String configLoc = "plugins/Tribes";
-	
-	private static ArrayList<Tribe> groups = new ArrayList<Tribe>();
-	private static ArrayList<TribePlayer> users = new ArrayList<TribePlayer>();
 	private static TribeProtect protector;
 	private static AutoSave autoSave;
 	private static LoginListener loginListener;
 	private static TribeDisbandRunner disbander;
 	private static TribeTeleportListener teleportListener;
 	
-	public JSONObject genDefaultConf() {
-		JSONObject defaults = new JSONObject();
-
-		defaults.put("ClaimSize",8);
-		defaults.put("YAxisClaim",false);
-		defaults.put("Tribe Spawn",false);
-		defaults.put("SpawnX",184);
-		defaults.put("SpawnY",77);
-		defaults.put("SpawnZ",255);
-		defaults.put("World","world");
-		defaults.put("MOTD","Welcome to Japura.net!");
-		defaults.put("Disband after time",true);
-		defaults.put("Days before disband",60);
-		
-		return defaults;
-
-	}
-
 	public void onEnable() {
 
-		//TODO: probably should log and crashing plugin instead of using asserts.
 
-		//set the logger
-		assert TribeLogger == null;
 		TribeLogger = getLogger();
+		saveDefaultConfig();
 		
-		assert config == null;
-		//load configuration
-		config = new MonoConf(this,genDefaultConf());
-
-		assert data ==  null;
-		//TODO review data storage
-		TribeData.init();
-		data = new TribeData(configLoc);
-		log("loading tribes...");
-		//load all the tribe data
-		loadData();
-		log("done loading tribes!");
+		//TODO add hostname and port to config
+		//add database name or prefix to config
+		mongo = new MongoClient("localhost",27017);
+		db = mongo.getDB("MonoMods");
+		table = db.getCollection("Tribes");
 		
 		//protector checks all emerald blocks
 		//and starts listeners
@@ -99,19 +62,20 @@ public class Tribes extends JavaPlugin{
 		//trigger events on player login
 		loginListener = new LoginListener(this);
 
-		if ((boolean) config.getConf("Disband after time"))
+		//TODO double check the disband stuff
+		if (getConfig().getBoolean("Disband after time"))
 			Bukkit.getScheduler().scheduleSyncRepeatingTask(this,disbander,0,2400);
 		else
 			log("Tribes will be lasting forever");
 		
 		//set a spawn point
-		if ((boolean) config.getConf("Tribe Spawn")) {
+		if (getConfig().getBoolean("Tribe Spawn")) {
 			
 			//TODO: why must i do these crazy casts
-			int x = (int) ((long) config.getConf("SpawnX"));
-			int y = (int) ((long) config.getConf("SpawnY"));
-			int z = (int) ((long) config.getConf("SpawnZ"));
-			String worldName = (String) config.getConf("World");
+			int x = getConfig().getInt("SpawnX");
+			int y = getConfig().getInt("SpawnY");
+			int z = getConfig().getInt("SpawnZ");
+			String worldName = getConfig().getString("World");
 			//TODO:should set a config option for this
 			World world = Bukkit.getWorld(worldName);
 			if (world == null) {
@@ -150,26 +114,10 @@ public class Tribes extends JavaPlugin{
 		//users
 		//protector
 		
-		//write tribes out to file
-		saveData();
-		
-		//write config back out to file
-		//if there were no errors reading config in
-		config.close();
-		data.close();
-
-		config = null;
-		data = null;
+		//TODO close DB connection?
+		saveConfig();
 
 		protector.stop();
-		protector = null;
-
-		//TODO: review good code cleanup
-		groups.clear();
-		groups = null;
-		users.clear();
-		users = null;
-
 
 		log("Tribes has been disabled");
 	}
@@ -182,6 +130,9 @@ public class Tribes extends JavaPlugin{
 	 */
 	public boolean verifyTribes() {
 		boolean result = true;
+
+		//TODO: update this for mongo
+		/*
 		//sanity check tribes and their leaders
 		for (Tribe group : groups) {
 			if (group.getName().equals("safezone")) continue;
@@ -224,165 +175,9 @@ public class Tribes extends JavaPlugin{
 			}
 		}
 		log("---- USER CHECK COMPLETE ----");
+		*/
+		log("STUB");
 		return result;
-	}
-	
-	public void saveData() {
-
-		//run a verification
-		verifyTribes();
-
-		//clear out old tribes first
-		data.popNewConf();
-
-		for (Tribe group : groups) {
-			JSONObject item = new JSONObject();
-			JSONArray playerList = new JSONArray();
-			JSONArray emeraldList = new JSONArray();
-			JSONArray diamondList = new JSONArray();
-			if (group.getLeader() == null) log("leader is null");
-			if (group.getLeader().getPlayer() == null) log("player is null");
-			item.put("leader" , group.getLeader().getPlayer());
-			
-			for (TribePlayer user : group.getPlayers()) {
-				if (user == group.getLeader()) continue;
-				playerList.add(user.getPlayer());
-			}
-			
-			for (Block emerald : group.getEmeralds()) {
-				JSONObject em = new JSONObject();
-				em.put("world",emerald.getWorld().getName());
-				em.put("x", emerald.getLocation().getBlockX());
-				em.put("y", emerald.getLocation().getBlockY());
-				em.put("z", emerald.getLocation().getBlockZ());
-				emeraldList.add(em);
-			}
-
-
-			for (Block diamond : group.getDiamonds()) {
-				JSONObject em = new JSONObject();
-				em.put("world",diamond.getWorld().getName());
-				em.put("x", diamond.getLocation().getBlockX());
-				em.put("y", diamond.getLocation().getBlockY());
-				em.put("z", diamond.getLocation().getBlockZ());
-
-				TeleportData teleData = group.getTeleData(diamond);
-				em.put("name",teleData.getName());
-				JSONArray allowedTribes = new JSONArray();	
-
-				Tribe[] allowed = teleData.getAllowed();
-				for (int i = 0; i < allowed.length; i++) {
-					allowedTribes.add(allowed[i].getName());
-				}
-				em.put("allowed tribes",allowedTribes);
-
-				diamondList.add(em);
-			}
-			
-			item.put("players",playerList);
-			item.put("emeralds",emeraldList);
-			item.put("diamonds",diamondList);
-			item.put("lastlog",group.getLastLogTime());
-			data.setConf(group.getName(),item);
-						
-		}
-	}
-	
-	public void loadData() {
-		
-		groups = new ArrayList<Tribe>();
-		users = new ArrayList<TribePlayer>();
-		Set<String> keys = data.getKeys();
-		for (String name : keys) {
-			JSONObject item = (JSONObject) data.getConf(name);
-			//log(name);
-			String leader = (String) item.get("leader");
-			if (leader == null) log("leader is null");
-			//log(leader);
-			TribePlayer tribeLeader = TribePlayerFactory.createNewPlayer(leader);
-			
-			TribeFactory.createNewTribe(name,tribeLeader);
-			Tribe group = getTribe(name);
-			group.addPlayer(tribeLeader);
-			tribeLeader.setTribe(group);
-			JSONArray playerList = (JSONArray) item.get("players");
-			for (int i = 0; i < playerList.size(); i++) {
-				TribePlayer user = TribePlayerFactory.createNewPlayer((String) playerList.get(i));
-				user.setTribe(group);
-				group.addPlayer(user); //FOR SOME REASON THIS IS REQUIRED. TODO: WHY?
-			}
-
-			JSONArray emeraldList = (JSONArray) item.get("emeralds");
-			World emeraldWorld;
-			long x,y,z;
-			for (int i = 0; i < emeraldList.size(); i++) {
-				JSONObject em = (JSONObject) emeraldList.get(i);
-				String worldName = (String) em.get("world");
-				if (worldName == null) {
-					worldName = "world";
-					log("found emerald's world set as null?");
-				}
-				emeraldWorld = Bukkit.getWorld(worldName);
-				if (emeraldWorld == null) log("error getting world");
-				x = (long) em.get("x");
-				y = (long) em.get("y");
-				z = (long) em.get("z");
-
-				Location loc = new Location(emeraldWorld,x,y,z);
-				if (loc == null) {
-					log("error getting location");
-				}
-				group.addEmerald(loc.getBlock());
-			}
-
-
-			JSONArray diamondList = (JSONArray) item.get("diamonds");
-			World diamondWorld;
-			for (int i = 0; i < diamondList.size(); i++) {
-				JSONObject em = (JSONObject) diamondList.get(i);
-				String worldName = (String) em.get("world");
-				if (worldName == null) {
-					worldName = "world";
-					log("found diamond's world set as null?");
-				}
-				diamondWorld = Bukkit.getWorld(worldName);
-				if (diamondWorld == null) log("error getting world");
-				x = (long) em.get("x");
-				y = (long) em.get("y");
-				z = (long) em.get("z");
-
-				Location loc = new Location(diamondWorld,x,y,z);
-				if (loc == null) {
-					log("error getting diamond location");
-				}
-				String teleName = (String) em.get("name");
-
-				TeleportData teleData = new TeleportData(loc.getBlock(),teleName, group);
-				JSONArray allowedList = (JSONArray) em.get("allowed tribes");
-				for (int j = 0; j < allowedList.size(); j++) {
-					Tribe allowedGroup = getTribe((String) allowedList.get(j));
-					if (allowedGroup == null) {
-						log("the alloweed tribe for a diamond does not exist yet");
-						continue;
-					}
-					teleData.addAllowed(allowedGroup);
-				
-				}
-
-
-				group.addTeleport(teleData);
-			}
-
-			//last login time
-			Object lastLogTime = item.get("lastlog");
-			if (lastLogTime == null) {
-				//if the config is outdated
-				group.setLastLogTime(System.currentTimeMillis());
-			} else {
-				group.setLastLogTime((long) lastLogTime);
-			}
-		}
-		
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -1043,11 +838,8 @@ public class Tribes extends JavaPlugin{
 		return getPlayer(user.getName());
 	}
 	
-	public static MonoConf getConf() {
-		return config;
-	}
-	public static TribeData getData() {
-		return data;
+	public static getTable() {
+		return table;
 	}
 	
 	//let other objects call our logger

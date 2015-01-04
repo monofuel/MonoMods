@@ -8,6 +8,8 @@
 
 package japura.Tribes;
 
+import com.mongodb.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -29,10 +31,11 @@ public class Tribes extends JavaPlugin{
 	private static Logger TribeLogger = null;
 	private static MongoClient mongo = null;
 	private static DB db = null;
-	private static DBCollection table = null;
+	private static DBCollection tribeTable = null;
+	private static DBCollection emeraldTable = null;
+	private static DBCollection diamondTable = null;
 	
 	private static TribeProtect protector;
-	private static AutoSave autoSave;
 	private static LoginListener loginListener;
 	private static TribeDisbandRunner disbander;
 	private static TribeTeleportListener teleportListener;
@@ -47,17 +50,17 @@ public class Tribes extends JavaPlugin{
 		//add database name or prefix to config
 		mongo = new MongoClient("localhost",27017);
 		db = mongo.getDB("MonoMods");
-		table = db.getCollection("Tribes");
+		tribeTable = db.getCollection("Tribes");
+		tribeTable = db.getCollection("Emeralds");
+		tribeTable = db.getCollection("Diamonds");
 		
 		//protector checks all emerald blocks
 		//and starts listeners
 		assert protector == null;
 		protector = new TribeProtect(this);
-		autoSave = new AutoSave(this);
 		disbander = new TribeDisbandRunner(this);
 		teleportListener = new TribeTeleportListener(this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,200,200);
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,autoSave,72000,72000);
 
 		//trigger events on player login
 		loginListener = new LoginListener(this);
@@ -838,10 +841,16 @@ public class Tribes extends JavaPlugin{
 		return getPlayer(user.getName());
 	}
 	
-	public static getTable() {
-		return table;
+	public static DBCollection getTribeTable() {
+		return tribeTable;
 	}
 	
+	public static DBCollection getEmeraldTable() {
+		return emeraldTable;
+	}
+	public static DBCollection getDiamondTable() {
+		return diamondTable;
+	}
 	//let other objects call our logger
 	public static void log(String line) {
 		TribeLogger.info(line);

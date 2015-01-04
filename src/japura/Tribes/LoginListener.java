@@ -23,13 +23,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class LoginListener implements Listener {
 	
+	JavaPlugin plugin;
+
 	public LoginListener(JavaPlugin plugin) {
+		this.plugin = plugin;
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
 	}
 	
 	@EventHandler
 	public void PlayerLogin(PlayerJoinEvent user) {
-		String motd = (String) Tribes.getConf().getConf("MOTD");
+		String motd = plugin.getConfig().getString("MOTD");
 		user.getPlayer().sendMessage(motd);	
 
 	}

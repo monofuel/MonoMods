@@ -8,6 +8,8 @@
 
 package japura.Tribes;
 
+import com.mongodb.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,14 +20,16 @@ import org.bukkit.entity.Player;
 
 public class Tribe {
 
-	DBObject myTribe;
+	private DBObject myTribe;
+	private String name;
 
 	//should only be used for safezone or special tribes
 	public Tribe(String name) {
+		this.name = name;
 		BasicDBObject query = new BasicDBObject();
 		query.put("name",name);
 
-		DBCursor cursor = table.find(query);
+		DBCursor cursor = Tribes.getTribeTable().find(query);
 
 		myTribe = cursor.next();
 		if (cursor.hasNext()) {
@@ -42,7 +46,7 @@ public class Tribe {
 			return 0;
 		} else {
 			//i'm sure return statements in an if violates some coding standard
-			return myTribe.get("lastLogTime");
+			return (long) myTribe.get("lastLogTime");
 		}
 	}
 
@@ -66,17 +70,24 @@ public class Tribe {
 	}
 
 	public void addEmerald(Block em) {
+		//TODO Log this
 		if (em.getType() != Material.EMERALD_BLOCK) return;
 		
-		emeralds.add(em);
+		//emeralds.add(em);
+
+		BasicDBObject emerald = new BasicDBObject();
+		emerald.put("tribe",name);
+		emerald.put("X",em.getLocation().getBlockX());
+		emerald.put("Y",em.getLocation().getBlockY());
+		emerald.put("Z",em.getLocation().getBlockZ());
+		Tribes.getTribeTable().insert(emerald);
 	}
 	public void addDiamond(Block em,Player user) {
 		if (em.getType() != Material.DIAMOND_BLOCK) return;
 		diamonds.add(em);
 		String name = "diamond_" + teleports.size();
 		TeleportData data = new TeleportData(em,name,this);
-		data.addAllowed(this);
-		teleports.put(em,data);
+		data.addAllowed(this); //TODO why is this needed?
 		user.sendMessage("created new teleporter named " + name);
 	}
 

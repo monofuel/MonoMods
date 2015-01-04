@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.Date;
+import java.net.UnknownHostException;
+
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,7 +35,12 @@ public class MonoBugs extends JavaPlugin{
 		
 		//TODO add hostname and port to config
 		//no config, just monogoDB
+		try {
 		mongo = new MongoClient("localhost",27017);
+		} catch (UnknownHostException e) {
+			//TODO should handle this error properly
+			e.printStackTrace();
+		}
 		//TODO add this shit to config
 		db = mongo.getDB("MonoMods");
 		table = db.getCollection("MonoBugs");

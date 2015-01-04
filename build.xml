@@ -39,8 +39,6 @@
 			<link href="http://jd.bukkit.org/rb/apidocs/"/>
 			<fileset dir="${src.dir}">
 				<include name="japura/*/*.java" />
-				<include name="org/json/simple/*.java" />
-				<include name="org/json/simple/parser/*.java" />
 			</fileset>
 		</javadoc>
 	</target>
@@ -160,7 +158,8 @@
         </target>
 
 
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,docs">
+	<!--<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,docs">-->
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,docs">
 		<description> Main target</description>
 	</target>
 

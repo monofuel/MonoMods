@@ -8,6 +8,8 @@
 
 package japura.Tribes;
 
+import com.mongodb.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,16 +20,37 @@ import org.bukkit.entity.Player;
 
 public class TeleportData {
 
-	Block spot;
 	String name;
 	Tribe owner;
-	ArrayList<Tribe> allowed;
+	private DBObject myTeleport;
 
 	public TeleportData(Block spot, String name,Tribe owner) {
-		this.spot = spot;
 		this.name = name;
 		this.owner = owner;
-		allowed = new ArrayList<Tribe>();
+
+		BasicDBObject query = new BasicDBObject();
+		query.put("tribe",owner);
+		query.put("name",name);
+		DBCursor cursor = Tribes.getDiamondTable().find(query);
+
+		myTeleport = cursor.next();
+		if (myTeleport != null) {
+			Tribes.log("Teleport already exists for " + owner.getName() +
+				   " with the name " + name);
+			return;
+		}
+
+		myTeleport = new BasicDBObject();
+		myTeleport.put("tribe",owner);
+		myTeleport.put("name",name);
+		myTeleport.put("X",em.getLocation().getBlockX());
+		myTeleport.put("Y",em.getLocation().getBlockY());
+		myTeleport.put("Z",em.getLocation().getBlockZ());
+		BasicDBList allowed = new BasicDBList();
+		allowed.add(owner.getName());
+		myTeleport.put("allowed",allowed);
+
+		Tribes.getDiamondTable.insert(myTeleport());
 	}
 
 	public Tribe getOwner() {

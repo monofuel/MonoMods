@@ -20,8 +20,6 @@
 
 package japura.MonoMobs;
 
-import japura.MonoUtil.MonoConf;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -35,7 +33,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
-import org.json.simple.JSONObject;
 
 public class ZedCheckRunner extends BukkitRunnable{
 
@@ -50,9 +47,9 @@ public class ZedCheckRunner extends BukkitRunnable{
 		loc = new ConcurrentLinkedQueue<Location>();
 		adds = new ConcurrentLinkedQueue<Player>();
 		
-		maxLight = (long) MonoMobs.getMonoConfig().getConf("max light to spawn");
+		maxLight = plugin.getConfig().getLong("max light to spawn");
 		
-		int threads = (int) (long) MonoMobs.getMonoConfig().getConf("threads");
+		int threads = plugin.getConfig().getInt("threads");
 		
 		//finders = new ZedFinder[threads];
 		
@@ -67,7 +64,7 @@ public class ZedCheckRunner extends BukkitRunnable{
 		
 	}
 	
-	//convert to ints?
+	//TODO convert to ints?
 	long zed;
 	int zedCount;
 	long max;
@@ -77,21 +74,17 @@ public class ZedCheckRunner extends BukkitRunnable{
 	long tickTime;
 	long tickLength;
 	long maxLight;
-	MonoConf config;
 	long lastTime;
 	
 	public void run() {
 		//MonoMobs.log("doing zedCheck on world");
 		//TODO update variables only on reload or load and not every tick
 		
-		config = MonoMobs.getMonoConfig();
-
-		
 		//only spawn at night
-		if (Bukkit.getWorld((String) config.getConf("world")).getTime() < 13187 &&
-				Bukkit.getWorld((String) config.getConf("world")).getTime() > 22812) return;
+		if (Bukkit.getWorld(plugin.getConfig().getString("world")).getTime() < 13187 &&
+				Bukkit.getWorld(plugin.getConfig().getString("world")).getTime() > 22812) return;
 	
-		maxLight = (long) config.getConf("max light to spawn");
+		maxLight = plugin.getConfig().getLong("max light to spawn");
 		
 		
 		//check if zedfinder threads died
@@ -103,10 +96,11 @@ public class ZedCheckRunner extends BukkitRunnable{
 		}*/
 		
 		//check how many zed there are
-		zed = MonoMobs.countZed((String) config.getConf("world"));
+		zed = MonoMobs.countZed(plugin.getConfig().getString("world"));
+
 		
 		//check max # of zed
-		max = (long) config.getConf("zombie cap");
+		max = plugin.getConfig().getLong("zombie cap");
 		
 		if (zed > max) {
 			MonoMobs.log("max zed reached");
@@ -114,14 +108,14 @@ public class ZedCheckRunner extends BukkitRunnable{
 		}
 		
 		//check ideal zed per player
-		maxPerPlayer = (long) config.getConf("zed per player");
+		maxPerPlayer = plugin.getConfig().getLong("zed per player");
 		
 		//check zed distance
-		maxDistance = (long) config.getConf("zed distance");
-		maxHeight = (long) config.getConf("zed y distance");
+		maxDistance = plugin.getConfig().getLong("zed distance");
+		maxHeight = plugin.getConfig().getLong("zed y distance");
 		
-		tickTime = (long) config.getConf("zed spawn tick offset");
-		tickLength = (long) config.getConf("zed spawn tick length");
+		tickTime = plugin.getConfig().getLong("zed spawn tick offset");
+		tickLength = plugin.getConfig().getLong("zed spawn tick length");
 		
 		//check server performance
 		//if the time delta is > 50, we're laggin.
@@ -136,7 +130,7 @@ public class ZedCheckRunner extends BukkitRunnable{
 		
 		
 		//add player to add queue
-		List<Player> all = Bukkit.getWorld((String) config.getConf("world")).getPlayers();
+		List<Player> all = Bukkit.getWorld( plugin.getConfig().getString("world")).getPlayers();
 		for (Player person : all) {
 			//MonoMobs.log("counting zed for " + person.getName());
 			zedCount = 0;
@@ -158,7 +152,7 @@ public class ZedCheckRunner extends BukkitRunnable{
 		//spawn zeds
 		while(!loc.isEmpty()) {
 			Location spawnLoc = loc.remove();
-			Bukkit.getWorld((String) config.getConf("world")).spawnEntity(spawnLoc, EntityType.ZOMBIE);
+			Bukkit.getWorld(plugin.getConfig().getString("world")).spawnEntity(spawnLoc, EntityType.ZOMBIE);
 			//MonoMobs.log("spawning zed");
 		}
 		

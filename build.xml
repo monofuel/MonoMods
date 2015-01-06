@@ -122,6 +122,7 @@
 	        <jar destfile="${dist.dir}/MonoPerms.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/MonoPerms/*">
 			<fileset file="${src.dir}/japura/MonoPerms/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoPerms/config.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoPerms.classpath}"/>
                         </manifest>

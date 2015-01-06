@@ -32,7 +32,6 @@ public class MonoPerms extends JavaPlugin{
 	private static Logger templateLogger = null;
 	
 	private static PermListener listener;
-	//TODO why are we storing this? this is dumb.
 	private static JavaPlugin plugin;
 
 	public void onEnable() {
@@ -45,6 +44,7 @@ public class MonoPerms extends JavaPlugin{
 		
 		listener = new PermListener(this);
 		setDonors();
+		setAdmins();
 		log("MonoPerms has been enabled");
 
 	}
@@ -112,11 +112,26 @@ public class MonoPerms extends JavaPlugin{
 		templateLogger.info(line);
 	}
 
+	public static void setAdmins() {
+		List<String> keys = plugin.getConfig().getStringList("groups.admin");
+	
+		for (String key : keys){
+			Player user = Bukkit.getPlayer(key);
+			if (user != null) {
+				addPerm(user,"tribes.admin");
+				addPerm(user,"nowither");
+				addPerm(user,"monoperms");
+			}
+		}
+	}
+
 	public static void setDonors() {
 
 		List<String> donors = plugin.getConfig().getStringList("groups.donors");
 
 		for (String donorName : donors) {
+			Player user = Bukkit.getPlayer(donorName);
+			if (user != null) addPerm(user,"donor");
 			OfflinePlayer offlineDonor = Bukkit.getOfflinePlayer(donorName);
 			Player donor = offlineDonor.getPlayer();
 			if (donor == null) continue; //that means they are offline

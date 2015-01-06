@@ -34,15 +34,15 @@ public class PermListener implements Listener {
 	public void login(PlayerLoginEvent event) {
 		Player user = event.getPlayer();
 		
-		//TODO:
-		//should have 1 method in the main class that is called to do this
-		//and the time this is done on plugin startup should call the smae method
+		//TODO: should be refactored with setAdmins()
 		List<String> keys = plugin.getConfig().getStringList("groups.admin");
 		
 		for (String key : keys) {
 			if (user.getName().equals(key)) {
 				//TODO add proper defining groups
 				MonoPerms.addPerm(user,"tribes.admin");
+				MonoPerms.addPerm(user,"nowither");
+				MonoPerms.addPerm(user,"monoperms");
 			}
 		}
 
@@ -50,6 +50,7 @@ public class PermListener implements Listener {
 		List<String> donors = plugin.getConfig().getStringList("groups.donors");
 		for (String person : donors) {
 			if (person.equalsIgnoreCase(user.getName())) {
+				MonoPerms.addPerm(user,"donor");
 				//BECAUSE MONOFUEL ROCKS
 				//should probably be re-done for all admin users. (if there's ever more)
 				if (user.getName().equalsIgnoreCase("monofuel"))
@@ -83,7 +84,6 @@ public class PermListener implements Listener {
 	}
 
 	public void close() {
-		// TODO Auto-generated method stub
-		
+
 	}
 }

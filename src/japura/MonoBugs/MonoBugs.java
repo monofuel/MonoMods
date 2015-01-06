@@ -22,6 +22,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.ChatPaginator;
+import org.bukkit.util.ChatPaginator.ChatPage;
 
 public class MonoBugs extends JavaPlugin{
 	
@@ -163,12 +164,17 @@ public class MonoBugs extends JavaPlugin{
 		
 		
 		//TODO make this last section easier to read
-		String userReports = "Your user reports:\n";
 
 		BasicDBObject query = new BasicDBObject();
-		query.put("name",sender.getName());
+		query.put("user",sender.getName());
 
 		DBCursor cursor = table.find(query);
+
+		if (cursor.count() == 0) {
+			sender.sendMessage("there are no reports to show");
+		}
+
+		String userReports = "";
 
 			//TODO should probably use a stringbuilder? depends if you believe in them
 		while (cursor.hasNext()) { //TODO does this properly iterate over all elements?
@@ -178,9 +184,13 @@ public class MonoBugs extends JavaPlugin{
 				userReports += " | reason: " + element.get("reason");
 			userReports += "\n";
 		}
+		ChatPage page = ChatPaginator.paginate(userReports,myPage);
 
-		//TODO is chatpaginator.tostring correct?
-		sender.sendMessage(ChatPaginator.paginate(userReports,myPage).toString());
+		sender.sendMessage("Page " + page.getPageNumber() + " of " + page.getTotalPages() + " for reports:");
+		
+		for (String line : page.getLines()) {
+			sender.sendMessage(line);
+		}
 		
 		return true;
 	}
@@ -209,11 +219,15 @@ public class MonoBugs extends JavaPlugin{
 		while (cursor.hasNext()) {
 			DBObject element = cursor.next();
 			//TODO should probably use a stringbuilder? depends if you believe in them
-			userReports += "ID: " + element.get("bugID") + " | user: " + element.get("user") + " | date: " + element.get("createdDate") + "\n";
+			userReports += "ID: " + element.get("bugID") + " | user: " + element.get("user") + " | issue: " +  element.get("issue") + " | date: " + element.get("createdDate") + "\n";
 		}
-		//TODO is chatpaginator.tostring correct?
-		sender.sendMessage(ChatPaginator.paginate(userReports,myPage).toString());
 	
+		ChatPage page = ChatPaginator.paginate(userReports,myPage);
+
+		for (String line : page.getLines()) {
+			sender.sendMessage(line);
+		}
+
 		return true;
 	}
 	
@@ -267,9 +281,9 @@ public class MonoBugs extends JavaPlugin{
 			return;
 		}
 		
-		if (args.length > 2) {
+		if (args.length >= 2) {
 			StringBuilder result = new StringBuilder();
-			for (int i = 3; i < args.length; i++) {
+			for (int i = 2; i < args.length; i++) {
 				result.append(" ");
 				result.append(args[i]);
 			}
@@ -281,15 +295,13 @@ public class MonoBugs extends JavaPlugin{
 			BasicDBObject query = new BasicDBObject();
 			query.put("bugID",index);
 
-			BasicDBObject newBug = new BasicDBObject();
-			newBug.put("status",stat);
+			DBObject myBug = table.findOne(query);
+			myBug.put("status",stat);
 			//TODO is ToString required?
-			newBug.put("reason",result.toString());
+			if (result.length() > 0)
+				myBug.put("reason",result.toString());
+			table.save(myBug);
 
-			BasicDBObject updateBug = new BasicDBObject();
-			updateBug.put("$set",newBug);
-
-			table.update(query,updateBug);
 
 		}
 		

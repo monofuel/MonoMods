@@ -1,6 +1,6 @@
 name: MonoMobs
 main: japura.MonoMobs.MonoMobs
-version: 0.01
+version: 2.0
 commands:
     monomobs:
         description: primary MonoMobs command. use /monomobs help for info

@@ -1,6 +1,6 @@
 name: MonoPerms
 main: japura.MonoPerms.MonoPerms
-version: 0.01
+version: 2.0
 commands:
     perm:
         description: primary MonoPerms command. use /perm help for info

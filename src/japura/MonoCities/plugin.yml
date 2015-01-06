@@ -1,6 +1,6 @@
 name: MonoCities
 main: japura.MonoCities.MonoCities
-version: 0.01
+version: 2.0
 load: startup
 commands:
     MonoCities:

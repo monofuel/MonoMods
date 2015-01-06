@@ -12,10 +12,14 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class TribeProtect extends BukkitRunnable {
 
+	JavaPlugin plugin;
+
 	public TribeProtect(JavaPlugin plugin) {
+		this.plugin = plugin;
 		new TribeProtectListener(plugin);
 		
 	}
@@ -29,7 +33,8 @@ public class TribeProtect extends BukkitRunnable {
 		for (Tribe group : all) {
 			Block[] emeralds = group.getEmeralds();
 			for (Block item : emeralds) {
-				group.checkEmerald(item);
+				//STUB
+				//group.checkEmerald(item);
 			}	
 		}
 	}

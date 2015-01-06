@@ -29,7 +29,8 @@ public class TribeTeleport extends BukkitRunnable {
 		for (Tribe group : all) {
 			Block[] diamonds = group.getDiamonds();
 			for (Block item : diamonds) {
-				group.checkDiamond(item);
+				//TODO stub
+				//group.checkDiamond(item);
 			}	
 		}
 	}

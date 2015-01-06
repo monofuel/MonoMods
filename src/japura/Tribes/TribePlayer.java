@@ -18,21 +18,27 @@ public class TribePlayer {
 		this.user = user.getName();
 		
 	}
-	
+
+	public TribePlayer(String user) {
+		this.user = user;
+	}
+
 	public TribePlayer(Player user, Tribe group) {
 		this.user = user.getName();
 		this.group = group;
 		
 	}
-	
-	public TribePlayer(String user) {
+	public TribePlayer(String user, Tribe group) {
 		this.user = user;
+		this.group = group;
+		
 	}
+	
 
 	public void setTribe(Tribe group) {
 		this.group = group;
 	}
-	
+	//rename getName()
 	public String getPlayer() {
 		
 		return user;

@@ -16,7 +16,7 @@ public class TribeFactory {
 		
 		TribePlayer user = Tribes.getPlayer(founder);
 		if (user == null) {
-			user = TribePlayerFactory.createNewPlayer(founder);
+			user = TribePlayerFactory.createNewPlayer(founder.getPlayer());
 		}
 		if (user == null) {
 			Tribes.log("error creating new user " + founder);
@@ -27,7 +27,8 @@ public class TribeFactory {
 	}
 	
 	public static void createNewTribe(String name, TribePlayer founder) {
-		Tribe group = new Tribe(name,founder);
+		Tribe group = new Tribe(name);
+		group.setLeader(founder.getPlayer());
 		founder.setTribe(group);
 		
 		Tribes.addTribe(group);
@@ -52,7 +53,7 @@ public class TribeFactory {
 			return;
 		}
 		
-		createNewTribe(name,user);
+		createNewTribe(name,user.getPlayer());
 		
 	}
 

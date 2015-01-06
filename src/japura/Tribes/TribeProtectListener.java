@@ -35,8 +35,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class TribeProtectListener implements Listener {
 	
 	public ArrayList<Entity> tntIgnites = new ArrayList<Entity>();
+	private JavaPlugin plugin;
 	
 	public TribeProtectListener(JavaPlugin plugin) {
+		this.plugin = plugin;
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
 	}
 	
@@ -88,7 +90,7 @@ public class TribeProtectListener implements Listener {
 			return;
 		}
 		
-		long claimSize = (long) Tribes.getConf().getConf("ClaimSize");
+		long claimSize = plugin.getConfig().getLong("ClaimSize");
 		loc = event.getBlock().getLocation();
 		corner1 = loc.clone().add(claimSize,0, claimSize);
 		corner2 = loc.clone().add(-claimSize,0,claimSize);

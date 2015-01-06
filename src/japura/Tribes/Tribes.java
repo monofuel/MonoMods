@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import java.net.UnknownHostException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -39,16 +41,26 @@ public class Tribes extends JavaPlugin{
 	private static LoginListener loginListener;
 	private static TribeDisbandRunner disbander;
 	private static TribeTeleportListener teleportListener;
+
+	private static Long claimSize;
+	private static boolean yAxisClaim;
 	
 	public void onEnable() {
 
-
 		TribeLogger = getLogger();
 		saveDefaultConfig();
+
+		claimSize = getConfig().getLong("ClaimSize");
+		yAxisClaim = getConfig().getBoolean("YAxisClaim");
 		
 		//TODO add hostname and port to config
 		//add database name or prefix to config
-		mongo = new MongoClient("localhost",27017);
+		try {
+			mongo = new MongoClient("localhost",27017);
+		} catch (UnknownHostException e) {
+			//TODO handle this error properly
+			e.printStackTrace();
+		}
 		db = mongo.getDB("MonoMods");
 		tribeTable = db.getCollection("Tribes");
 		tribeTable = db.getCollection("Emeralds");
@@ -428,9 +440,7 @@ public class Tribes extends JavaPlugin{
 			this.getServer().getPluginManager().disablePlugin(this);
 			return true;
 		} else if (args[0].equalsIgnoreCase("load")) {
-			//GARBAGE EVERYWHERE
-			config = new MonoConf(this,genDefaultConf());
-			loadData();
+			reloadConfig();
 			return true;
 		} else if (args[0].equalsIgnoreCase("verify")) {
 			if (verifyTribes()) {
@@ -440,15 +450,12 @@ public class Tribes extends JavaPlugin{
 			}
 			return true;
 		} else if (args[0].equalsIgnoreCase("save")) {
-			config.close();
-			config = new MonoConf(this,genDefaultConf());
-			saveData();
-			data.write();
+			saveConfig();
 			return true;
 		} else if (args[0].equalsIgnoreCase("list")) {
 			StringBuilder list = new StringBuilder();
 			
-			for (Tribe tribe : groups) {
+			for (Tribe tribe : getTribes()) {
 				list.append(tribe.getName() + ",");
 			}
 			sender.sendMessage(list.toString());
@@ -492,7 +499,7 @@ public class Tribes extends JavaPlugin{
 					
 					tribe.delPlayer(tPlayer);
 					if (tribe.getLeader() == tPlayer) {
-						tribe.setLeader(new TribePlayer(""));
+						tribe.setLeader("");
 					}
 					sender.sendMessage("success");
 				}
@@ -515,7 +522,7 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("tribe doesn't exist");
 			} else {
 				tribe.addPlayer(tPlayer);
-				tribe.setLeader(tPlayer);
+				tribe.setLeader(tPlayer.getPlayer());
 				tPlayer.setTribe(tribe);
 				sender.sendMessage("success");
 			}
@@ -717,7 +724,7 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			if (tPlayer.getTribe().getLeader().equals(tPlayer)) {
-				tPlayer.getTribe().setLeader(otherPlayer);
+				tPlayer.getTribe().setLeader(otherPlayer.getPlayer());
 				sender.sendMessage("leadership transfered");
 				return true;
 			} else {
@@ -792,46 +799,56 @@ public class Tribes extends JavaPlugin{
 	public static void destroyTribe(Tribe group) {
 		try {
 			log("destroying tribe " + group.getName());
-			groups.remove(group);
+			//groups.remove(group);
+			//TODO stub
 		} catch (Exception e) {
 			log("error destroying tribe " + group.getName());
 		}
 	}
 	
 	public static void addTribe(Tribe group) {
-		if (!groups.contains(group))
+		/*if (!groups.contains(group))
 			groups.add(group);
+		*/ //TODO stub
 	}
 	
 	public static Tribe getTribe(String name) {
+		/*
 		for (Tribe group : groups) {
 			if (group.getName().equalsIgnoreCase(name)) {
 				return group;
 			}
-		}
-		return null;
+		}*/
+		return null; //TODO STUB
 	}
 	
 	public static Tribe[] getTribes() {
-		return groups.toArray(new Tribe[groups.size()]);
+		//TODO stub
+		//return groups.toArray(new Tribe[groups.size()]);
+		return null;
+
 	}
 	
 	public static void addPlayer(TribePlayer user) {
+		/*
 		if (!users.contains(user))
 			users.add(user);
+		*/ //TODO STUB
 	}
 	
 	public static void delPlayer(TribePlayer user) {
-		users.remove(user);
+		//users.remove(user);
+		//TODO stub
 		
 	}
 
 	
 	public static TribePlayer getPlayer(String name) {
 		if (name == null) return null;
+		/*
 		for (int i = 0; i < users.size(); i++) {
 			if(users.get(i).getPlayer().equalsIgnoreCase(name)) return users.get(i);
-		}
+		}*/ //TODO stub
 		return null;
 
 	}
@@ -839,6 +856,7 @@ public class Tribes extends JavaPlugin{
 	public static TribePlayer getPlayer(Player user) {
 		if (user == null) return null;
 		return getPlayer(user.getName());
+		
 	}
 	
 	public static DBCollection getTribeTable() {
@@ -850,6 +868,15 @@ public class Tribes extends JavaPlugin{
 	}
 	public static DBCollection getDiamondTable() {
 		return diamondTable;
+	}
+
+	public static Long getClaimSize() {
+		return claimSize;
+	}
+
+
+	public static boolean getYAxisClaim() {
+		return yAxisClaim;
 	}
 	//let other objects call our logger
 	public static void log(String line) {

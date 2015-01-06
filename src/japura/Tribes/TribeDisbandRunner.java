@@ -25,7 +25,7 @@ public class TribeDisbandRunner extends BukkitRunnable{
 		//60 seconds in a minute
 		//60 minutes in an hour
 		//24 hours in a day
-		timeDeltaInMillis = 1000 * 60 * 60 * 24 * plugin.getConfig().get("Days before disband");
+		timeDeltaInMillis = 1000 * 60 * 60 * 24 * plugin.getConfig().getInt("Days before disband");
 		Tribes.log("Tribe Disband spawned");
 		
 	}

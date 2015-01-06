@@ -22,6 +22,10 @@ public class Tribe {
 
 	private DBObject myTribe;
 	private String name;
+	private TribePlayer leader;
+	ArrayList<Player> invites = new ArrayList<Player>();
+
+
 
 	//should only be used for safezone or special tribes
 	public Tribe(String name) {
@@ -32,6 +36,8 @@ public class Tribe {
 		DBCursor cursor = Tribes.getTribeTable().find(query);
 
 		myTribe = cursor.next();
+
+		leader = new TribePlayer((String)myTribe.get("leader"),this);
 		if (cursor.hasNext()) {
 			Tribes.log("FATAL: multiple tribes with the same name " + name);
 		}
@@ -57,16 +63,18 @@ public class Tribe {
 	public Block[] getEmeralds() {
 		//TODO fetch current list from db
 		//return emeralds.toArray(new Block[emeralds.size()]);
+		return null;
 	}
 
 	public Block[] getDiamonds() {
 		//TODO stub
 		//return diamonds.toArray(new Block[diamonds.size()]);
+		return null;
 	}
 	public TeleportData getTeleData(Block em) {
 		//TODO stub
 		//return teleports.get(em);
-		
+		return null;
 	}
 
 	public void addEmerald(Block em) {
@@ -84,51 +92,66 @@ public class Tribe {
 	}
 	public void addDiamond(Block em,Player user) {
 		if (em.getType() != Material.DIAMOND_BLOCK) return;
-		diamonds.add(em);
-		String name = "diamond_" + teleports.size();
+		//diamonds.add(em);
+		BasicDBObject query = new BasicDBObject();
+		query.put("tribe",name);
+		DBCursor cursor = Tribes.getDiamondTable().find(query);
+
+		String name = "diamond_" + cursor.count();
 		TeleportData data = new TeleportData(em,name,this);
 		data.addAllowed(this); //TODO why is this needed?
 		user.sendMessage("created new teleporter named " + name);
 	}
 
+	//TODO what is this used for
+	/*
 	public void addTeleport(TeleportData teleData) {
 		teleData.addAllowed(this);
-		diamonds.add(teleData.getSpot());
 		teleports.put(teleData.getSpot(),teleData);
-	}
+	}*/
 
+
+	//TODO actually why do we have this. this is silly. come up with a better way to verify emeralds.
+	/*
 	public void checkEmerald(Block em) {
 		if (!em.getChunk().isLoaded()) return;
 		if (emeralds.contains(em)){
 			if (em.getType() != Material.EMERALD_BLOCK) emeralds.remove(em);
 		}
-	}
+	}*/
 
+	//TODO actually why do we have this. this is silly. come up with a better way to verify diamonds.
+	/*
 	public void checkDiamond(Block em) {
 		if (!em.getChunk().isLoaded()) return;
-		if (diamonds.contains(em)) {
+		BasicDBObject query = new BasicDBObject();
+		query.put("tribe",owner);
+		DBCursor blocks = Tribes.getEmeraldTable().find(query);
+		for (DBObject block : blocks) {
 			if (em.getType() != Material.DIAMOND_BLOCK) diamonds.remove(em);
 		}
 
-	}
+	}*/
 	
 	public void delEmerald(Block em) {
-		if (emeralds.contains(em)){
+		//TODO stub
+		/*if (emeralds.contains(em)){
 			emeralds.remove(em);
-		}
+		}*/
 	}
 	public void delDiamond(Block em) {
-		if (diamonds.contains(em)){
+		//TODO stub
+		/*if (diamonds.contains(em)){
 			diamonds.remove(em);
-		}
+		}*/
 	}
 	
 	public boolean checkLocOwnership(Location loc) {
 		Block[] emeralds = getEmeralds();
 		Location tmp;
 		//claim size from one edge to the center
-		long claimSize = (long) Tribes.getConf().getConf("ClaimSize");
-		boolean YClaim = (boolean) Tribes.getConf().getConf("YAxisClaim");
+		long claimSize = (long) Tribes.getClaimSize();
+		boolean YClaim = (boolean) Tribes.getYAxisClaim();
 		for (Block em : emeralds) {
 			if (!loc.getWorld().equals(em.getWorld())) continue;
 			tmp = em.getLocation().subtract(loc);
@@ -149,10 +172,11 @@ public class Tribe {
 		return false;
 	}
 	
-	public void setLeader(TribePlayer user) {
-		leader = user;
+	public void setLeader(String user) {
+		//TODO stub
+		/*leader = user;
 		user.setTribe(this);
-		addPlayer(user);
+		addPlayer(user);*/
 	}
 	
 	public void setName(String name) {
@@ -164,9 +188,9 @@ public class Tribe {
 	}
 	
 	public void addPlayer(TribePlayer user) {
-		//TODO:
+		//TODO: STUB
 		//for loop added because contains didn't work right
-		for (TribePlayer item : users) {
+		/*for (TribePlayer item : users) {
 			if (item.getPlayer().equalsIgnoreCase(user.getPlayer())) {
 				user.setTribe(this);
 				return;
@@ -181,11 +205,15 @@ public class Tribe {
 		user.setTribe(this);
 		
 		invites.remove(user.getPlayer());
+		*/
 	}
 	
 	public void delPlayer(TribePlayer user) {
+		//TODO stub
+		/*
 		users.remove(user);
 		user.setTribe(null);
+		*/
 		
 	}
 	
@@ -208,7 +236,11 @@ public class Tribe {
 	}
 	
 	public boolean hasPlayer(TribePlayer user) {
+		//TODO stub
+		/*
 		return users.contains(user);
+		*/
+		return false;
 	}
 	
 	public String getName() {
@@ -216,11 +248,14 @@ public class Tribe {
 	}
 
 	public TribePlayer[] getPlayers() {
-		TribePlayer[] list = users.toArray(new TribePlayer[users.size()]);
+		//TODO stub
+		//TribePlayer[] list = users.toArray(new TribePlayer[users.size()]);
+		TribePlayer[] list = null;
 		return list;
 	}
 	
 	public String toString() {
+		//TODO stub
 		StringBuilder info = new StringBuilder();
 		info.append("Tribe: ");
 		info.append(name);
@@ -230,6 +265,7 @@ public class Tribe {
 			info.append(leader.getPlayer());
 			info.append("\n");
 		}
+		/*
 		if (users.size() > 1) {
 			info.append("Members: ");
 			for (TribePlayer user : getPlayers()) {
@@ -237,7 +273,7 @@ public class Tribe {
 				info.append(user.getPlayer());
 				info.append(",");
 			}
-		}
+		}*/
 		
 		
 		return info.toString();

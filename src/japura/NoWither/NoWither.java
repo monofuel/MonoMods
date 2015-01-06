@@ -60,49 +60,65 @@ public class NoWither extends JavaPlugin{
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("NoWither") &&
-			sender instanceof ConsoleCommandSender ||
-			(sender instanceof Player && ((Player) sender).hasPermission("nowither"))) {
+		//verify this is the correct command, and check if 
+		//it is being send via console or via player.
+		//console always gets full access, but for the player we
+		//will check the permission.
+		//.hasPermission will only be tested if sender is indeed an instance of Player,
+		//so this will not give an exception.
+		if ("nowither".equalsIgnoreCase(cmd.getName()) &&
+			(sender instanceof ConsoleCommandSender ||
+			(sender instanceof Player && ((Player) sender).hasPermission("nowither")))) {
+			//safety first
+			if (args.length < 1) return false;
 
-			//TODO update this to a java-7 switch by strings case
-			if (args[0].equalsIgnoreCase("reload")) {
-				this.getServer().getPluginManager().disablePlugin(this);
-				this.getServer().getPluginManager().enablePlugin(this);
-				return true;
-			} else if (args[0].equalsIgnoreCase("unload")) {
-				this.getServer().getPluginManager().disablePlugin(this);
-				return true;
-			} else if (args[0].equalsIgnoreCase("load")) {			
-				reloadConfig();
-				return true;
-			} else if (args[0].equalsIgnoreCase("save")) {
-				saveConfig();
-				return true;
-			} else if (args[0].equalsIgnoreCase("enable")) {
-				getConfig().set("wither disabled",false);
-				sender.sendMessage("wither enabled");
-				saveConfig();
-				return true;
-			} else if (args[0].equalsIgnoreCase("disable")) {
-				getConfig().set("wither disabled",true);
-				sender.sendMessage("wither disabled");
-				saveConfig();
-				return true;
-			} else if (args[0].equalsIgnoreCase("help")) {
-				//TODO
-				String help = "NoWither is configured from the config.\n" +
-					      "/nowither load will reload the config.";
-				sender.sendMessage(help);
-				
-				return true;
+			//valid cases will return true so that plugin help will not be displayed.
+			//if none of these cases are met, then the 'return false' at the end
+			//of this method would run. to be explicit, we'll default to return false.
+			switch(args[0].toLowerCase()) {
+				case "reload":
+					this.getServer().getPluginManager().disablePlugin(this);
+					this.getServer().getPluginManager().enablePlugin(this);
+					return true;
+				case "unload":
+					this.getServer().getPluginManager().disablePlugin(this);
+					return true;
+				case "load":
+					reloadConfig();
+					return true;
+				case "save":
+					saveConfig();
+					return true;
+				case "enable":
+					getConfig().set("wither disabled",false);
+					sender.sendMessage("wither enabled");
+					saveConfig();
+					return true;
+				case "disable":
+					getConfig().set("wither disabled",true);
+					sender.sendMessage("wither disabled");
+					saveConfig();
+					return true;
+				case "help":
+					String help = "NoWither can toggle the wither. all commands are in the style of /nowither <command>\n" +
+						      "reload will disable and enable the plugin\n" +
+						      "unload will disable the plugin\n" +
+						      "load will reload the config\n" +
+						      "save will save the current setting to the config\n" +
+						      "enable will enable wither spawning\n" +
+						      "disable will disable withe rspawning\n";
+					sender.sendMessage(help);
+					return true;
+				default:
+					return false;
 			}
-
+		//in the event that a player does not have permission...
 		} else if (sender instanceof Player && !((Player) sender).hasPermission("nowither")) {
 			sender.sendMessage("you do not have permission to use nowither");
 			return true;
 
 		}
-		
+		//failure case if all goes wrong, let's display plugin help.
 		return false;
 	}
 	

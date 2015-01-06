@@ -50,6 +50,7 @@
 	        <jar destfile="${dist.dir}/MonoBugs.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/MonoBugs/*">
 			<fileset file="${src.dir}/japura/MonoBugs/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoBugs/config.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoBugs.classpath}"/>
                         </manifest>

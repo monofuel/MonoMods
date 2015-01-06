@@ -14,12 +14,15 @@ import com.mongodb.*;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.util.Date;
 import java.net.UnknownHostException;
 
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.ChatPaginator;
 import org.bukkit.util.ChatPaginator.ChatPage;
@@ -30,75 +33,119 @@ public class MonoBugs extends JavaPlugin{
 	private static MongoClient mongo = null;
 	private static DB db = null;
 	private static DBCollection table = null;
+
+	private static final String adminHelp = "";
+	private static final String userHelp = "";
+	private String mongoHost;
+	private int port;
+	private String databaseName;
+	private String tableName;
+
 	
 	public void onEnable() {
 		bugsLogger = getLogger();
-		
-		//TODO add hostname and port to config
-		//no config, just monogoDB
+		saveDefaultConfig();		
+
+		mongoHost = getConfig().getString("mongo host");
+		port = getConfig().getInt("mongo port");
+		databaseName = getConfig().getString("mongo database");
+		tableName = getConfig().getString("mongo table");
+
 		try {
-		mongo = new MongoClient("localhost",27017);
+			mongo = new MongoClient(mongoHost,port);
 		} catch (UnknownHostException e) {
-			//TODO should handle this error properly
-			e.printStackTrace();
+			bugsLogger.log(Level.SEVERE,"Error connecing to database, bailling out",e);
+			this.getServer().getPluginManager().disablePlugin(this);
 		}
-		//TODO add this shit to config
-		db = mongo.getDB("MonoMods");
-		table = db.getCollection("MonoBugs");
+
+		db = mongo.getDB(databaseName);
+		table = db.getCollection(tableName);
 
 		log("MonoBugs has been enabled");
 	}
 	
 	public void onDisable() {
 		
-		//TODO close DB connection?
+		if (mongo != null) {
+			mongo.close();
+		}
 
 		log("MonoBugs has been disabled");
 		bugsLogger = null;
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("bug")) {
-			if (args.length < 1) return false;
-			if (args[0].equalsIgnoreCase("reload")) {
-				this.getServer().getPluginManager().disablePlugin(this);
-				this.getServer().getPluginManager().enablePlugin(this);
-				return true;
-			} else if (args[0].equalsIgnoreCase("unload")) {
-				this.getServer().getPluginManager().disablePlugin(this);
-				return true;
-			} else if (args[0].equalsIgnoreCase("load")) {
-				//TODO: STUB
-				return true;
-			} else if (args[0].equalsIgnoreCase("save")) {
-				//TODO: STUB
-				return true;
-			} else if (args[0].equalsIgnoreCase("help")) {
-				//TODO
-				String help = "Help stuff goes here";
-				sender.sendMessage(help);
-				
-				return true;
-			} else if (args[0].equalsIgnoreCase("report")) {
-				report(sender,args);
-				return true;
-			}else if (args[0].equalsIgnoreCase("list")) {
-				return list(sender,args);
-			}else if (args[0].equalsIgnoreCase("fixed")) {
-				fixed(sender,args);
-				return true;
-			}else if (args[0].equalsIgnoreCase("closed")) {
-				closed(sender,args);
-				return true;
-			}else if (args[0].equalsIgnoreCase("spam")) {
-				spam(sender,args);
-				return true;
-			}else if (args[0].equalsIgnoreCase("unresolved")) {
-				unresolved(sender,args);
-				return true;
-			}
 
+		//verify that this is the correct command, and check if
+		//it is being sent via the console or via player.
+		//console always gets full access, but for the player we
+		//will check the permission.
+		//.hasPermission will only be tested if the sender is indeed an instance of Player,
+		//so this will not give an exception.
+		if ("bug".equalsIgnoreCase(cmd.getName()) &&
+			(sender instanceof ConsoleCommandSender ||
+			(sender instanceof Player && ((Player) sender).hasPermission("monobugs.admin")))) {
+			//safety first
+			if (args.length < 1) return false;
+
+			//valid cases will return true so that the plugin help will not be displayed.
+			//if none of these casese are met, then the 'return false' at the end
+			//of this method would run.
+			switch(args[0].toLowerCase()) {
+				case "reload":
+					this.getServer().getPluginManager().disablePlugin(this);
+					this.getServer().getPluginManager().enablePlugin(this);
+					return true;
+				case "unload":
+					this.getServer().getPluginManager().disablePlugin(this);
+					return true;
+				case "load":
+					//TODO: STUB
+					return true;
+				case "save":
+					//TODO: STUB
+					return true;
+				case "help":
+					sender.sendMessage(userHelp);	
+					sender.sendMessage(adminHelp);	
+					return true;
+			}
+		//if they are a normal player without admin privileges
+		//or if an admin issued a command that did not meet the above
 		}
+		
+		if ("bug".equalsIgnoreCase(cmd.getName()) &&
+		    sender instanceof Player) {
+			if (args.length < 1) return false;
+			//since we are calling sub-methods for commands,
+			//these commands are responsible for displaying errors,
+			//or for deciding if plugin help should be shown.
+			//most likely they will give their own specific argument
+			//error.
+			switch (args[0].toLowerCase()) {
+				case "report":
+					report(sender,args);
+					return true;
+				case "list":
+					return list(sender,args);
+				case "fixed":
+					fixed(sender,args);
+					return true;
+				case "closed":
+					closed(sender,args);
+					return true;
+				case "spam":
+					spam(sender,args);
+					return true;
+				case "unresolved":
+					unresolved(sender,args);
+					return true;
+				case "help":
+					sender.sendMessage(userHelp);
+					return true;
+			}
+		}
+
 		
 		return false;
 	}

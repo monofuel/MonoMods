@@ -119,8 +119,12 @@ public class MonoPerms extends JavaPlugin{
 			Player user = Bukkit.getPlayer(key);
 			if (user != null) {
 				addPerm(user,"tribes.admin");
-				addPerm(user,"nowither");
-				addPerm(user,"monoperms");
+				addPerm(user,"nowither.admin");
+				addPerm(user,"monoperms.admin");
+				addPerm(user,"monolocks.admin");
+				addPerm(user,"monobugs.admin");
+				addPerm(user,"monochat.admin");
+				addPerm(user,"monocities.admin");
 			}
 		}
 	}

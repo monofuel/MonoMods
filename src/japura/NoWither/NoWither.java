@@ -68,7 +68,7 @@ public class NoWither extends JavaPlugin{
 		//so this will not give an exception.
 		if ("nowither".equalsIgnoreCase(cmd.getName()) &&
 			(sender instanceof ConsoleCommandSender ||
-			(sender instanceof Player && ((Player) sender).hasPermission("nowither")))) {
+			(sender instanceof Player && ((Player) sender).hasPermission("nowither.admin")))) {
 			//safety first
 			if (args.length < 1) return false;
 

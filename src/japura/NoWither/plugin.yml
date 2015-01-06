@@ -7,6 +7,6 @@ commands:
                 usage: /nowither help
 
 permissions:
-        nowither:
-                description: the /nowither command for admins
+        nowither.admin:
+                description: access to the /nowither command for admins
                 default: false

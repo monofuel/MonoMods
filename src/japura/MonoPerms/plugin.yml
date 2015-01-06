@@ -7,6 +7,6 @@ commands:
         usage: /perm help
 
 permissions:
-        monoperms:
-                descrption: permission to use monoperms
+        monoperms.admin:
+                descrption: permission to use monoperms admin commands
                 default: false

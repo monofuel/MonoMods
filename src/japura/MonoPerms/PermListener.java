@@ -41,8 +41,12 @@ public class PermListener implements Listener {
 			if (user.getName().equals(key)) {
 				//TODO add proper defining groups
 				MonoPerms.addPerm(user,"tribes.admin");
-				MonoPerms.addPerm(user,"nowither");
-				MonoPerms.addPerm(user,"monoperms");
+				MonoPerms.addPerm(user,"nowither.admin");
+				MonoPerms.addPerm(user,"monoperms.admin");
+				MonoPerms.addPerm(user,"monolocks.admin");
+				MonoPerms.addPerm(user,"monobugs.admin");
+				MonoPerms.addPerm(user,"monochat.admin");
+				MonoPerms.addPerm(user,"monocities.admin");
 			}
 		}
 

@@ -20,6 +20,7 @@ import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -30,7 +31,7 @@ public class MonoLocks extends JavaPlugin{
 	public void onEnable() {
 		templateLogger = getLogger();
 
-		//no configuration stuffs
+		saveDefaultConfig();
 		
 		new LockCreateListener(this);
 		new LockAccessListener(this);
@@ -48,7 +49,9 @@ public class MonoLocks extends JavaPlugin{
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("plugintemplate")) {
+		if ("monolocks".equalsIgnoreCase(cmd.getName()) &&
+			(sender instanceof ConsoleCommandSender ||
+			(sender.instanceof Player && ((Player) sender).hasPermission("monolocks.admin")))) {
 			if (args[0].equalsIgnoreCase("reload")) {
 				this.getServer().getPluginManager().disablePlugin(this);
 				this.getServer().getPluginManager().enablePlugin(this);

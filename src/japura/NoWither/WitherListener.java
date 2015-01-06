@@ -32,6 +32,7 @@ public class WitherListener implements Listener{
 		
 		if (mob instanceof Wither) {
 			if (plugin.getConfig().getBoolean("wither disabled")) {
+				//TODO display message to player
 				event.setCancelled(true);
 				NoWither.log("Wither spawn averted");
 			}

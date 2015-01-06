@@ -29,7 +29,7 @@ public class Tribe {
 
 	//should only be used for safezone or special tribes
 	public Tribe(String name) {
-		this.name = name;
+		this.name = name.toLowerCase();
 		BasicDBObject query = new BasicDBObject();
 		query.put("name",name);
 

@@ -1,9 +1,9 @@
 /**
- *  *      author: Monofuel
- *   *      website: japura.net
- *    *      this file is distributed under the modified BSD license
- *     *      that should have been included with it.
- *      */
+ *      author: Monofuel
+ *      website: japura.net
+ *      this file is distributed under the modified BSD license
+ *      that should have been included with it.
+ */
 
 
 package japura.Tribes;

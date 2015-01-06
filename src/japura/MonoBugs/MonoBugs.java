@@ -29,7 +29,6 @@ import org.bukkit.util.ChatPaginator.ChatPage;
 
 public class MonoBugs extends JavaPlugin{
 	
-	private static Logger bugsLogger = null;
 	private static MongoClient mongo = null;
 	private static DB db = null;
 	private static DBCollection table = null;
@@ -44,7 +43,6 @@ public class MonoBugs extends JavaPlugin{
 	private final int CMD_ARGS = 2;
 	
 	public void onEnable() {
-		bugsLogger = getLogger();
 		saveDefaultConfig();		
 
 		mongoHost = getConfig().getString("mongo host");
@@ -55,14 +53,14 @@ public class MonoBugs extends JavaPlugin{
 		try {
 			mongo = new MongoClient(mongoHost,port);
 		} catch (UnknownHostException e) {
-			bugsLogger.log(Level.SEVERE,"Error connecing to database, bailling out",e);
+			getLogger().log(Level.SEVERE,"Error connecing to database, bailling out",e);
 			this.getServer().getPluginManager().disablePlugin(this);
 		}
 
 		db = mongo.getDB(databaseName);
 		table = db.getCollection(tableName);
 
-		log("MonoBugs has been enabled");
+		getLogger().info("MonoBugs has been enabled");
 	}
 	
 	public void onDisable() {
@@ -71,8 +69,7 @@ public class MonoBugs extends JavaPlugin{
 			mongo.close();
 		}
 
-		log("MonoBugs has been disabled");
-		bugsLogger = null;
+		getLogger().info("MonoBugs has been disabled");
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String[] args) {
@@ -337,9 +334,4 @@ public class MonoBugs extends JavaPlugin{
 		
 	}
 	
-	//TODO improve this shit
-	//let other objects call our logger
-	public static void log(String line) {
-		bugsLogger.info(line);
-	}
 }

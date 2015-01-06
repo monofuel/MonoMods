@@ -41,6 +41,7 @@ public class MonoBugs extends JavaPlugin{
 	private String databaseName;
 	private String tableName;
 
+	private final int CMD_ARGS = 2;
 	
 	public void onEnable() {
 		bugsLogger = getLogger();
@@ -74,7 +75,7 @@ public class MonoBugs extends JavaPlugin{
 		bugsLogger = null;
 	}
 	
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String[] args) {
 
 		//verify that this is the correct command, and check if
 		//it is being sent via the console or via player.
@@ -86,7 +87,9 @@ public class MonoBugs extends JavaPlugin{
 			(sender instanceof ConsoleCommandSender ||
 			(sender instanceof Player && ((Player) sender).hasPermission("monobugs.admin")))) {
 			//safety first
-			if (args.length < 1) return false;
+			if (args.length < 1) {
+				return false;
+			}
 
 			//valid cases will return true so that the plugin help will not be displayed.
 			//if none of these casese are met, then the 'return false' at the end
@@ -152,16 +155,15 @@ public class MonoBugs extends JavaPlugin{
 	
 	//TODO Javadocs stuff
 	public void report(CommandSender sender, String[] args) {
-		if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
+		if (args.length < CMD_ARGS || args[1].equalsIgnoreCase("help")) {
 			sender.sendMessage("Report a bug on the server");
 			sender.sendMessage("Syntax: /bug report desciption of the error");
 			return;
 		}
 		String error = args[1];
-		for (int i = 2; i < args.length; i++) {
+		for (int i = CMD_ARGS; i < args.length; i++) {
 			error += " " + args[i];
 		}
-		//bugs.put(bugCount,new bug(error,sender.getName(),bugCount));
 		//TODO: should anything be sanitized first?
 		BasicDBObject bugReport = new BasicDBObject();
 		bugReport.put("bugID",table.count()+1);
@@ -180,61 +182,42 @@ public class MonoBugs extends JavaPlugin{
 	public boolean list(CommandSender sender, String[] args) {
 
 		int myPage = 1;
-		if (args.length == 2) {
+		if (args.length == CMD_ARGS) {
 			try {
 				myPage = Integer.parseInt(args[1]);
 			} catch(NumberFormatException e) {
 				return false;
 			}
-		} else if (args.length > 2) {
+		} else if (args.length > CMD_ARGS) {
 			return false;
 		}
-		//TODO update this
-		//if (pages == 0) {
-		//	sender.sendMessage("you have no bugs atm");
-		//	return true;
-		//}
-		//if (myPage < 1 || myPage > pages) {
-		//	sender.sendMessage("please give a valid page number");
-		//	return true;
-		//}
-		
-		//sender.sendMessage("Page " + myPage + "/" + pages);
-		//String report;
-		//int bugsOnPage = 5;
-		//if (myPage == pages) bugsOnPage = myBugs.size() % 5;
-		//if (bugsOnPage == 0) bugsOnPage = 5;
-		//for (int i = bugsOnPage-1; i >= 0; i--) {
-		//	report = myBugs.get((5*(myPage-1) + i)).toString();
-		//	sender.sendMessage(report);
-		//}
-		
-		
-		//TODO make this last section easier to read
 
+		//query all of our user's bug reports
 		BasicDBObject query = new BasicDBObject();
 		query.put("user",sender.getName());
-
 		DBCursor cursor = table.find(query);
 
+		//if there are none to show..
 		if (cursor.count() == 0) {
 			sender.sendMessage("there are no reports to show");
+			return true;
 		}
-
+		//otherwise, list them all together separated by newlines.
 		String userReports = "";
 
-			//TODO should probably use a stringbuilder? depends if you believe in them
-		while (cursor.hasNext()) { //TODO does this properly iterate over all elements?
+		while (cursor.hasNext()) {
 			DBObject element = cursor.next();
 			userReports += "ID: " + element.get("bugID") + " | " + element.get("status") + " | " + element.get("issue") + " | date: " + element.get("createdDate");
 			if (element.containsField("reason"))
 				userReports += " | reason: " + element.get("reason");
 			userReports += "\n";
 		}
+
+		//divy the report into pages and get the desired page
 		ChatPage page = ChatPaginator.paginate(userReports,myPage);
 
-		sender.sendMessage("Page " + page.getPageNumber() + " of " + page.getTotalPages() + " for reports:");
-		
+		//send each line of our page to the user
+		sender.sendMessage("Page " + page.getPageNumber() + " of " + page.getTotalPages() + " for reports:");	
 		for (String line : page.getLines()) {
 			sender.sendMessage(line);
 		}
@@ -246,13 +229,13 @@ public class MonoBugs extends JavaPlugin{
 	//TODO double check return values for everything in this class
 	public boolean unresolved(CommandSender sender, String[] args) {
 		int myPage = 1;
-		if (args.length == 2) {
+		if (args.length == CMD_ARGS) {
 			try {
 				myPage = Integer.parseInt(args[1]);
 			} catch(NumberFormatException e) {
 				return false;
 			}
-		} else if (args.length > 2) {
+		} else if (args.length > CMD_ARGS) {
 			return false;
 		}
 
@@ -282,7 +265,7 @@ public class MonoBugs extends JavaPlugin{
 	//TODO Javadocs stuff
 	public void fixed(CommandSender sender, String[] args) {
 		//TODO improve this shit
-		if (args.length < 2) {
+		if (args.length < CMD_ARGS) {
 			sender.sendMessage("Syntax: /bug fixed index reason");
 		}
 		update("fixed",sender,args);
@@ -293,7 +276,7 @@ public class MonoBugs extends JavaPlugin{
 	//TODO Javadocs stuff
 	public void closed(CommandSender sender,String[] args) {
 		//TODO improve this shit
-		if (args.length < 2) {
+		if (args.length < CMD_ARGS) {
 			sender.sendMessage("Syntax: /bug closed index reason");
 		}
 		update("closed",sender,args);
@@ -304,7 +287,7 @@ public class MonoBugs extends JavaPlugin{
 	//TODO Javadocs stuff
 	public void spam(CommandSender sender,String[] args) {
 		//TODO improve this shit
-		if (args.length < 2) {
+		if (args.length < CMD_ARGS) {
 			sender.sendMessage("Syntax: /bug spam index reason");
 		}
 		update("spam",sender,args);
@@ -328,9 +311,9 @@ public class MonoBugs extends JavaPlugin{
 			return;
 		}
 		
-		if (args.length >= 2) {
+		if (args.length >= CMD_ARGS) {
 			StringBuilder result = new StringBuilder();
-			for (int i = 2; i < args.length; i++) {
+			for (int i = CMD_ARGS; i < args.length; i++) {
 				result.append(" ");
 				result.append(args[i]);
 			}

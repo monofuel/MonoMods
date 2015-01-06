@@ -51,7 +51,7 @@ public class MonoLocks extends JavaPlugin{
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if ("monolocks".equalsIgnoreCase(cmd.getName()) &&
 			(sender instanceof ConsoleCommandSender ||
-			(sender.instanceof Player && ((Player) sender).hasPermission("monolocks.admin")))) {
+			(sender instanceof Player && ((Player) sender).hasPermission("monolocks.admin")))) {
 			if (args[0].equalsIgnoreCase("reload")) {
 				this.getServer().getPluginManager().disablePlugin(this);
 				this.getServer().getPluginManager().enablePlugin(this);

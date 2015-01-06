@@ -13,6 +13,7 @@ import com.mongodb.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import java.net.UnknownHostException;
 
@@ -24,13 +25,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.event.HandlerList;
 
 public class Tribes extends JavaPlugin{
 	
-	//TODO: do we really need all these static values?
 
-	//TODO: perhaps rename this lowercase t?
-	private static Logger TribeLogger = null;
 	private static MongoClient mongo = null;
 	private static DB db = null;
 	private static DBCollection tribeTable = null;
@@ -44,31 +43,33 @@ public class Tribes extends JavaPlugin{
 
 	private static Long claimSize;
 	private static boolean yAxisClaim;
+
 	
 	public void onEnable() {
 
-		TribeLogger = getLogger();
 		saveDefaultConfig();
-
-		claimSize = getConfig().getLong("ClaimSize");
-		yAxisClaim = getConfig().getBoolean("YAxisClaim");
 		
-		//TODO add hostname and port to config
-		//add database name or prefix to config
+		String mongoHost = getConfig().getString("mongo host");
+		int port = getConfig().getInt("mongo port");
+		String databaseName = getConfig().getString("mongo database");
+		String tribeTableName = getConfig().getString("mongo tribe table");
+		String emeraldTableName = getConfig().getString("mongo emerald table");
+		String diamondTableName = getConfig().getString("mongo diamond table");
+
 		try {
-			mongo = new MongoClient("localhost",27017);
+			mongo = new MongoClient(mongoHost,port);
 		} catch (UnknownHostException e) {
-			//TODO handle this error properly
-			e.printStackTrace();
+			getLogger().log(Level.SEVERE,"Error connecting to database, bailing out",e);
+			this.getServer().getPluginManager().disablePlugin(this);
+			return;
 		}
-		db = mongo.getDB("MonoMods");
-		tribeTable = db.getCollection("Tribes");
-		tribeTable = db.getCollection("Emeralds");
-		tribeTable = db.getCollection("Diamonds");
+		db = mongo.getDB(databaseName);
+		tribeTable = db.getCollection(tribeTableName);
+		emeraldTable = db.getCollection(EmeraldTableName);
+		diamondTable = db.getCollection(DiamondTableName);
 		
 		//protector checks all emerald blocks
 		//and starts listeners
-		assert protector == null;
 		protector = new TribeProtect(this);
 		disbander = new TribeDisbandRunner(this);
 		teleportListener = new TribeTeleportListener(this);
@@ -78,11 +79,12 @@ public class Tribes extends JavaPlugin{
 		loginListener = new LoginListener(this);
 
 		//TODO double check the disband stuff
-		if (getConfig().getBoolean("Disband after time"))
+		if (getConfig().getBoolean("Disband after time")) {
 			Bukkit.getScheduler().scheduleSyncRepeatingTask(this,disbander,0,2400);
-		else
+			log("Tribes will disband after " + 1000 * 60 * 60 * 24 * getConfig().getInt("Days before disband"));
+		} else {
 			log("Tribes will be lasting forever");
-		
+		}
 		//set a spawn point
 		if (getConfig().getBoolean("Tribe Spawn")) {
 			
@@ -94,9 +96,9 @@ public class Tribes extends JavaPlugin{
 			//TODO:should set a config option for this
 			World world = Bukkit.getWorld(worldName);
 			if (world == null) {
-				log("invalid world!");
+				log("invalid world for spawn");
 			} else {
-				log("spawn set to " + x + "," + y + "," + z);
+				log("setting spawn to " + x + "," + y + "," + z);
 				world.setSpawnLocation(x,y,z);
 			}
 			
@@ -104,16 +106,11 @@ public class Tribes extends JavaPlugin{
 			log("not using tribes to set world spawn");
 		}
 
-		//TODO:teleport listener
-
-		//TODO: autosave runnable
-
-		//create the safezone if it does not exit
-		//TODO: find more appropriate place for this
+		//create the safezone tribe if it does not exit
 		Tribe group = getTribe("safezone");
 		if (group == null) {
 			TribeFactory.createNewTribe("safezone");
-			log("safezone tribe created");
+			getLogger().info("safezone tribe created");
 		}
 
 		log("Tribes has been enabled");
@@ -121,18 +118,11 @@ public class Tribes extends JavaPlugin{
 	
 	public void onDisable() {
 		
-		//TODO verify all variables are cleared out
-		//config
-		//data
-		//configLoc
-		//groups
-		//users
-		//protector
 		
-		//TODO close DB connection?
-		saveConfig();
-
+		mongo.close();
 		protector.stop();
+
+		HandlerList.unregisterAll(this);
 
 		log("Tribes has been disabled");
 	}
@@ -146,63 +136,24 @@ public class Tribes extends JavaPlugin{
 	public boolean verifyTribes() {
 		boolean result = true;
 
-		//TODO: update this for mongo
-		/*
-		//sanity check tribes and their leaders
-		for (Tribe group : groups) {
-			if (group.getName().equals("safezone")) continue;
-			if (group == null) {
-				log("somehow group null was created?");
-				result = false;
-				continue;
-			}
+		//TODO
+		//verify that safezone exists
 
-			TribePlayer leader = group.getLeader();
-			if (leader == null) {
-				log("tribe " + group.getName() + "'s leader is null");
-				result = false;
-				continue;
-			}
-			if (leader.getTribe() != group) {
-				if (leader.getTribe() == null) {
-					log("player " + leader.getPlayer() + " is a leader, but believes it leads null");
-					result = false;
-					continue;
-				}
-				log("player " + leader.getPlayer() + " does not think it leads " + group.getName());
-				result = false;
-			}
-		}
-		log("---- GROUP CHECK COMPLETE ----");
-		for (TribePlayer user : users) {
-			if (user == null) {
-				log("somehow user null was created?");
-				result = false;
-				continue;
-			}
+		//verify that every tribe other than safezone has a leader
 
-			Tribe group = user.getTribe();
-			//if group is null, then the user is not in a tribe.
-			if (group == null || group.getName().equals("safezone")) continue;
-			if (!group.hasPlayer(user)) {
-				log("tribe " + group.getName() + " does not think it has player " + user.getPlayer());
-				result = false;
-			}
-		}
-		log("---- USER CHECK COMPLETE ----");
-		*/
-		log("STUB");
+		//check that no user is in multiple tribes
+
 		return result;
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-		if (cmd.getName().equalsIgnoreCase("tadmin")) {
+		if ("tadmin".equalsIgnoreCase(cmd.getName())) {
 			return tadmin(sender,cmd,label,args);
-		}else if (cmd.getName().equalsIgnoreCase("t") ||
-				  cmd.getName().equalsIgnoreCase("tribes")) {
+		}else if ("t".equalsIgnoreCase(cmd.getName()) ||
+			  "tribes".equalsIgnoreCase(cmd.getName())) {
 			return tcmd(sender,cmd,label,args);
-		}else if (cmd.getName().equalsIgnoreCase("ttp")) {
+		}else if ("ttp".equalsIgnoreCase(cmd.getName())) {
 			return ttp(sender,cmd,label,args);
 		}
 		
@@ -213,10 +164,9 @@ public class Tribes extends JavaPlugin{
                 if (args.length == 0) return false;
                 Tribe group;
                 Player player;
-                TribePlayer tPlayer;
 
                 player = Bukkit.getPlayer(sender.getName());
-                tPlayer = getPlayer(player);
+
 
 		if (args[0].equalsIgnoreCase("help")) {
 			sender.sendMessage("ttp can be used to modify teleport locations or to teleport.\n" +
@@ -823,10 +773,8 @@ public class Tribes extends JavaPlugin{
 	}
 	
 	public static Tribe[] getTribes() {
-		//TODO stub
-		//return groups.toArray(new Tribe[groups.size()]);
-		return null;
-
+		DBCursor cursor = tribeTable.find();
+		return cursor.toArray();
 	}
 	
 	public static void addPlayer(TribePlayer user) {
@@ -842,18 +790,30 @@ public class Tribes extends JavaPlugin{
 		
 	}
 
-	
-	public static TribePlayer getPlayer(String name) {
+	public static Tribe getPlayersTribe(String name) {
+		//garbage in garbage out
 		if (name == null) return null;
 		/*
 		for (int i = 0; i < users.size(); i++) {
 			if(users.get(i).getPlayer().equalsIgnoreCase(name)) return users.get(i);
 		}*/ //TODO stub
-		return null;
+
+		BasicDBObject query = new BasicDBObject();
+		BasicDBList members = new BasicDBList();
+		members.add(name);
+		query.put("members",members);
+
+		DBObject tribeObject = tribeTable.findOne(query);
+		if (tribeObject == null) {
+			return null;
+		} else {
+			return new Tribe(tribeObject.getString("name"));
+		}
 
 	}
-	
-	public static TribePlayer getPlayer(Player user) {
+
+	public static Tribe getPlayersTribe(Player user) {
+		//garbage in garbage out
 		if (user == null) return null;
 		return getPlayer(user.getName());
 		
@@ -870,17 +830,9 @@ public class Tribes extends JavaPlugin{
 		return diamondTable;
 	}
 
-	public static Long getClaimSize() {
-		return claimSize;
-	}
-
-
-	public static boolean getYAxisClaim() {
-		return yAxisClaim;
-	}
 	//let other objects call our logger
 	public static void log(String line) {
-		TribeLogger.info(line);
+		getLogger().info(line);
 	}
 
 }

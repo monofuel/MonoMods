@@ -35,26 +35,24 @@ public class MonoBugs extends JavaPlugin{
 
 	private static final String adminHelp = "";
 	private static final String userHelp = "";
-	private String mongoHost;
-	private int port;
-	private String databaseName;
-	private String tableName;
 
-	private final int CMD_ARGS = 2;
+	//number of arguments to skip at the start of each command
+	private static final int CMD_ARGS = 2;
 	
 	public void onEnable() {
 		saveDefaultConfig();		
 
-		mongoHost = getConfig().getString("mongo host");
-		port = getConfig().getInt("mongo port");
-		databaseName = getConfig().getString("mongo database");
-		tableName = getConfig().getString("mongo table");
+		String mongoHost = getConfig().getString("mongo host");
+		int port = getConfig().getInt("mongo port");
+		String databaseName = getConfig().getString("mongo database");
+		String tableName = getConfig().getString("mongo table");
 
 		try {
 			mongo = new MongoClient(mongoHost,port);
 		} catch (UnknownHostException e) {
 			getLogger().log(Level.SEVERE,"Error connecing to database, bailling out",e);
 			this.getServer().getPluginManager().disablePlugin(this);
+			return;
 		}
 
 		db = mongo.getDB(databaseName);
@@ -205,8 +203,9 @@ public class MonoBugs extends JavaPlugin{
 		while (cursor.hasNext()) {
 			DBObject element = cursor.next();
 			userReports += "ID: " + element.get("bugID") + " | " + element.get("status") + " | " + element.get("issue") + " | date: " + element.get("createdDate");
-			if (element.containsField("reason"))
+			if (element.containsField("reason")) {
 				userReports += " | reason: " + element.get("reason");
+			}
 			userReports += "\n";
 		}
 
@@ -325,8 +324,9 @@ public class MonoBugs extends JavaPlugin{
 			DBObject myBug = table.findOne(query);
 			myBug.put("status",stat);
 			//TODO is ToString required?
-			if (result.length() > 0)
+			if (result.length() > 0) {
 				myBug.put("reason",result.toString());
+			}
 			table.save(myBug);
 
 

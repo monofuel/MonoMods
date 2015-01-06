@@ -13,14 +13,20 @@ import java.util.logging.Level;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import org.bukkit.event.HandlerList;
+
 
 public class NoWither extends JavaPlugin{
 
 	
 	private static Logger WitherLogger = null;
 	private boolean enabled = true;
+	public WitherListener blocker = null;
 
 	public void onEnable() {
 		WitherLogger = getLogger();
@@ -31,28 +37,34 @@ public class NoWither extends JavaPlugin{
 		saveDefaultConfig();
 		enabled = getConfig().getBoolean("wither disabled");
 		
-		log("NoWither has been enabled");
-		
 		//check if we want wither disabled, and if so, disable
-		if((enabled)) {
+		if(enabled) {
 			//create anti-wither listener
-			log("wither disabled");
-			new WitherListener(this);
+			log("wither spawning disabled");
+			blocker = new WitherListener(this);
 		} else {
-			log("wither enabled");
+			log("wither spawning enabled");
 		}
 	}
 	
 	public void onDisable() {
-		
-		saveConfig();
+		//saving configs on unload is annoying.
+		//config should be saved on config changes.
+
+		if (blocker != null) {
+			HandlerList.unregisterAll(this);
+		}
 
 		log("NoWither has been disabled");
 		WitherLogger = null;
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("NoWither")) {
+		if (cmd.getName().equalsIgnoreCase("NoWither") &&
+			sender instanceof ConsoleCommandSender ||
+			(sender instanceof Player && ((Player) sender).hasPermission("nowither"))) {
+
+			//TODO update this to a java-7 switch by strings case
 			if (args[0].equalsIgnoreCase("reload")) {
 				this.getServer().getPluginManager().disablePlugin(this);
 				this.getServer().getPluginManager().enablePlugin(this);
@@ -66,6 +78,16 @@ public class NoWither extends JavaPlugin{
 			} else if (args[0].equalsIgnoreCase("save")) {
 				saveConfig();
 				return true;
+			} else if (args[0].equalsIgnoreCase("enable")) {
+				getConfig().set("wither disabled",false);
+				sender.sendMessage("wither enabled");
+				saveConfig();
+				return true;
+			} else if (args[0].equalsIgnoreCase("disable")) {
+				getConfig().set("wither disabled",true);
+				sender.sendMessage("wither disabled");
+				saveConfig();
+				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
 				//TODO
 				String help = "NoWither is configured from the config.\n" +
@@ -74,6 +96,10 @@ public class NoWither extends JavaPlugin{
 				
 				return true;
 			}
+
+		} else if (sender instanceof Player && !((Player) sender).hasPermission("nowither")) {
+			sender.sendMessage("you do not have permission to use nowither");
+			return true;
 
 		}
 		

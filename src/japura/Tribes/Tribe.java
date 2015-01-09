@@ -22,8 +22,8 @@ public class Tribe {
 
 	private DBObject myTribe;
 	private String name;
-	private TribePlayer leader;
-	ArrayList<Player> invites = new ArrayList<Player>();
+	private String leader;
+	ArrayList<String> invites = new ArrayList<String>();
 
 
 
@@ -37,7 +37,7 @@ public class Tribe {
 
 		myTribe = cursor.next();
 
-		leader = new TribePlayer((String)myTribe.get("leader"),this);
+		leader = (String) myTribe.get("leader");
 		if (cursor.hasNext()) {
 			Tribes.log("FATAL: multiple tribes with the same name " + name);
 		}
@@ -88,14 +88,14 @@ public class Tribe {
 		emerald.put("X",em.getLocation().getBlockX());
 		emerald.put("Y",em.getLocation().getBlockY());
 		emerald.put("Z",em.getLocation().getBlockZ());
-		Tribes.getTribeTable().insert(emerald);
+		Tribes.getPlugin().getTribeTable().insert(emerald);
 	}
 	public void addDiamond(Block em,Player user) {
 		if (em.getType() != Material.DIAMOND_BLOCK) return;
 		//diamonds.add(em);
 		BasicDBObject query = new BasicDBObject();
 		query.put("tribe",name);
-		DBCursor cursor = Tribes.getDiamondTable().find(query);
+		DBCursor cursor = Tribes.getPlugin().getDiamondTable().find(query);
 
 		String name = "diamond_" + cursor.count();
 		TeleportData data = new TeleportData(em,name,this);
@@ -150,8 +150,8 @@ public class Tribe {
 		Block[] emeralds = getEmeralds();
 		Location tmp;
 		//claim size from one edge to the center
-		long claimSize = (long) Tribes.getClaimSize();
-		boolean YClaim = (boolean) Tribes.getYAxisClaim();
+		long claimSize = Tribes.getPlugin().getConfig().getLong("ClaimSize");
+		boolean YClaim = (boolean) Tribes.getPlugin().getConfig().getBoolean("YAxisClaim");
 		for (Block em : emeralds) {
 			if (!loc.getWorld().equals(em.getWorld())) continue;
 			tmp = em.getLocation().subtract(loc);
@@ -183,11 +183,11 @@ public class Tribe {
 		this.name = name;
 	}
 	
-	public TribePlayer getLeader() {
+	public String getLeader() {
 		return leader;
 	}
 	
-	public void addPlayer(TribePlayer user) {
+	public void addPlayer(String user) {
 		//TODO: STUB
 		//for loop added because contains didn't work right
 		/*for (TribePlayer item : users) {
@@ -208,7 +208,7 @@ public class Tribe {
 		*/
 	}
 	
-	public void delPlayer(TribePlayer user) {
+	public void delPlayer(String user) {
 		//TODO stub
 		/*
 		users.remove(user);
@@ -217,25 +217,28 @@ public class Tribe {
 		
 	}
 	
-	public void unInvite(TribePlayer user) {
-		invites.remove(user.getPlayer());
+	public void unInvite(String user) {
+		invites.remove(user);
 	}
 	
-	public void invite(Player user) {
-		TribePlayer check = Tribes.getPlayer(user);
+	//returns if successful
+	public boolean invite(String user) {
+		Tribe check = Tribes.getPlayersTribe(user);
 		if (check != null) {
-			if (check.getTribe() == this)
-				return;
+			if(name.equals(check.getName()))
+				return false;
 		}
-		
+		//TODO check if player exists?
 		invites.add(user);
+		return true;
 	}
 	
-	public boolean isInvited(Player user) {
+	public boolean isInvited(String user) {
+		//TODO: maybe this should be equals ignore case?
 		return invites.contains(user);
 	}
 	
-	public boolean hasPlayer(TribePlayer user) {
+	public boolean hasPlayer(String user) {
 		//TODO stub
 		/*
 		return users.contains(user);
@@ -247,10 +250,10 @@ public class Tribe {
 		return name;
 	}
 
-	public TribePlayer[] getPlayers() {
+	public String[] getPlayers() {
 		//TODO stub
 		//TribePlayer[] list = users.toArray(new TribePlayer[users.size()]);
-		TribePlayer[] list = null;
+		String[] list = null;
 		return list;
 	}
 	
@@ -262,7 +265,7 @@ public class Tribe {
 		info.append("\n");
 		if (leader != null) {
 			info.append("Leader: ");
-			info.append(leader.getPlayer());
+			info.append(leader);
 			info.append("\n");
 		}
 		/*

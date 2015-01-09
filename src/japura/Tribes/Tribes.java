@@ -171,6 +171,9 @@ public class Tribes extends JavaPlugin{
                 Tribe group;
                 Player player;
 		TeleportData teleData;
+		String tpName;
+		String otherTribeName;
+		Tribe otherGroup;
 
                 player = Bukkit.getPlayer(sender.getName());
 		//group will be null if player is not in a tribe
@@ -245,14 +248,14 @@ public class Tribes extends JavaPlugin{
 					sender.sendMessage("You must specify an existing teleport and the naeme of the tribe to give permission");
 					return true;
 				}
-				String tpName = args[1];
-				String otherTribeName = args[2];
+				tpName = args[1];
+				otherTribeName = args[2];
 				teleData = getttp(tpName,group);
 				if (teleData == null) {
 					sender.sendMessage("Teleport location " + tpName + " does not exist");
 					return true;
 				}
-				Tribe otherGroup = getTribe(otherTribeName);
+				otherGroup = getTribe(otherTribeName);
 				if (otherGroup  == null) {
 					sender.sendMessage("The tribe " + otherTribeName + " does not exist");
 					return true;
@@ -277,14 +280,14 @@ public class Tribes extends JavaPlugin{
 					sender.sendMessage("You must specify an existing teleport and the naeme of the tribe to deny permission");
 					return true;
 				}
-				String tpName = args[1];
-				String otherTribeName = args[2];
+				tpName = args[1];
+				otherTribeName = args[2];
 				teleData = getttp(tpName,group);
 				if (teleData == null) {
 					sender.sendMessage("Teleport location " + tpName + " does not exist");
 					return true;
 				}
-				Tribe otherGroup = getTribe(otherTribeName);
+				otherGroup = getTribe(otherTribeName);
 				if (otherGroup  == null) {
 					sender.sendMessage("The tribe " + otherTribeName + " does not exist");
 					return true;
@@ -298,10 +301,10 @@ public class Tribes extends JavaPlugin{
 					sender.sendMessage("You must specify the name of a teleport");
 					return true;
 				}
-				if (tPlayer == null || tPlayer.getTribe() == null) {
+				//TODO find more elegant way to handle safezone tp's for everyone
+				if (group == null) {
 					teleData = getttp(args[1],getTribe("safezone"));
 				} else {
-					group = tPlayer.getTribe();
 					teleData = getttp(args[1],group);
 				}
 				if (teleData == null) {
@@ -339,11 +342,9 @@ public class Tribes extends JavaPlugin{
 				return true;
 			default:
 				//teleport to location and return true
-			
-				if ((tPlayer == null) || (tPlayer.getTribe() == null)) {
+				//TODO find more elegant way to handle safezone tp's for everyone
+				if ((group == null)) {
 					group = getTribe("safezone");
-				} else {
-					group = tPlayer.getTribe();
 				}
 				if (args.length != 1) {
 					sender.sendMessage("you must specify an existing teleport.");
@@ -358,7 +359,7 @@ public class Tribes extends JavaPlugin{
 				teleData.teleportPlayer(player);
 				return true;
 		}
-		return false;
+		//return false;
 
 	}
 
@@ -402,6 +403,8 @@ public class Tribes extends JavaPlugin{
 
 	//should be split into separate commands, probably in another class
 	public boolean tadmin(CommandSender sender, Command cmd, String label, String[] args) {
+		//TODO needs to be converted to newer format for console/admins
+		//and converted to a switch statement
 		if (args.length < 1) return false;
 		if (args[0].equalsIgnoreCase("reload")) {
 			this.getServer().getPluginManager().disablePlugin(this);
@@ -424,30 +427,21 @@ public class Tribes extends JavaPlugin{
 			saveConfig();
 			return true;
 		} else if (args[0].equalsIgnoreCase("list")) {
-			StringBuilder list = new StringBuilder();
-			
-			for (Tribe tribe : getTribes()) {
-				list.append(tribe.getName() + ",");
-			}
-			sender.sendMessage(list.toString());
-			
-			return true;
+			//TODO stub
+			//use paginator n shit
 		} else if (args[0].equalsIgnoreCase("put")) {
 			if (args.length != 3) {
 				sender.sendMessage("/tadmin put player tribe");
 				return true;
 			}
-			TribePlayer tPlayer = getPlayer(args[1]);
-			Tribe tribe = getTribe(args[2]);
-			sender.sendMessage("placing " + args[1] + " into " + args[2]);
-			if (tPlayer == null) {
-				tPlayer = TribePlayerFactory.createNewPlayer(args[1]);
-			}
+			String user = args[1];
+			String tribeName = args[2];
+			Tribe tribe = getTribe(tribeName);
+			sender.sendMessage("placing " + user + " into " + tribeName);
 			if (tribe == null) {
 				sender.sendMessage("tribe doesn't exist");
 			} else {
-				
-				tribe.addPlayer(tPlayer);
+				tribe.addPlayer(user);
 				sender.sendMessage("success");
 			}
 				
@@ -459,20 +453,21 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("/tadmin remove player tribe");
 				return true;
 			}
-			TribePlayer tPlayer = getPlayer(args[1]);
-			Tribe tribe = getTribe(args[2]);
-			if (tPlayer == null) {
+			String user = args[1];
+			String tribeName = args[2];
+			Tribe tribe = getTribe(tribeName);
+			if (getPlayersTribe(user) == null) {
 				sender.sendMessage("player is not in a tribe");
 			} else {
 				if (tribe == null) {
 					sender.sendMessage("tribe doesn't exist");
 				} else {
 					
-					tribe.delPlayer(tPlayer);
-					if (tribe.getLeader() == tPlayer) {
+					tribe.delPlayer(user);
+					if (user.equals(tribe.getLeader())) {
 						tribe.setLeader("");
 					}
-					sender.sendMessage("success");
+					sender.sendMessage("successfully moved " + user + " to tribe " + tribeName);
 				}
 				
 			}
@@ -483,18 +478,15 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("/tadmin leader player tribe");
 				return true;
 			}
-			TribePlayer tPlayer = getPlayer(args[1]);
-			Tribe tribe = getTribe(args[2]);
-			sender.sendMessage("placing " + args[1] + " as leader of " + args[2]);
-			if (tPlayer == null) {
-				tPlayer = TribePlayerFactory.createNewPlayer(args[1]);
-			}
+			String user = args[1];
+			String tribeName = args[2];
+			Tribe tribe = getTribe(tribeName);
+			sender.sendMessage("placing " + user + " as leader of " + tribeName);
 			if (tribe == null) {
 				sender.sendMessage("tribe doesn't exist");
 			} else {
-				tribe.addPlayer(tPlayer);
-				tribe.setLeader(tPlayer.getPlayer());
-				tPlayer.setTribe(tribe);
+				tribe.addPlayer(user);
+				tribe.setLeader(user);
 				sender.sendMessage("success");
 			}
 				
@@ -514,6 +506,7 @@ public class Tribes extends JavaPlugin{
 			}
 			return true;
 		} else if (args[0].equalsIgnoreCase("help")) {
+			//TODO update help
 			String help = "/tadmin reload will reload the config\n" +
 						"/tadmin unload will unload the plugin\n" +
 						"/tadmin load will load config changes\n" +
@@ -529,12 +522,12 @@ public class Tribes extends JavaPlugin{
 	//TODO: should be split into separate commands, probably in another class.
 	public boolean tcmd(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length == 0) return false;
+		String user = sender.getName();
 		Tribe group;
 		Player player;
-		TribePlayer tPlayer;
 		
-		player = Bukkit.getPlayer(sender.getName());
-		tPlayer = getPlayer(player);
+		player = Bukkit.getPlayer(user);
+		group = getPlayersTribe(player);
 		
 		if (args[0].equalsIgnoreCase("create")) {
 			if (args.length < 2){
@@ -563,15 +556,15 @@ public class Tribes extends JavaPlugin{
 			
 			group = getTribe(args[1]);
 			
-			if (tPlayer == null) {
+			if (group == null) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
-			} else if (group == null) {
+			} else if (!user.equals(group.getLeader())) {
 				sender.sendMessage("You are not leader of that tribe");
 				return true;
 			}
 			
-			if (tPlayer.equals(group.getLeader())) {
+			if (user.equals(group.getLeader())) {
 				TribeFactory.destroyTribe(group);
 				sender.sendMessage("Your tribe has been destroyed");
 				return true;
@@ -586,16 +579,14 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			
-			if (tPlayer == null || tPlayer.getTribe() == null) {
+			if (group == null) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			}
-			group = tPlayer.getTribe();
 			
-			if (group.getLeader().equals(tPlayer)) {
-				Player user = Bukkit.getPlayer(args[1]);
+			if (user.equals(group.getLeader())) {
 				group.invite(user);
-				sender.sendMessage(args[1] + " invited successfully");
+				sender.sendMessage(user + " invited successfully");
 				return true;
 			} else {
 				sender.sendMessage("You are not leader of this tribe");
@@ -609,23 +600,20 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			
-			if (tPlayer == null) {
-				tPlayer = TribePlayerFactory.createNewPlayer(player);
-			}
-			if (tPlayer.getTribe() != null) {
-				if (tPlayer.getTribe().getLeader().equals(tPlayer)) {
+			if (group != null) {
+				if (user.equals(group.getLeader())) {
 					sender.sendMessage("You cannot leave without transfering leadership");
 					return true;
 				}
-				tPlayer.getTribe().delPlayer(tPlayer);
+				group.delPlayer(user);
 			}
 			Tribe newGroup = getTribe(args[1]);
 			if (newGroup == null) {
 				sender.sendMessage("invalid tribe name");
 				return true;
 			}
-			if (newGroup.isInvited(player)) {
-				newGroup.addPlayer(tPlayer);
+			if (newGroup.isInvited(user)) {
+				newGroup.addPlayer(user);
 				sender.sendMessage("you have joined " + newGroup.getName());
 				return true;
 			} else {
@@ -633,12 +621,12 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("kick")) {
-			if (tPlayer == null || tPlayer.getTribe() == null) {
+			if (group == null) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			}
 			
-			if (!tPlayer.getTribe().getLeader().equals(tPlayer)) {
+			if (user.equals(group.getLeader())) {
 				sender.sendMessage("You are not leader of this tribe");
 				return true;
 			}
@@ -646,19 +634,15 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("You need to specify the player to kick");
 				return true;
 			}
-			TribePlayer kicked = getPlayer(args[1]);
-			if (kicked == null) {
-				sender.sendMessage("Player does not exist or is not in a tribe");
-				return true;
-			}
-			if (kicked.getTribe() != tPlayer.getTribe()) {
+			String kicked = args[1];
+			if (!group.hasPlayer(args[1])) {
 				sender.sendMessage("Player is not in your tribe");
 				return true;
 			}
 			
-			tPlayer.getTribe().delPlayer(kicked);
-			sender.sendMessage(kicked.getPlayer() + " has been kicked");
-			Player kickedPlayer = Bukkit.getServer().getPlayer(kicked.getPlayer());
+			group.delPlayer(kicked);
+			sender.sendMessage(kicked + " has been kicked");
+			Player kickedPlayer = Bukkit.getServer().getPlayer(kicked);
 			if (kickedPlayer != null) {
 				kickedPlayer.sendMessage("You have been kicked from your tribe!");
 			}
@@ -666,17 +650,17 @@ public class Tribes extends JavaPlugin{
 
 		
 		} else if (args[0].equalsIgnoreCase("leave")) {
-			if (tPlayer == null || tPlayer.getTribe() == null) {
+			if (group == null) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			}
 			
-			if (tPlayer.getTribe().getLeader().equals(tPlayer)) {
+			if (user.equals(group.getLeader())) {
 				sender.sendMessage("You cannot leave without transfering leadership");
 				return true;
 			}
 			
-			tPlayer.getTribe().delPlayer(tPlayer);
+			group.delPlayer(user);
 			return true;
 			
 			
@@ -685,8 +669,8 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("You need to specify who to give leadership to");
 				return true;
 			}
-			TribePlayer otherPlayer = getPlayer(args[1]);
-			if (tPlayer == null || tPlayer.getTribe() == null) {
+			String otherPlayer = args[1];
+			if (group == null) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			}
@@ -694,9 +678,10 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("They are not in your tribe");
 				return true;
 			}
-			if (tPlayer.getTribe().getLeader().equals(tPlayer)) {
-				tPlayer.getTribe().setLeader(otherPlayer.getPlayer());
+			if (user.equals(group.getLeader())) {
+				group.setLeader(otherPlayer);
 				sender.sendMessage("leadership transfered");
+				//TODO send the other player a message that leadership is transferred
 				return true;
 			} else {
 				sender.sendMessage("You are not leader of your tribe");
@@ -712,18 +697,11 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage(group.toString()); 
 				return true;
 			}
-			tPlayer = getPlayer(args[1]);
-			if (tPlayer != null) {
-				group = tPlayer.getTribe();
-				if (group != null) {
-					sender.sendMessage(tPlayer.getPlayer() + " is in the tribe " + group.getName());
-					return true;
-				} else {
-					//TODO: this will typically never be reached.
-					//players who are not in a tribe will probably not have tribeplayer objects.
-					sender.sendMessage(tPlayer.getPlayer() + " is not in a tribe");
-					return true;
-				}
+			String otherUser = args[1];
+			Tribe otherGroup = getPlayersTribe(otherUser);
+			if (otherGroup != null) {
+				sender.sendMessage(otherUser + " is in the tribe " + otherGroup.getName());
+				return true;
 			} else {
 				sender.sendMessage("User or tribe does not exist");
 				return true;
@@ -795,7 +773,9 @@ public class Tribes extends JavaPlugin{
 	
 	public static Tribe[] getTribes() {
 		DBCursor cursor = tribeTable.find();
-		return cursor.toArray();
+		//TODO convert to array of Tribes
+		//return cursor.toArray();
+		return null;
 	}
 	
 	public static void addPlayer(TribePlayer user) {
@@ -828,7 +808,7 @@ public class Tribes extends JavaPlugin{
 		if (tribeObject == null) {
 			return null;
 		} else {
-			return new Tribe(tribeObject.getString("name"));
+			return new Tribe((String) tribeObject.get("name"));
 		}
 
 	}
@@ -836,7 +816,7 @@ public class Tribes extends JavaPlugin{
 	public static Tribe getPlayersTribe(Player user) {
 		//garbage in garbage out
 		if (user == null) return null;
-		return getPlayer(user.getName());
+		return getPlayersTribe(user.getName());
 		
 	}
 	

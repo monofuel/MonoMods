@@ -76,6 +76,8 @@ public class Tribes extends JavaPlugin{
 		//and starts listeners
 		protector = new TribeProtect(this);
 		disbander = new TribeDisbandRunner(this);
+		//TODO listener is not actually set to run?
+		//there's a method in it for removing diamonds that don't exist anymore
 		teleportListener = new TribeTeleportListener(this);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,200,200);
 
@@ -92,12 +94,10 @@ public class Tribes extends JavaPlugin{
 		//set a spawn point
 		if (getConfig().getBoolean("Tribe Spawn")) {
 			
-			//TODO: why must i do these crazy casts
 			int x = getConfig().getInt("SpawnX");
 			int y = getConfig().getInt("SpawnY");
 			int z = getConfig().getInt("SpawnZ");
 			String worldName = getConfig().getString("World");
-			//TODO:should set a config option for this
 			World world = Bukkit.getWorld(worldName);
 			if (world == null) {
 				log("invalid world for spawn");
@@ -794,10 +794,6 @@ public class Tribes extends JavaPlugin{
 	public static Tribe getPlayersTribe(String name) {
 		//garbage in garbage out
 		if (name == null) return null;
-		/*
-		for (int i = 0; i < users.size(); i++) {
-			if(users.get(i).getPlayer().equalsIgnoreCase(name)) return users.get(i);
-		}*/ //TODO stub
 
 		BasicDBObject query = new BasicDBObject();
 		BasicDBList members = new BasicDBList();

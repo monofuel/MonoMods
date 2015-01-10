@@ -7,6 +7,6 @@ commands:
         usage: /MonoLocks help
 
 permissions:
-	monolocks.admin:
-		description: permission to use monolocks admin commands
-		default: false
+    monolocks.admin:
+        description: permission to use monolocks admin commands
+        default: false

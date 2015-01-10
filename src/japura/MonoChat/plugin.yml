@@ -7,6 +7,6 @@ commands:
         usage: /monochat help
 
 permissions:
-	monochat.admin:
-		description: permission to use monochat admin commands
-		default: false
+    monochat.admin:
+        description: permission to use monochat admin commands
+        default: false

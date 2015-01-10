@@ -7,6 +7,6 @@ commands:
         usage: /monomobs help
 
 permissions:
-	monomobs.admin:
-		description: permission to use monomobs admin commands
-		default: false
+    monomobs.admin:
+        description: permission to use monomobs admin commands
+        default: false

@@ -31,4 +31,4 @@ permissions:
         default: false
         children:
             tribes: true
-	    tribes.tp: true
+            tribes.tp: true

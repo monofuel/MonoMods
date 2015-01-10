@@ -120,19 +120,6 @@ public class Tribe {
 		}
 	}*/
 
-	//TODO actually why do we have this. this is silly. come up with a better way to verify diamonds.
-	/*
-	public void checkDiamond(Block em) {
-		if (!em.getChunk().isLoaded()) return;
-		BasicDBObject query = new BasicDBObject();
-		query.put("tribe",owner);
-		DBCursor blocks = Tribes.getEmeraldTable().find(query);
-		for (DBObject block : blocks) {
-			if (em.getType() != Material.DIAMOND_BLOCK) diamonds.remove(em);
-		}
-
-	}*/
-	
 	public void delEmerald(Block em) {
 		//TODO stub
 		/*if (emeralds.contains(em)){

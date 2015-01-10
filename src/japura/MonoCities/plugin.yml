@@ -8,6 +8,6 @@ commands:
         usage: /MonoCities help
 
 permissions:
-	monocities.admin:
-		description: permission to use monocities admin commands
-		default: false
+    monocities.admin:
+        description: permission to use monocities admin commands
+        default: false

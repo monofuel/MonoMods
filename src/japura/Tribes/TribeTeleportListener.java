@@ -45,21 +45,16 @@ public class TribeTeleportListener implements Listener {
 		if (event.getBlock().getType() != Material.DIAMOND_BLOCK) return;
 		if (event.isCancelled()) return;
 		
-		TribePlayer user = Tribes.getPlayer(event.getPlayer());
+		String user = event.getPlayer().getName();
+		Tribe userGroup = Tribes.getPlayersTribe(user);
 		//check if they are in a tribe faction
-		if (user == null) {
+		if (userGroup == null) {
 			event.getPlayer().sendMessage("You are not in a tribe");
 			return;
 		}
 		//check if we're in our own territory
 		Location loc;
-		Tribe userGroup,group;
-		
-		userGroup = user.getTribe();
-		if (userGroup == null) {
-			event.getPlayer().sendMessage("You are not in a tribe");
-			return;
-		}
+		Tribe group;
 		
 		loc = event.getBlock().getLocation();
 		group = TribeProtect.getBlockOwnership(loc);
@@ -71,7 +66,7 @@ public class TribeTeleportListener implements Listener {
 			return;
 		}
 		
-		user.getTribe().addDiamond(event.getBlock(),event.getPlayer());
+		group.addDiamond(event.getBlock(),event.getPlayer());
 		
 	}
 	
@@ -86,14 +81,14 @@ public class TribeTeleportListener implements Listener {
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
 		
 		if (group == null) return;
-		TribePlayer user = Tribes.getPlayer(event.getPlayer().getName());
-		if (user == null || user.getTribe() != group) {
+		String user = event.getPlayer().getName();
+		if (Tribes.getPlayersTribe(user) != group) {
 			event.getPlayer().sendMessage("You are not allowed to break here");
 			event.setCancelled(true);
 			return;
 		}
 
-		Tribes.log("Player " + user.getPlayer() + " broke " + user.getTribe().getName() + "'s diamond at " +
+		Tribes.log("Player " + user + " broke " + group.getName() + "'s diamond at " +
 			event.getBlock().getLocation().getX() + "," + event.getBlock().getLocation().getY() + "," + 
 			event.getBlock().getLocation().getZ());
 		event.setCancelled(false);

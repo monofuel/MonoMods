@@ -777,19 +777,19 @@ public class Tribes extends JavaPlugin{
 		//return cursor.toArray();
 		return null;
 	}
-	
+	/*
 	public static void addPlayer(TribePlayer user) {
 		/*
 		if (!users.contains(user))
 			users.add(user);
-		*/ //TODO STUB
+		 //TODO STUB
 	}
 	
 	public static void delPlayer(TribePlayer user) {
 		//users.remove(user);
 		//TODO stub
 		
-	}
+	}*/
 
 	public static Tribe getPlayersTribe(String name) {
 		//garbage in garbage out

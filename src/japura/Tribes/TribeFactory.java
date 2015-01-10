@@ -14,47 +14,13 @@ public class TribeFactory {
 
 	public static void createNewTribe(String name, Player founder) {
 		
-		TribePlayer user = Tribes.getPlayer(founder);
-		if (user == null) {
-			user = TribePlayerFactory.createNewPlayer(founder.getPlayer());
-		}
-		if (user == null) {
-			Tribes.log("error creating new user " + founder);
-			return;
-		}
-		
-		createNewTribe(name,user);
-	}
-	
-	public static void createNewTribe(String name, TribePlayer founder) {
-		Tribe group = new Tribe(name);
-		group.setLeader(founder.getPlayer());
-		founder.setTribe(group);
-		
-		Tribes.addTribe(group);
-		
-		
-	}
-	
-	public static void destroyTribe(Tribe group) {
-		Tribes.destroyTribe(group);
-		for (TribePlayer user : group.getPlayers()) {
-			Tribes.delPlayer(user);
-		}
+		createNewTribe(name,founder.getName());
 	}
 
 	public static void createNewTribe(String name, String founder) {
-		TribePlayer user = Tribes.getPlayer(founder);
-		if (user == null) {
-			user = TribePlayerFactory.createNewPlayer(founder);
-		}
-		if (user == null) {
-			Tribes.log("error creating new user " + founder);
-			return;
-		}
-		
-		createNewTribe(name,user.getPlayer());
-		
+		Tribe group = new Tribe(name);
+		group.setLeader(founder);
+
 	}
 
 	public static void createNewTribe(String name) {
@@ -63,4 +29,7 @@ public class TribeFactory {
 		
 	}
 	
+	public static void destroyTribe(Tribe group) {
+		//TODO stub
+	}
 }

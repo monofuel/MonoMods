@@ -38,9 +38,8 @@ public class LoginListener implements Listener {
 	}
 
 	public void TimestampLogin(PlayerLoginEvent event) {
-                TribePlayer user = Tribes.getPlayer(event.getPlayer().getName());
-                if (user == null) return;
-                Tribe group = user.getTribe();
+                String user = event.getPlayer().getName();
+                Tribe group = Tribes.getPlayersTribe(user);
                 if (group == null) return;
                 group.setLastLogTime(System.currentTimeMillis());
         }

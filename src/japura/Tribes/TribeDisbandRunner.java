@@ -14,6 +14,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
 
+import com.mongodb.*;
+
 public class TribeDisbandRunner extends BukkitRunnable{
 
 	private final JavaPlugin plugin;
@@ -31,12 +33,15 @@ public class TribeDisbandRunner extends BukkitRunnable{
 	}
 	
 	public void run() {
-		Tribe[] currentTribes = Tribes.getTribes();
+		DBCursor currentTribes = Tribes.getTribes();
 		long currentTime = System.currentTimeMillis();
-		for (Tribe item : currentTribes) {
-			if (currentTime - item.getLastLogTime() > timeDeltaInMillis) {
-				Tribes.log("Tribe " + item.getName() + " has exceeded the time since last login limit");
-				Tribes.destroyTribe(item);
+		for (DBObject item : currentTribes) {
+			if ("safezone".equalsIgnoreCase((String) item.get("name"))) {
+				continue;
+			}
+			if (currentTime - (long) item.get("getLastLogTime") > timeDeltaInMillis) {
+				Tribes.log("Tribe " + (String) item.get("name") + " has exceeded the time since last login limit");
+				Tribes.destroyTribe((String) item.get("name"));
 			}
 
 		}

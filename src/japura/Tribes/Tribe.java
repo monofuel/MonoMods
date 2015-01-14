@@ -13,6 +13,8 @@ import com.mongodb.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -61,15 +63,56 @@ public class Tribe {
 	}
 	
 	public Block[] getEmeralds() {
-		//TODO fetch current list from db
-		//return emeralds.toArray(new Block[emeralds.size()]);
-		return null;
+		BasicDBObject query = new BasicDBObject();
+		query.put("tribe",name);
+		DBCursor cursor = Tribes.getEmeraldTable().find(query);
+		int size = cursor.count();
+		Block[] blocks = new Block[size];
+		double x;
+		double y;
+		double z;
+		World world;
+		Location loc;
+		BasicDBObject current;
+		for (int i = 0; i < size; i++) {
+			current = ((BasicDBObject) cursor.next());
+			x = current.getLong("X");
+			y = current.getLong("Y");
+			z = current.getLong("Z");
+			world = Bukkit.getWorld(current.getString("world"));
+			loc = new Location(world,x,y,z);
+			blocks[i] = loc.getBlock();
+		}
+
+
+		return blocks;
 	}
 
 	public Block[] getDiamonds() {
-		//TODO stub
-		//return diamonds.toArray(new Block[diamonds.size()]);
-		return null;
+
+		BasicDBObject query = new BasicDBObject();
+		query.put("tribe",name);
+		DBCursor cursor = Tribes.getDiamondTable().find(query);
+		int size = cursor.count();
+		Block[] blocks = new Block[size];
+		double x;
+		double y;
+		double z;
+		World world;
+		Location loc;
+		BasicDBObject current;
+		for (int i = 0; i < size; i++) {
+			current = ((BasicDBObject) cursor.next());
+			x = current.getLong("X");
+			y = current.getLong("Y");
+			z = current.getLong("Z");
+			world = Bukkit.getWorld(current.getString("world"));
+			loc = new Location(world,x,y,z);
+			blocks[i] = loc.getBlock();
+		}
+
+
+		return blocks;
 	}
 	public TeleportData getTeleData(Block em) {
 		//TODO stub
@@ -88,6 +131,7 @@ public class Tribe {
 		emerald.put("X",em.getLocation().getBlockX());
 		emerald.put("Y",em.getLocation().getBlockY());
 		emerald.put("Z",em.getLocation().getBlockZ());
+		emerald.put("world",em.getLocation().getWorld().getName());
 		Tribes.getPlugin().getTribeTable().insert(emerald);
 	}
 	public void addDiamond(Block em,Player user) {
@@ -121,16 +165,25 @@ public class Tribe {
 	}*/
 
 	public void delEmerald(Block em) {
-		//TODO stub
-		/*if (emeralds.contains(em)){
-			emeralds.remove(em);
-		}*/
+		BasicDBObject query = new BasicDBObject();
+		query.put("tribe",name);
+		query.put("world",em.getWorld());
+		query.put("X",em.getX());
+		query.put("Y",em.getY());
+		query.put("Z",em.getZ());
+
+		Tribes.getEmeraldTable().remove(query);
 	}
 	public void delDiamond(Block em) {
-		//TODO stub
-		/*if (diamonds.contains(em)){
-			diamonds.remove(em);
-		}*/
+		BasicDBObject query = new BasicDBObject();
+		query.put("tribe",name);
+		query.put("world",em.getWorld());
+		query.put("X",em.getX());
+		query.put("Y",em.getY());
+		query.put("Z",em.getZ());
+
+
+		Tribes.getDiamondTable().remove(query);
 	}
 	
 	public boolean checkLocOwnership(Location loc) {

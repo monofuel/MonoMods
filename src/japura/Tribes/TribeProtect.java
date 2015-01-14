@@ -8,6 +8,8 @@
 
 package japura.Tribes;
 
+import com.mongodb.*;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,8 +31,16 @@ public class TribeProtect extends BukkitRunnable {
 	}
 	
 	public void updateEmeralds() {
-		Tribe[] all = Tribes.getTribes();
-		for (Tribe group : all) {
+		DBCursor cursor = Tribes.getTribes();
+		Tribe group;
+		String name;
+		while (cursor.hasNext()) {
+			name = (String) cursor.next().get("name");
+			group = Tribes.getTribe(name);
+			if (group == null) {
+				Tribes.log("Emerald updater found tribe with name set to null");
+				continue;
+			}
 			Block[] emeralds = group.getEmeralds();
 			for (Block item : emeralds) {
 				//STUB
@@ -40,8 +50,10 @@ public class TribeProtect extends BukkitRunnable {
 	}
 	
 	public static Tribe getBlockOwnership(Location loc) {
-		Tribe[] all = Tribes.getTribes();
-		for (Tribe group : all) {
+		DBCursor cursor = Tribes.getTribes();
+		Tribe group;
+		while (cursor.hasNext()) {
+			group = Tribes.getTribe((String) cursor.next().get("name"));
 			if (group.checkLocOwnership(loc)) return group;
 		}
 		return null;

@@ -139,6 +139,18 @@ public class Tribes extends JavaPlugin{
 	 */
 	public boolean verifyTribes() {
 		boolean result = true;
+		DBCursor cursor = getTribeTable().find();
+		DBObject group;
+
+		//verify all tribes have a correct name
+		while (cursor.hasNext()) {
+			group = cursor.next();
+			if (group.get("name") == null) {
+				log("found a tribe with the name null");
+				result = false;
+			}
+		}
+
 
 		//TODO
 		//verify that safezone exists
@@ -146,6 +158,9 @@ public class Tribes extends JavaPlugin{
 		//verify that every tribe other than safezone has a leader
 
 		//check that no user is in multiple tribes
+		
+
+
 
 		return result;
 	}
@@ -378,7 +393,10 @@ public class Tribes extends JavaPlugin{
 
 		//if our tribe does not have this point, see if another tribe does
 		//and if they have allowed us to use it
-		for (Tribe otherGroup : getTribes()) {
+		DBCursor cursor = getTribes();
+		Tribe otherGroup;
+		while (cursor.hasNext()) {
+			otherGroup = getTribe((String) cursor.next().get("name"));
 			//don't re-scan the same group
 			if (otherGroup == group) continue;
 
@@ -754,6 +772,10 @@ public class Tribes extends JavaPlugin{
 			log("error destroying tribe " + group.getName());
 		}
 	}
+
+	public static void destroyTribe(String group) {
+		destroyTribe(getTribe(group));
+	}
 	
 	public static void addTribe(Tribe group) {
 		/*if (!groups.contains(group))
@@ -761,21 +783,21 @@ public class Tribes extends JavaPlugin{
 		*/ //TODO stub
 	}
 	
+
+	/*
+	 * the getTribe function is alot simpler than it used to,
+	 * you could really just call a new tribe object instead.
+	 * Tribe objects are just a layer above the database,
+	 * and the TribeFactory is for the creation of new tribes.
+	 *
+	 */
 	public static Tribe getTribe(String name) {
-		/*
-		for (Tribe group : groups) {
-			if (group.getName().equalsIgnoreCase(name)) {
-				return group;
-			}
-		}*/
-		return null; //TODO STUB
+		return new Tribe(name);
 	}
 	
-	public static Tribe[] getTribes() {
+	public static DBCursor getTribes() {
 		DBCursor cursor = tribeTable.find();
-		//TODO convert to array of Tribes
-		//return cursor.toArray();
-		return null;
+		return cursor;
 	}
 	/*
 	public static void addPlayer(TribePlayer user) {

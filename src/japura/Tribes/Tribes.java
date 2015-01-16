@@ -583,7 +583,7 @@ public class Tribes extends JavaPlugin{
 			}
 			
 			if (user.equals(group.getLeader())) {
-				TribeFactory.destroyTribe(group);
+				group.destroy();
 				sender.sendMessage("Your tribe has been destroyed");
 				return true;
 			} else {
@@ -763,24 +763,11 @@ public class Tribes extends JavaPlugin{
 	}
 	
 	
-	public static void destroyTribe(Tribe group) {
-		try {
-			log("destroying tribe " + group.getName());
-			//groups.remove(group);
-			//TODO stub
-		} catch (Exception e) {
-			log("error destroying tribe " + group.getName());
-		}
-	}
-
-	public static void destroyTribe(String group) {
-		destroyTribe(getTribe(group));
-	}
-	
 	public static void addTribe(Tribe group) {
 		/*if (!groups.contains(group))
 			groups.add(group);
-		*/ //TODO stub
+		*/ //TODO
+		Tribes.log("STUB add Tribe method called");
 	}
 	
 
@@ -804,12 +791,14 @@ public class Tribes extends JavaPlugin{
 		/*
 		if (!users.contains(user))
 			users.add(user);
-		 //TODO STUB
+		 //TODO
+		 //i think this is safe to delete
 	}
 	
 	public static void delPlayer(TribePlayer user) {
 		//users.remove(user);
-		//TODO stub
+		//TODO
+		 //i think this is safe to delete
 		
 	}*/
 

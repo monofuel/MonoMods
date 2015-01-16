@@ -1,4 +1,5 @@
 server: irc.japura.net
-channel: #minecrafttesting
+# the leading # will be added automatically
+channel: minecrafttesting
 username: TestingBot
 port: 6667

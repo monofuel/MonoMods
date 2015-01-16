@@ -43,7 +43,9 @@ public class TribeProtect extends BukkitRunnable {
 			}
 			Block[] emeralds = group.getEmeralds();
 			for (Block item : emeralds) {
-				//STUB
+				//TODO:
+				//modify this so that it just goes to the emerald
+				//table directly rather than work through the tribe class.
 				//group.checkEmerald(item);
 			}	
 		}

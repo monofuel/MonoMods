@@ -1,6 +1,8 @@
 THINGS TO TEST:
 everything
 
+test how bugs and tribes react when the db isn't running
+
 pistons moving emeralds
 
 Bug help

@@ -136,8 +136,7 @@ public class MonoPerms extends JavaPlugin{
 		for (String donorName : donors) {
 			Player user = Bukkit.getPlayer(donorName);
 			if (user != null) addPerm(user,"donor");
-			OfflinePlayer offlineDonor = Bukkit.getOfflinePlayer(donorName);
-			Player donor = offlineDonor.getPlayer();
+			Player donor = Bukkit.getPlayer(donorName);
 			if (donor == null) continue; //that means they are offline
 			if (donor.getName().equalsIgnoreCase("monofuel"))
 				donor.setPlayerListName(ChatColor.YELLOW + donor.getName());

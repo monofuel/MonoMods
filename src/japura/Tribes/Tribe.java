@@ -35,13 +35,14 @@ public class Tribe {
 		BasicDBObject query = new BasicDBObject();
 		query.put("name",name);
 
-		DBCursor cursor = Tribes.getTribeTable().find(query);
+		myTribe = Tribes.getTribeTable().findOne(query);
+		
+		if (myTribe == null) {
+			name = "invalid tribe";
+			leader = "invalid tribe leader";
+		} else {
 
-		myTribe = cursor.next();
-
-		leader = (String) myTribe.get("leader");
-		if (cursor.hasNext()) {
-			Tribes.log("FATAL: multiple tribes with the same name " + name);
+			leader = (String) myTribe.get("leader");
 		}
 	}
 	
@@ -284,6 +285,22 @@ public class Tribe {
 		return users.contains(user);
 		*/
 		return false;
+	}
+
+	public void destroy() {
+                BasicDBObject query = new BasicDBObject();
+                query.put("name",group.getName());
+                DBObject item = Tribes.getTribeTable().findOne(query);
+
+                //delete all emeralds and diamonds too
+                BasicDBObject blockQuery = new BasicDBObject();
+                blockQuery.put("tribe",group.getName());
+
+                Tribes.getEmeraldTable().remove(blockQuery);
+                Tribes.getDiamondTable().remove(blockQuery);
+
+                Tribes.getTribeTable().remove(item);
+		Tribes.log("tribe " + name + " destroyed");
 	}
 	
 	public String getName() {

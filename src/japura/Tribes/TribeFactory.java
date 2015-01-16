@@ -35,6 +35,7 @@ public class TribeFactory {
 			BasicDBObject newTribe = new BasicDBObject();
 			newTribe.put("name",name);
 			newTribe.put("leader",name);
+			newTribe.put("getLastLogTime",System.currentTimeMillis());
 
 			Tribes.getTribeTable().insert(newTribe);
 		}
@@ -56,27 +57,11 @@ public class TribeFactory {
 			//create the new tribe
 			BasicDBObject newTribe = new BasicDBObject();
 			newTribe.put("name",name);
+			newTribe.put("getLastLogTime",System.currentTimeMillis());
 
 			Tribes.getTribeTable().insert(newTribe);
 		}
 
 	}
 	
-	//TODO this should probably be moved
-	//to be a method in the tribe class, rather than here in the factory.
-	//this is from back when tribes was a little more complicated.
-	public static void destroyTribe(Tribe group) {
-		BasicDBObject query = new BasicDBObject();
-		query.put("name",group.getName());
-		DBObject item = Tribes.getTribeTable().findOne(query);
-
-		//delete all emeralds and diamonds too
-		BasicDBObject blockQuery = new BasicDBObject();
-		blockQuery.put("tribe",group.getName());
-
-		Tribes.getEmeraldTable().remove(blockQuery);
-		Tribes.getDiamondTable().remove(blockQuery);
-
-		Tribes.getTribeTable().remove(item);
-	}
 }

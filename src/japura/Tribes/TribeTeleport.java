@@ -25,7 +25,7 @@ public class TribeTeleport extends BukkitRunnable {
 	}
 	
 	public void updateDiamonds() {
-		//TODO STUB
+		//TODO
 		//pull up the diamond database
 		//and review that all the diamonds on currently-loaded chunks are indeed diamonds
 		//if (!em.getChunk().isLoaded()) return;

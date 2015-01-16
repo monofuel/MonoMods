@@ -1,13 +1,7 @@
 THINGS TO TEST:
-nowither
-MonoBugs
+everything
 
-
-configs not always loading default settings right //done, needs testing
-
-BIG ONE: unify command output paging. currently several plugins
-do it in several different ways. a unique solution should be created in
-monoutil.
+pistons moving emeralds
 
 Bug help
 

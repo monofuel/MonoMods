@@ -107,7 +107,7 @@ public class IRCListener implements Listener {
 	private void sendMessage(String user, String message) {
 		
 		StringBuilder line = new StringBuilder("PRIVMSG ");
-		line.append(" #minecraft :");
+		line.append(" " + channel + " :");
 		line.append(user);
 		line.append(": ");
 		line.append(message);

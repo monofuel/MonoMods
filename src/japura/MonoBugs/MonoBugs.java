@@ -69,9 +69,8 @@ public class MonoBugs extends JavaPlugin{
 
 		getLogger().info("MonoBugs has been disabled");
 	}
-	
-	public boolean onCommand(CommandSender sender, Command cmd, String[] args) {
 
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		//verify that this is the correct command, and check if
 		//it is being sent via the console or via player.
 		//console always gets full access, but for the player we
@@ -85,7 +84,6 @@ public class MonoBugs extends JavaPlugin{
 			if (args.length < 1) {
 				return false;
 			}
-
 			//valid cases will return true so that the plugin help will not be displayed.
 			//if none of these casese are met, then the 'return false' at the end
 			//of this method would run.
@@ -112,8 +110,7 @@ public class MonoBugs extends JavaPlugin{
 		//or if an admin issued a command that did not meet the above
 		}
 		
-		if ("bug".equalsIgnoreCase(cmd.getName()) &&
-		    sender instanceof Player) {
+		if ("bug".equalsIgnoreCase(cmd.getName())) {
 			if (args.length < 1) return false;
 			//since we are calling sub-methods for commands,
 			//these commands are responsible for displaying errors,

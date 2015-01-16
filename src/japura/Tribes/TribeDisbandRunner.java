@@ -41,7 +41,7 @@ public class TribeDisbandRunner extends BukkitRunnable{
 			}
 			if (currentTime - (long) item.get("getLastLogTime") > timeDeltaInMillis) {
 				Tribes.log("Tribe " + (String) item.get("name") + " has exceeded the time since last login limit");
-				Tribes.destroyTribe((String) item.get("name"));
+				Tribes.getTribe((String) item.get("name")).destroy();
 			}
 
 		}

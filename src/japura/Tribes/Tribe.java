@@ -25,42 +25,50 @@ public class Tribe {
 	private DBObject myTribe;
 	private String name;
 	private String leader;
+	private boolean valid;
 	ArrayList<String> invites = new ArrayList<String>();
+	BasicDBList users;
 
 
 
-	//should only be used for safezone or special tribes
 	public Tribe(String name) {
+		if (name == null) {
+			Tribes.log("attempted to get tribe null");
+			return;
+		}
 		this.name = name.toLowerCase();
 		BasicDBObject query = new BasicDBObject();
 		query.put("name",name);
 
 		myTribe = Tribes.getTribeTable().findOne(query);
+
 		
 		if (myTribe == null) {
-			name = "invalid tribe";
+			this.name = "invalid tribe";
 			leader = "invalid tribe leader";
+			valid = false;
 		} else {
-
+			valid = true;
+			users = (BasicDBList) myTribe.get("members");
+			if (users == null) {
+				users = new BasicDBList();
+			} 
 			leader = (String) myTribe.get("leader");
 		}
 	}
 	
+	public boolean isValid() {
+		return valid;
+	}
+
 	public long getLastLogTime() {
 
-		if(!myTribe.containsField("lastLogTime")) {
-			//only for importing old configs
-			//TODO update field
-			//System.currentTimeMillis();
-			return 0;
-		} else {
-			//i'm sure return statements in an if violates some coding standard
-			return (long) myTribe.get("lastLogTime");
-		}
+		return (long) myTribe.get("lastLogTime");
 	}
 
 	public void setLastLogTime(long lastLogTime) {
-		//TODO stub
+		myTribe.put("lastLogTime",System.currentTimeMillis());
+		Tribes.getTribeTable().save(myTribe);
 	}
 	
 	public Block[] getEmeralds() {
@@ -116,9 +124,7 @@ public class Tribe {
 		return blocks;
 	}
 	public TeleportData getTeleData(Block em) {
-		//TODO stub
-		//return teleports.get(em);
-		return null;
+		return new TeleportData(em);
 	}
 
 	public void addEmerald(Block em) {
@@ -133,7 +139,7 @@ public class Tribe {
 		emerald.put("Y",em.getLocation().getBlockY());
 		emerald.put("Z",em.getLocation().getBlockZ());
 		emerald.put("world",em.getLocation().getWorld().getName());
-		Tribes.getPlugin().getTribeTable().insert(emerald);
+		Tribes.getPlugin().getEmeraldTable().insert(emerald);
 	}
 	public void addDiamond(Block em,Player user) {
 		if (em.getType() != Material.DIAMOND_BLOCK) return;
@@ -214,10 +220,10 @@ public class Tribe {
 	}
 	
 	public void setLeader(String user) {
-		//TODO stub
-		/*leader = user;
-		user.setTribe(this);
-		addPlayer(user);*/
+		String oldLeader = leader;
+		this.leader = user;
+		myTribe.put("leader",user);
+		addPlayer(oldLeader);
 	}
 	
 	public void setName(String name) {
@@ -229,32 +235,27 @@ public class Tribe {
 	}
 	
 	public void addPlayer(String user) {
-		//TODO: STUB
-		//for loop added because contains didn't work right
-		/*for (TribePlayer item : users) {
-			if (item.getPlayer().equalsIgnoreCase(user.getPlayer())) {
-				user.setTribe(this);
+		for (String item : getAll()) {
+			if (item.equalsIgnoreCase(user)) {
+				//we already have this user, so quit
 				return;
 			}
 		}
 		
-		//if (users.contains(user)) {
-		//	user.setTribe(this);
-		//	return;
-		//}
 		users.add(user);
-		user.setTribe(this);
+		myTribe.put("members",users);
+
 		
-		invites.remove(user.getPlayer());
-		*/
+		Tribes.getTribeTable().save(myTribe);
+		
+		invites.remove(user);
 	}
 	
 	public void delPlayer(String user) {
-		//TODO stub
-		/*
+
 		users.remove(user);
-		user.setTribe(null);
-		*/
+		myTribe.put("members",users);
+		Tribes.getTribeTable().save(myTribe);
 		
 	}
 	
@@ -280,21 +281,18 @@ public class Tribe {
 	}
 	
 	public boolean hasPlayer(String user) {
-		//TODO stub
-		/*
-		return users.contains(user);
-		*/
-		return false;
+
+		return users.contains(user) || user.equalsIgnoreCase("leader");
 	}
 
 	public void destroy() {
                 BasicDBObject query = new BasicDBObject();
-                query.put("name",group.getName());
+                query.put("name",name);
                 DBObject item = Tribes.getTribeTable().findOne(query);
 
                 //delete all emeralds and diamonds too
                 BasicDBObject blockQuery = new BasicDBObject();
-                blockQuery.put("tribe",group.getName());
+                blockQuery.put("tribe",name);
 
                 Tribes.getEmeraldTable().remove(blockQuery);
                 Tribes.getDiamondTable().remove(blockQuery);
@@ -307,15 +305,40 @@ public class Tribe {
 		return name;
 	}
 
-	public String[] getPlayers() {
-		//TODO stub
-		//TribePlayer[] list = users.toArray(new TribePlayer[users.size()]);
-		String[] list = null;
+	public String[] getMembers() {
+		String[] list;
+		if (myTribe == null) {
+			Tribes.log("getMembers ran on null tribe");
+			return new String[0];
+		}
+		BasicDBList players = (BasicDBList) myTribe.get("members");
+		if (players == null) {
+			list = new String[0];
+		} else {
+			list = players.toArray(new String[players.size()]);
+		}
+
 		return list;
 	}
 	
+	public String[] getAll() {
+		String[] list;
+		if (myTribe == null) {
+			Tribes.log("getMembers ran on null tribe");
+			return new String[] {leader};
+		}
+		BasicDBList players = (BasicDBList) myTribe.get("members");
+		if (players == null) {
+			list = new String[] {leader};
+		} else {
+			list = players.toArray(new String[players.size()+1]);
+			list[players.size()] = leader;
+		}
+
+		return list;
+	}
+
 	public String toString() {
-		//TODO stub
 		StringBuilder info = new StringBuilder();
 		info.append("Tribe: ");
 		info.append(name);
@@ -325,15 +348,19 @@ public class Tribe {
 			info.append(leader);
 			info.append("\n");
 		}
-		/*
-		if (users.size() > 1) {
+		String[] list = getMembers();
+		if (list.length > 1) {
 			info.append("Members: ");
-			for (TribePlayer user : getPlayers()) {
-				if (user.equals(leader)) continue;
-				info.append(user.getPlayer());
-				info.append(",");
+			boolean first = true;
+			for (String user : list) {
+				if (!first) {
+					info.append(",");
+				} else {
+					first = false;
+				}
+				info.append(user);
 			}
-		}*/
+		}
 		
 		
 		return info.toString();

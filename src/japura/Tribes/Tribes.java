@@ -112,7 +112,7 @@ public class Tribes extends JavaPlugin{
 
 		//create the safezone tribe if it does not exit
 		Tribe group = getTribe("safezone");
-		if (group == null) {
+		if (group.isValid()) {
 			TribeFactory.createNewTribe("safezone");
 			getLogger().info("safezone tribe created");
 		}
@@ -561,8 +561,7 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("Tribe already exists");
 			}
 			
-			Player founder = Bukkit.getPlayer(sender.getName());
-			TribeFactory.createNewTribe(name,founder);
+			TribeFactory.createNewTribe(name,sender.getName());
 			sender.sendMessage("Tribe " + name + " created");
 			return true;
 			
@@ -644,7 +643,7 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			
-			if (user.equals(group.getLeader())) {
+			if (!user.equals(group.getLeader())) {
 				sender.sendMessage("You are not leader of this tribe");
 				return true;
 			}
@@ -664,8 +663,7 @@ public class Tribes extends JavaPlugin{
 			if (kickedPlayer != null) {
 				kickedPlayer.sendMessage("You have been kicked from your tribe!");
 			}
-			
-
+			return true;
 		
 		} else if (args[0].equalsIgnoreCase("leave")) {
 			if (group == null) {
@@ -806,17 +804,21 @@ public class Tribes extends JavaPlugin{
 		//garbage in garbage out
 		if (name == null) return null;
 
-		BasicDBObject query = new BasicDBObject();
 		BasicDBList members = new BasicDBList();
 		members.add(name);
-		query.put("members",members);
 
-		DBObject tribeObject = tribeTable.findOne(query);
-		if (tribeObject == null) {
-			return null;
-		} else {
-			return new Tribe((String) tribeObject.get("name"));
+		DBCursor cursor = Tribes.getTribes();
+		Tribe group;
+		String tribeName;
+		while (cursor.hasNext()) {
+			tribeName = (String) cursor.next().get("name");
+			group = getTribe(tribeName);
+
+			if (group.hasPlayer(name)) {
+				return group;
+			}
 		}
+		return null;
 
 	}
 

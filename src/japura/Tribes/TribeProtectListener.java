@@ -55,8 +55,8 @@ public class TribeProtectListener implements Listener {
 		Tribe toGroup = TribeProtect.getBlockOwnership(to);
 		//if !=, tell the user where
 		//they are entering.
-		if (fromGroup != toGroup) {
-			if (toGroup == null) {
+		if (!fromGroup.equals(toGroup)) {
+			if (!toGroup.isValid()) {
 				move.getPlayer().sendMessage("You are entering " +
 						"the wilderness");
 			} else {
@@ -77,7 +77,7 @@ public class TribeProtectListener implements Listener {
 		String user = event.getPlayer().getName();
 		Tribe group = Tribes.getPlayersTribe(user);
 		//check if they are in a tribe faction
-		if (group == null) {
+		if (group.isValid()) {
 			event.getPlayer().sendMessage("You are not in a tribe");
 			event.getPlayer().sendMessage("If you were in a tribe, you could place emeralds to claim land");
 			return;
@@ -98,10 +98,10 @@ public class TribeProtectListener implements Listener {
 		group3 = TribeProtect.getBlockOwnership(corner3);
 		group4 = TribeProtect.getBlockOwnership(corner4);
 		
-		if ((group1 != null && group1 != group) ||
-			(group2 != null && group2 != group) ||
-			(group3 != null && group3 != group) ||
-			(group4 != null && group4 != group)) {
+		if ((group1.isValid() && ! group1.equals(group)) ||
+			(group2.isValid() && ! group2.equals(group)) ||
+			(group3.isValid() && ! group3.equals(group)) ||
+			(group4.isValid() && ! group4.equals(group))) {
 			
 			event.setCancelled(true);
 			event.getPlayer().sendMessage("You're too close to another tribe");

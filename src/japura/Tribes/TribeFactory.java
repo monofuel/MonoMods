@@ -25,6 +25,8 @@ public class TribeFactory {
 			Tribes.log("attempted find a tribe named null");
 			return;
 		}
+		name = name.toLowerCase();
+
 		//check if it already exists
 		BasicDBObject query = new BasicDBObject();
 		query.put("name",name);
@@ -32,9 +34,10 @@ public class TribeFactory {
 		DBObject item = Tribes.getTribeTable().findOne(query);
 		if (item == null) {
 			//create the new tribe
+			Tribes.log("adding new tribe " + name + " to database");
 			BasicDBObject newTribe = new BasicDBObject();
 			newTribe.put("name",name);
-			newTribe.put("leader",name);
+			newTribe.put("leader",founder);
 			newTribe.put("getLastLogTime",System.currentTimeMillis());
 
 			Tribes.getTribeTable().insert(newTribe);
@@ -43,11 +46,11 @@ public class TribeFactory {
 	}
 
 	public static void createNewTribe(String name) {
-		
 		if (name == null) {
 			Tribes.log("attempted find a tribe named null");
 			return;
 		}
+		name = name.toLowerCase();
 		//check if it already exists
 		BasicDBObject query = new BasicDBObject();
 		query.put("name",name);

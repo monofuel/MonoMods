@@ -29,6 +29,7 @@ public class TeleportData {
 	private BasicDBObject myTeleport;
 	private BasicDBList allowed;
 
+	//for making a new teleport (or getting an existing once if you know the name)
 	public TeleportData(Block spot, String name,Tribe owner) {
 		this.name = name;
 		this.owner = owner;
@@ -50,8 +51,6 @@ public class TeleportData {
 			if (!spot.equals(loc1.getBlock())) {
 				Tribes.log("invalid diamond in DB");
 			}
-			Tribes.log("Teleport already exists for " + owner.getName() +
-				   " with the name " + name);
 			return;
 		}
 		//else, create this teleport
@@ -69,6 +68,32 @@ public class TeleportData {
 		Tribes.getDiamondTable().insert(myTeleport);
 	}
 
+	//for making a new teleport (or getting an existing once if you know the name)
+	public TeleportData(Block spot) {
+		//this.name = name;
+		//this.owner = owner;
+		this.spot = spot;
+
+		long x = spot.getX();
+		long y = spot.getY();
+		long z = spot.getX();
+
+		BasicDBObject query = new BasicDBObject();
+		query.put("X",x);
+		query.put("Y",y);
+		query.put("Z",z);
+		myTeleport = (BasicDBObject) Tribes.getDiamondTable().findOne(query);
+
+		if (myTeleport != null) {
+			allowed = (BasicDBList) myTeleport.get("allowed");
+			this.owner = Tribes.getTribe(myTeleport.getString("owner"));
+			this.name = myTeleport.getString("name");
+			World myWorld = Bukkit.getWorld(myTeleport.getString("world"));
+		} else {
+			Tribes.log("invalid teleport");
+		}
+
+	}
 	public Tribe getOwner() {
 		return owner;
 	}
@@ -79,6 +104,10 @@ public class TeleportData {
 
 	public Block getSpot() {
 		return spot;
+	}
+
+	public boolean equals(Tribe other) {
+		return name.equals(other.getName());
 	}
 
 	public void rename(String name) {

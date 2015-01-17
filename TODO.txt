@@ -4,62 +4,23 @@ everything
 test how bugs and tribes react when the db isn't running
 fail-safe to lock the server down if tribes doesn't load right
 
-pistons moving emeralds
-
-Bug help
+MonoCities respawning chests
 
 vote rewards
 
-strubs for unused commands
-eg:
-	/kit
+Tribes should protect some items on player death
 
-monomobs:
-sometimes :true gets changed to :"true" in json config
-zedcheckrunner errors	
+custom or stub commands
+	/kit should either give a kit or not, i'm not the boss
 
-anti spawnkilling
 
-kick from tribe //done, needs testing
 
-teleport diamonds
+IRC moderation
+moderate irc from in-game
+moderate in-game from irc
 
 mailing system
 
-donor colors
-
-Error enabling MonoMobs
-
-java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Boolean
-        at japura.MonoMobs.onEnable(Unknown Source)
-        at org.bukkit.plugin.java.JavaPlugin.setEnabled(JavaPlugin.java:217)
-
-
-Error enabling MonoChat
-
-03:16:29 [SEVERE] Error occurred while enabling MonoChat v1.0 (Is it up to date?)
-java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.Long
-        at japura.MonoChat.IRCListener.init(Unknown Source)
-        at japura.MonoChat.IRCListener.<init>(Unknown Source)
-        at japura.MonoChat.MonoChat.onEnable(Unknown Source)
-        at org.bukkit.plugin.java.JavaPlugin.setEnabled(JavaPlugin.java:217)
-
-Error enabling plugins:
-
-java.lang.NullPointerException
-        at japura.MonoPerms.MonoPerms.log(Unknown Source)
-        at japura.MonoPerms.MonoConf.<init>(Unknown Source)
-        at japura.MonoPerms.MonoConf.<init>(Unknown Source)
-        at japura.MonoPerms.MonoPerms.onEnable(Unknown Source)
-        at org.bukkit.plugin.java.JavaPlugin.setEnabled(JavaPlugin.java:217)
-
-Error with monocities:
-
-	div by 0 if there are no buildings available
-
-Error with monochat:
-	connecting to null:0
-	on initial start. requires a full restart to fix.
 
 Error with tribes:
 	acted funky with "could not pass event" on first load

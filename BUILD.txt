@@ -27,6 +27,7 @@ remember, the aperture science bring your daughter to work day is the perfect
 time to have her tested.
 
 include the latest bukkit jar in ../dev
+you should compile from the latest sauce: https://github.com/Bukkit/Bukkit
 after you've built the plugins, you can copy the plugins into ../dev/plugins
 or use push.sh to simply copy them all over.
 

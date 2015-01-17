@@ -9,6 +9,7 @@
 package japura.Tribes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -26,10 +27,16 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class TribeProtectListener implements Listener {
@@ -42,6 +49,29 @@ public class TribeProtectListener implements Listener {
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
 	}
 	
+
+	static final Material[] DEATH_WHITELIST = {
+		Material.TORCH,
+		Material.IRON_SWORD
+
+	};
+
+	//TODO setup a permission with this
+	@EventHandler
+	public void getDeath(PlayerDeathEvent event) {
+		event.setKeepInventory(true);
+
+		Player user = event.getEntity();
+		PlayerInventory inv = user.getInventory();
+
+		for (ItemStack item : inv.getContents()) {
+			if (!Arrays.asList(DEATH_WHITELIST).contains(item.getType())) {
+				inv.remove(item);
+				user.getWorld().dropItemNaturally(user.getLocation(),item);
+			}
+		}
+	}
+
 	//TODO
 	//inform players when they enter/leave tribe territory
 	@EventHandler
@@ -183,6 +213,39 @@ public class TribeProtectListener implements Listener {
 		
 	}
 	
+	@EventHandler
+	public void pistonExtendCheck(BlockPistonExtendEvent event) {
+		for (Block item : event.getBlocks()) {
+			if (item.getType() == Material.EMERALD_BLOCK ||
+			    item.getType() == Material.DIAMOND_BLOCK) {
+				event.setCancelled(true);
+			}
+		}
+	}
+	@EventHandler
+	public void pistonRetractCheck(BlockPistonRetractEvent event) {
+		if (!event.isSticky()) return;
+		Block item = event.getRetractLocation().getBlock();
+		if (item.getType() == Material.EMERALD_BLOCK ||
+		    item.getType() == Material.DIAMOND_BLOCK) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void protectSafezone(EntityDamageEvent event) {
+
+		if (event.getEntityType() != EntityType.PLAYER) return;
+
+		Location loc = event.getEntity().getLocation();
+
+		Tribe group = TribeProtect.getBlockOwnership(loc);
+
+		if (group.isValid() && "safezone".equals(group.getName())){
+			event.setCancelled(true);
+		}
+	}
+
 	@EventHandler
 	public void tntIgnite(ExplosionPrimeEvent event) {
 		if (event.getEntityType() != EntityType.PRIMED_TNT) return;

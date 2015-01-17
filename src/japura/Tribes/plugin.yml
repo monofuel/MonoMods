@@ -4,6 +4,17 @@ version: 2.0
 author: monofuel
 
 commands:
+    kit:
+        description: give the player a free kit, if enabled.
+        usage: /kit
+        permission: tribes.kit
+        permissions-messeage: You do not have permission for a kit
+    spawn:
+        description: teleport to safezone's main teleport
+        usage: /spawn
+        permission: tribes.spawn
+        permissions-message: You do not have permission to use spawn
+
     t:
         description: primary Tribes command. use /t help for info
         usage: /t help to display help
@@ -26,9 +37,17 @@ permissions:
     tribes.tp:
         description: Tribes teleport permission
         default: true
+    tribes.kit:
+        description: allow use of /kit
+        default: true
+    tribes.spawn:
+        description: allow use of /spawn
+        default: true
     tribes.admin:
         description: Full admin permissions
         default: false
         children:
             tribes: true
             tribes.tp: true
+            tribes.kit: true
+            tribes.spawn: true

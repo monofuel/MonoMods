@@ -180,6 +180,9 @@ public class Tribes extends JavaPlugin{
 			return tcmd(sender,cmd,label,args);
 		}else if ("ttp".equalsIgnoreCase(cmd.getName())) {
 			return ttp(sender,cmd,label,args);
+		}else if ("spawn".equalsIgnoreCase(cmd.getName())) {
+			//TODO name of this teleport should be in the config
+			return ttp(sender,cmd,label,new String[] {"spawn"});
 		}
 		
 		return false;
@@ -243,7 +246,8 @@ public class Tribes extends JavaPlugin{
 					return true;
 				}
 				//check if the teleport already exists
-				if (getttp(newName,group) != null) {
+				TeleportData newData = getttp(newName,group);
+				if (newData != null && group.getName().equals(newData.getOwner().getName())) {
 					sender.sendMessage("Teleport location " + newName + " already exists");
 				} else {
 					teleData.rename(newName);

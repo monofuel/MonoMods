@@ -26,13 +26,8 @@ test: directory for a testing server
 USAGE:
 
 follow the instructions in BUILD.txt to compile and test the plugins.
-all the plugins require the MonoUtil.jar plugin. MonoUtil includes shared classes that all the other
-plugins rely on. This might not be the best setup, and has not been heavily stress tested. I give no warrenty to
-updating monoUtil without a server restart, but it should be fine in theory
 
 LICENSE:
 
 Anything in src/japura/* is included under the modified BSD license included.
-all software in src/japura/* was written by monofuel for japura.net, with the exception of one
-or two lines that may have been shamelessly stolen from stackoverflow. EG: crazy regular expressions or
-the like. I'd rather not burden myself with the horror of inventing and debugging my own regexes.
+all software in src/japura/* was written by monofuel for japura.net

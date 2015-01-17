@@ -2,9 +2,11 @@ TO BUILD:
 
 dependencies:
 	ant
-	JDK
+	JDK 1.7+
+	craftbukkit 1.7.10 API
+	java mongodb driver
 
-any JDK should work, this project was developed and tested on IcedTea 1.7.0
+any JDK 1.7+ should work, this project was developed and tested on IcedTea 1.7.0
 compiled on a gentoo system.
 
 if you have and and the jdk installed and properly on your path,
@@ -17,14 +19,15 @@ no warrenty is given for building on a windows system, however the build.xml
 file should be perfectly fine for importing into an IDE like netbeans or eclipse.
 
 place the latest version of the bukkit API in bin/
+place a copy of the mongodb driver jar in bin/
 
 to TEST:
 
 remember, the aperture science bring your daughter to work day is the perfect
 time to have her tested.
 
-include the latest bukkit jar in test/
-after you've built the plugins, you can copy the plugins into test/plugins
+include the latest bukkit jar in ../dev
+after you've built the plugins, you can copy the plugins into ../dev/plugins
 or use push.sh to simply copy them all over.
 
 then you should just have to execute the bukkit jar in the testing directory

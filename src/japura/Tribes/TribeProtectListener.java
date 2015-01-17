@@ -59,7 +59,7 @@ public class TribeProtectListener implements Listener {
 	//TODO setup a permission with this
 	@EventHandler
 	public void getDeath(PlayerDeathEvent event) {
-		event.setKeepInventory(true);
+		//event.setKeepInventory(true);
 
 		Player user = event.getEntity();
 		PlayerInventory inv = user.getInventory();

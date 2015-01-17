@@ -8,8 +8,6 @@
 
 package japura.MonoChat;
 
-import java.util.Collection;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -180,11 +178,7 @@ public class IRCListener implements Listener {
 		}
 		
 		private String listPlayers() {
-			//TODO
-			//should probably re-make this proper
-			//because some dumbass wanted to break people's code for 'performance reasons'
-			Collection<? extends Player> onlineCollection = Bukkit.getOnlinePlayers();
-			Player[] online = onlineCollection.toArray(new Player[onlineCollection.size()]);
+			Player[] online = Bukkit.getOnlinePlayers();
 			if (online.length == 0) {
 				return "nobody";
 			}

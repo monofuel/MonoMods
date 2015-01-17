@@ -36,11 +36,10 @@ public class TeleportData {
 		this.spot = spot;
 
 		BasicDBObject query = new BasicDBObject();
-		query.put("tribe",owner);
+		query.put("tribe",owner.getName());
 		query.put("name",name);
-		DBCursor cursor = Tribes.getDiamondTable().find(query);
+		myTeleport = (BasicDBObject) Tribes.getDiamondTable().findOne(query);
 
-		myTeleport = (BasicDBObject) cursor.next();
 		if (myTeleport != null) {
 			allowed = (BasicDBList) myTeleport.get("allowed");
 			long x = myTeleport.getLong("X");
@@ -55,7 +54,7 @@ public class TeleportData {
 		}
 		//else, create this teleport
 		myTeleport = new BasicDBObject();
-		myTeleport.put("tribe",owner);
+		myTeleport.put("tribe",owner.getName());
 		myTeleport.put("name",name);
 		myTeleport.put("X",spot.getLocation().getBlockX());
 		myTeleport.put("Y",spot.getLocation().getBlockY());
@@ -76,20 +75,23 @@ public class TeleportData {
 
 		long x = spot.getX();
 		long y = spot.getY();
-		long z = spot.getX();
+		long z = spot.getZ();
 
 		BasicDBObject query = new BasicDBObject();
 		query.put("X",x);
 		query.put("Y",y);
 		query.put("Z",z);
+		query.put("world",spot.getWorld().getName());
 		myTeleport = (BasicDBObject) Tribes.getDiamondTable().findOne(query);
 
 		if (myTeleport != null) {
 			allowed = (BasicDBList) myTeleport.get("allowed");
-			this.owner = Tribes.getTribe(myTeleport.getString("owner"));
+			this.owner = Tribes.getTribe(myTeleport.getString("tribe"));
 			this.name = myTeleport.getString("name");
 			World myWorld = Bukkit.getWorld(myTeleport.getString("world"));
 		} else {
+			this.name = "invalid teleport";
+			this.owner = new Tribe("invalid owner");
 			Tribes.log("invalid teleport");
 		}
 
@@ -118,18 +120,18 @@ public class TeleportData {
 
 	public void addAllowed(Tribe group) {
 		//TODO should this also be in the constructor?
-		if (!allowed.contains(group))
-			allowed.add(group);
+		if (!allowed.contains(group.getName()))
+			allowed.add(group.getName());
 		myTeleport.put("allowed",allowed); //TODO: is this required?
 		Tribes.getDiamondTable().save(myTeleport);
 	}
 	public void rmAllowed(Tribe group) {
-		allowed.remove(group);
+		allowed.remove(group.getName());
 		myTeleport.put("allowed",allowed);
 		Tribes.getDiamondTable().save(myTeleport);
 	}
 	public boolean isAllowed(Tribe group) {
-		return allowed.contains(group);
+		return allowed.contains(group.getName());
 	}
 
 	public Tribe[] getAllowed() {

@@ -58,7 +58,7 @@ public class TribeProtect extends BukkitRunnable {
 			group = Tribes.getTribe((String) cursor.next().get("name"));
 			if (group.checkLocOwnership(loc)) return group;
 		}
-		return null;
+		return new Tribe("invalid tribe");
 	}
 	
 	public void stop() {

@@ -48,7 +48,7 @@ public class TribeTeleportListener implements Listener {
 		String user = event.getPlayer().getName();
 		Tribe userGroup = Tribes.getPlayersTribe(user);
 		//check if they are in a tribe faction
-		if (userGroup == null) {
+		if (!userGroup.isValid()) {
 			event.getPlayer().sendMessage("You are not in a tribe");
 			return;
 		}
@@ -59,7 +59,7 @@ public class TribeTeleportListener implements Listener {
 		loc = event.getBlock().getLocation();
 		group = TribeProtect.getBlockOwnership(loc);
 		
-		if (group != null && group != userGroup) {
+		if (!group.isValid() || !group.equals(userGroup)) {
 			
 			event.setCancelled(true);
 			event.getPlayer().sendMessage("You're not on your own land");
@@ -73,16 +73,16 @@ public class TribeTeleportListener implements Listener {
 	
 	//catch diamond break events
 	@EventHandler
-	public void emeraldBreak(BlockBreakEvent event) {
+	public void diamondBreak(BlockBreakEvent event) {
 		//check if the block is an diamond
 		if (event.getBlock().getType() != Material.DIAMOND_BLOCK) return;
 		if (event.isCancelled())  return;
 		
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
 		
-		if (group == null) return;
+		if (!group.isValid()) return;
 		String user = event.getPlayer().getName();
-		if (Tribes.getPlayersTribe(user) != group) {
+		if (!Tribes.getPlayersTribe(user).equals(group)) {
 			event.getPlayer().sendMessage("You are not allowed to break here");
 			event.setCancelled(true);
 			return;

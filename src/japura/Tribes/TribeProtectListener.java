@@ -77,7 +77,7 @@ public class TribeProtectListener implements Listener {
 		String user = event.getPlayer().getName();
 		Tribe group = Tribes.getPlayersTribe(user);
 		//check if they are in a tribe faction
-		if (group.isValid()) {
+		if (!group.isValid()) {
 			event.getPlayer().sendMessage("You are not in a tribe");
 			event.getPlayer().sendMessage("If you were in a tribe, you could place emeralds to claim land");
 			return;
@@ -117,9 +117,9 @@ public class TribeProtectListener implements Listener {
 	public void blockPlace(BlockPlaceEvent event) {
 		if (event.isCancelled()) return;
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
-		if (group != null) {
+		if (group.isValid()) {
 			//TODO verify this works
-			if (Tribes.getPlayersTribe(event.getPlayer().getName()) != group) {
+			if (!Tribes.getPlayersTribe(event.getPlayer().getName()).equals(group)) {
 				event.setCancelled(true);
 				event.getPlayer().sendMessage("You are not allowed to build here");
 			}
@@ -130,8 +130,8 @@ public class TribeProtectListener implements Listener {
 	@EventHandler (priority = EventPriority.HIGHEST)
 	public void blockPlace(PlayerBucketEmptyEvent event) {
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlockClicked().getRelative(event.getBlockFace()).getLocation());
-		if (group != null) {
-			if (Tribes.getPlayersTribe(event.getPlayer().getName()) != group) {
+		if (group.isValid()) {
+			if (!Tribes.getPlayersTribe(event.getPlayer().getName()).equals(group)) {
 				event.setCancelled(true);
 				event.getPlayer().sendMessage("You are not allowed to build here");
 			}
@@ -143,8 +143,8 @@ public class TribeProtectListener implements Listener {
 	public void blockBreak(BlockBreakEvent event) {
 		if (event.isCancelled()) return;
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
-		if (group != null) {
-			if (Tribes.getPlayersTribe(event.getPlayer().getName()) != group) {
+		if (group.isValid()) {
+			if (!Tribes.getPlayersTribe(event.getPlayer().getName()).equals(group)) {
 				event.setCancelled(true);
 				event.getPlayer().sendMessage("You are not allowed to destroy here");
 			}
@@ -164,12 +164,12 @@ public class TribeProtectListener implements Listener {
 		
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
 		
-		if (group == null) {
+		if (!group.isValid()) {
 			event.setCancelled(false);
 			return;
 		}
 		String user = event.getPlayer().getName();
-		if (Tribes.getPlayersTribe(user) != group) {
+		if (!Tribes.getPlayersTribe(user).equals(group)) {
 			event.getPlayer().sendMessage("You are not allowed to break here");
 			event.setCancelled(true);
 			return;
@@ -203,7 +203,7 @@ public class TribeProtectListener implements Listener {
 			event.getEntityType().equals(EntityType.MINECART_TNT)) {
                        for (Block item : array) {
                                group = TribeProtect.getBlockOwnership(item.getLocation());
-                               if (group != null) {
+                               if (group.isValid()) {
                                        //Tribes.log("blocking creeper");
                                        blockList.remove(item);
                                }
@@ -220,7 +220,7 @@ public class TribeProtectListener implements Listener {
 				for(Block item : array) {
 					group = TribeProtect.getBlockOwnership(item.getLocation());
 					
-					if (group != null) {
+					if (group.isValid()) {
 						//Tribes.log("blocking tnt");
 						blockList.remove(item);
 					}
@@ -243,11 +243,11 @@ public class TribeProtectListener implements Listener {
 		//if spreadgroup == null, allow
 		//if sourcegroup == null, do not allow where spreadgroup != null
 
-		if (sourceGroup == null) {
-			if (spreadGroup == null) return;
+		if (!sourceGroup.isValid()) {
+			if (!spreadGroup.isValid()) return;
 			else event.setCancelled(true);
 		} else {
-			if (spreadGroup == null) return;
+			if (!spreadGroup.isValid()) return;
 			else {
 				if (sourceGroup != spreadGroup)
 					event.setCancelled(true);
@@ -264,13 +264,13 @@ public class TribeProtectListener implements Listener {
 		
 		//if spreadgroup == null, allow
 		//if sourcegroup == null, do not allow where spreadgroup != null
-		if (sourceGroup == null) {
-			if (spreadGroup == null) return;
+		if (!sourceGroup.isValid()) {
+			if (!spreadGroup.isValid()) return;
 			else event.setCancelled(true);
 		} else {
-			if (spreadGroup == null) return;
+			if (!spreadGroup.isValid()) return;
 			else {
-				if (sourceGroup != spreadGroup)
+				if (!sourceGroup.equals(spreadGroup))
 					event.setCancelled(true);
 			}
 		}

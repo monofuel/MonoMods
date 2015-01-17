@@ -2,6 +2,7 @@ THINGS TO TEST:
 everything
 
 test how bugs and tribes react when the db isn't running
+fail-safe to lock the server down if tribes doesn't load right
 
 pistons moving emeralds
 

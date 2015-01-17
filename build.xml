@@ -24,7 +24,7 @@
 	</target>
 
 	<target name="build" depends="init">
-		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" fork="yes" >
+		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" fork="yes" debug="true" >
 			<classpath refid="compile.classpath"/>
 		</javac>
 	</target>

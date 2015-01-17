@@ -23,9 +23,9 @@ import org.bukkit.entity.Player;
 public class Tribe {
 
 	private DBObject myTribe;
-	private String name;
-	private String leader;
-	private boolean valid;
+	private String name = "invalid tribe";
+	private String leader = "invalid leader";
+	private boolean valid = false;
 	ArrayList<String> invites = new ArrayList<String>();
 	BasicDBList users;
 
@@ -54,6 +54,9 @@ public class Tribe {
 				users = new BasicDBList();
 			} 
 			leader = (String) myTribe.get("leader");
+			if (leader == null) {
+				leader = "invalid leader";
+			}
 		}
 	}
 	
@@ -174,7 +177,7 @@ public class Tribe {
 	public void delEmerald(Block em) {
 		BasicDBObject query = new BasicDBObject();
 		query.put("tribe",name);
-		query.put("world",em.getWorld());
+		query.put("world",em.getWorld().getName());
 		query.put("X",em.getX());
 		query.put("Y",em.getY());
 		query.put("Z",em.getZ());
@@ -184,7 +187,7 @@ public class Tribe {
 	public void delDiamond(Block em) {
 		BasicDBObject query = new BasicDBObject();
 		query.put("tribe",name);
-		query.put("world",em.getWorld());
+		query.put("world",em.getWorld().getName());
 		query.put("X",em.getX());
 		query.put("Y",em.getY());
 		query.put("Z",em.getZ());
@@ -220,10 +223,17 @@ public class Tribe {
 	}
 	
 	public void setLeader(String user) {
-		String oldLeader = leader;
-		this.leader = user;
-		myTribe.put("leader",user);
-		addPlayer(oldLeader);
+		if (!"invalid leader".equals(leader)) {
+			String oldLeader = leader;
+			this.leader = user;
+			myTribe.put("leader",user);
+			Tribes.getTribeTable().save(myTribe);
+			addPlayer(oldLeader);
+		} else {
+			this.leader = user;
+			myTribe.put("leader",user);
+			Tribes.getTribeTable().save(myTribe);
+		}
 	}
 	
 	public void setName(String name) {
@@ -282,7 +292,7 @@ public class Tribe {
 	
 	public boolean hasPlayer(String user) {
 
-		return users.contains(user) || user.equalsIgnoreCase("leader");
+		return users.contains(user) || user.equalsIgnoreCase(leader);
 	}
 
 	public void destroy() {
@@ -303,6 +313,10 @@ public class Tribe {
 	
 	public String getName() {
 		return name;
+	}
+
+	public boolean equals(Tribe other) {
+		return name.equals(other.getName());
 	}
 
 	public String[] getMembers() {

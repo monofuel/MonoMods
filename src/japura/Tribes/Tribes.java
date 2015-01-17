@@ -23,6 +23,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.HandlerList;
@@ -148,6 +149,9 @@ public class Tribes extends JavaPlugin{
 			if (group.get("name") == null) {
 				log("found a tribe with the name null");
 				result = false;
+			} else if (group.get("name") == "invalid tribe") {
+				log("found an invalid tribe in db");
+				result = false;
 			}
 		}
 
@@ -167,7 +171,9 @@ public class Tribes extends JavaPlugin{
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-		if ("tadmin".equalsIgnoreCase(cmd.getName())) {
+		if ("tadmin".equalsIgnoreCase(cmd.getName()) &&
+		    (sender instanceof ConsoleCommandSender ||
+		    (sender instanceof Player && ((Player) sender).hasPermission("tribes.admin")))){
 			return tadmin(sender,cmd,label,args);
 		}else if ("t".equalsIgnoreCase(cmd.getName()) ||
 			  "tribes".equalsIgnoreCase(cmd.getName())) {
@@ -207,7 +213,7 @@ public class Tribes extends JavaPlugin{
 
 			case "rename":
 				//check if the player is in a tribe
-				if (group == null) {
+				if (!group.isValid()) {
 					sender.sendMessage("You are not in a tribe");
 					return true;
 				}
@@ -248,7 +254,7 @@ public class Tribes extends JavaPlugin{
 
 			case "permit":
 				//check if they are in a tribe
-				if (group == null) {
+				if (!group.isValid()) {
 					sender.sendMessage("You are not in a tribe");
 					return true;
 				}
@@ -271,7 +277,7 @@ public class Tribes extends JavaPlugin{
 					return true;
 				}
 				otherGroup = getTribe(otherTribeName);
-				if (otherGroup  == null) {
+				if (!otherGroup.isValid()) {
 					sender.sendMessage("The tribe " + otherTribeName + " does not exist");
 					return true;
 				} else {
@@ -281,7 +287,7 @@ public class Tribes extends JavaPlugin{
 				}
 			case "deny":
 				//check if the player is in a tribe
-				if (group == null) {
+				if (!group.isValid()) {
 					sender.sendMessage("You are not in a tribe");
 					return true;
 				}
@@ -303,7 +309,7 @@ public class Tribes extends JavaPlugin{
 					return true;
 				}
 				otherGroup = getTribe(otherTribeName);
-				if (otherGroup  == null) {
+				if (!otherGroup.isValid()) {
 					sender.sendMessage("The tribe " + otherTribeName + " does not exist");
 					return true;
 				} else {
@@ -317,7 +323,7 @@ public class Tribes extends JavaPlugin{
 					return true;
 				}
 				//TODO find more elegant way to handle safezone tp's for everyone
-				if (group == null) {
+				if (!group.isValid()) {
 					teleData = getttp(args[1],getTribe("safezone"));
 				} else {
 					teleData = getttp(args[1],group);
@@ -358,7 +364,7 @@ public class Tribes extends JavaPlugin{
 			default:
 				//teleport to location and return true
 				//TODO find more elegant way to handle safezone tp's for everyone
-				if ((group == null)) {
+				if (!group.isValid()) {
 					group = getTribe("safezone");
 				}
 				if (args.length != 1) {
@@ -381,16 +387,18 @@ public class Tribes extends JavaPlugin{
 	public TeleportData getttp(String name, Tribe group) {
 		//first search for a teleport in our tribe
 		TeleportData teleData;
-		Block[] diamonds = group.getDiamonds();
-		for (Block item : diamonds) {
-			teleData = group.getTeleData(item);
-			if (teleData == null) {
-				log("error in looking up a tribe teleport location");
+		Block[] diamonds;
+		if (group.isValid()) {
+			diamonds = group.getDiamonds();
+			for (Block item : diamonds) {
+				teleData = group.getTeleData(item);
+				if (teleData == null) {
+					log("error in looking up a tribe teleport location");
+				}
+				if (teleData.getName().equalsIgnoreCase(name))
+					return teleData;
 			}
-			if (teleData.getName().equalsIgnoreCase(name))
-				return teleData;
 		}
-
 		//if our tribe does not have this point, see if another tribe does
 		//and if they have allowed us to use it
 		DBCursor cursor = getTribes();
@@ -398,9 +406,10 @@ public class Tribes extends JavaPlugin{
 		while (cursor.hasNext()) {
 			otherGroup = getTribe((String) cursor.next().get("name"));
 			//don't re-scan the same group
-			if (otherGroup == group) continue;
+			if (otherGroup.equals(group)) continue;
 
 			diamonds = otherGroup.getDiamonds();
+			if (diamonds == null) continue;
 			for (Block item : diamonds) {
 				teleData = otherGroup.getTeleData(item);
 				if (teleData == null) {
@@ -456,15 +465,12 @@ public class Tribes extends JavaPlugin{
 			String tribeName = args[2];
 			Tribe tribe = getTribe(tribeName);
 			sender.sendMessage("placing " + user + " into " + tribeName);
-			if (tribe == null) {
+			if (!tribe.isValid()) {
 				sender.sendMessage("tribe doesn't exist");
 			} else {
 				tribe.addPlayer(user);
 				sender.sendMessage("success");
 			}
-				
-			
-			
 			return true;
 		} else if (args[0].equalsIgnoreCase("remove")) {
 			if (args.length != 3) {
@@ -474,21 +480,17 @@ public class Tribes extends JavaPlugin{
 			String user = args[1];
 			String tribeName = args[2];
 			Tribe tribe = getTribe(tribeName);
-			if (getPlayersTribe(user) == null) {
-				sender.sendMessage("player is not in a tribe");
+			if (!tribe.isValid()) {
+				sender.sendMessage("tribe doesn't exist");
 			} else {
-				if (tribe == null) {
-					sender.sendMessage("tribe doesn't exist");
-				} else {
-					
-					tribe.delPlayer(user);
-					if (user.equals(tribe.getLeader())) {
-						tribe.setLeader("");
-					}
-					sender.sendMessage("successfully moved " + user + " to tribe " + tribeName);
-				}
 				
+				tribe.delPlayer(user);
+				if (user.equals(tribe.getLeader())) {
+					tribe.setLeader("");
+				}
+				sender.sendMessage("successfully removed " + user + " from tribe " + tribeName);
 			}
+				
 			
 			return true;
 		} else if (args[0].equalsIgnoreCase("leader")) {
@@ -499,11 +501,20 @@ public class Tribes extends JavaPlugin{
 			String user = args[1];
 			String tribeName = args[2];
 			Tribe tribe = getTribe(tribeName);
-			sender.sendMessage("placing " + user + " as leader of " + tribeName);
-			if (tribe == null) {
+			Tribe playersTribe = getPlayersTribe(user);
+			if (!tribe.isValid()) {
 				sender.sendMessage("tribe doesn't exist");
 			} else {
-				tribe.addPlayer(user);
+				if (playersTribe.isValid()) {
+					sender.sendMessage("removing " + user + " from tribe " + playersTribe.getName());
+					if (!tribe.equals(playersTribe) && user.equalsIgnoreCase(playersTribe.getLeader())) {
+						sender.sendMessage("setting tribe " + playersTribe.getName() + " leader to invalid leader");
+						playersTribe.setLeader("invalid leader");
+					}
+					playersTribe.delPlayer(user);
+					
+				}
+				sender.sendMessage("placing " + user + " as leader of " + tribeName);
 				tribe.setLeader(user);
 				sender.sendMessage("success");
 			}
@@ -517,11 +528,17 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			Tribe tribe = getTribe(args[1]);
-			if (tribe == null) {
+			if (!tribe.isValid()) {
 				sender.sendMessage("tribe doesn't exist");
-			} else {
-				tribe.setName(args[2]);
 			}
+
+			Tribe newTribe = getTribe(args[2]);
+			if (newTribe.isValid()) {
+				sender.sendMessage("tribe " + args[2] + " already exists!");
+				return true;
+			}
+
+			tribe.setName(args[2]);
 			return true;
 		} else if (args[0].equalsIgnoreCase("help")) {
 			//TODO update help
@@ -548,6 +565,14 @@ public class Tribes extends JavaPlugin{
 		group = getPlayersTribe(player);
 		
 		if (args[0].equalsIgnoreCase("create")) {
+
+			if (group.isValid()) {
+				sender.sendMessage("you are already in a tribe. Please leave first");
+				if (user.equals(group.getLeader())) {
+					sender.sendMessage("You will have to either disband or pass on leadership");
+				}
+			}
+
 			if (args.length < 2){
 				sender.sendMessage("Please specify a tribe name");
 				return true;
@@ -600,10 +625,15 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			}
-			
+			String invited = args[1];
+			if (group.hasPlayer(invited)) {
+				sender.sendMessage("they are already a member of your tribe");
+				return true;
+			}
+
 			if (user.equals(group.getLeader())) {
-				group.invite(user);
-				sender.sendMessage(user + " invited successfully");
+				group.invite(invited);
+				sender.sendMessage(invited + " invited successfully");
 				return true;
 			} else {
 				sender.sendMessage("You are not leader of this tribe");
@@ -617,19 +647,21 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			
-			if (group != null) {
+			if (group.isValid()) {
 				if (user.equals(group.getLeader())) {
 					sender.sendMessage("You cannot leave without transfering leadership");
 					return true;
 				}
-				group.delPlayer(user);
 			}
 			Tribe newGroup = getTribe(args[1]);
-			if (newGroup == null) {
+			if (!newGroup.isValid()) {
 				sender.sendMessage("invalid tribe name");
 				return true;
 			}
 			if (newGroup.isInvited(user)) {
+				if (group.isValid()) {
+					group.delPlayer(user);
+				}
 				newGroup.addPlayer(user);
 				sender.sendMessage("you have joined " + newGroup.getName());
 				return true;
@@ -638,7 +670,7 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("kick")) {
-			if (group == null) {
+			if (!group.isValid()) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			}
@@ -666,7 +698,7 @@ public class Tribes extends JavaPlugin{
 			return true;
 		
 		} else if (args[0].equalsIgnoreCase("leave")) {
-			if (group == null) {
+			if (!group.isValid()) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			}
@@ -802,7 +834,7 @@ public class Tribes extends JavaPlugin{
 
 	public static Tribe getPlayersTribe(String name) {
 		//garbage in garbage out
-		if (name == null) return null;
+		if (name == null) return new Tribe("invalid tribe");
 
 		BasicDBList members = new BasicDBList();
 		members.add(name);
@@ -818,13 +850,13 @@ public class Tribes extends JavaPlugin{
 				return group;
 			}
 		}
-		return null;
+		return new Tribe("invalid tribe");
 
 	}
 
 	public static Tribe getPlayersTribe(Player user) {
 		//garbage in garbage out
-		if (user == null) return null;
+		if (user == null) return new Tribe("invalid tribe");
 		return getPlayersTribe(user.getName());
 		
 	}

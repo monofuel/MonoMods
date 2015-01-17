@@ -100,17 +100,17 @@ public class Tribes extends JavaPlugin{
 		}
 		//set a spawn point
 		if (getConfig().getBoolean("Tribe Spawn")) {
-			
-			int x = getConfig().getInt("SpawnX");
-			int y = getConfig().getInt("SpawnY");
-			int z = getConfig().getInt("SpawnZ");
-			String worldName = getConfig().getString("World");
-			World world = Bukkit.getWorld(worldName);
-			if (world == null) {
-				log("invalid world for spawn");
+
+			TeleportData teleData = getttp("spawn",new Tribe("safezone"));
+			if (teleData == null) {
+				log("safezone does not have a teleport named spawn");
 			} else {
-				log("setting spawn to " + x + "," + y + "," + z);
-				world.setSpawnLocation(x,y,z);
+				World world = teleData.getSpot().getWorld();
+				int x = teleData.getSpot().getX();
+				int y = teleData.getSpot().getY();
+				int z = teleData.getSpot().getZ();
+				world.setSpawnLocation(x,y+1,z);
+				log("spawn set to safezone's spawn teleport");
 			}
 			
 		} else {

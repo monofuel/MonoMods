@@ -18,8 +18,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 
 public class WitherListener implements Listener{
-	
+
+	private JavaPlugin plugin;
+
 	public WitherListener(JavaPlugin plugin) {
+		this.plugin = plugin;
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
 	}
 	
@@ -28,9 +31,11 @@ public class WitherListener implements Listener{
 		LivingEntity mob = event.getEntity();
 		
 		if (mob instanceof Wither) {
-			
-			event.setCancelled(true);
-			NoWither.log("Wither spawn averted");
+			if (plugin.getConfig().getBoolean("wither disabled")) {
+				//TODO display message to player
+				event.setCancelled(true);
+				NoWither.log("Wither spawn averted");
+			}
 		}
 	}
 	

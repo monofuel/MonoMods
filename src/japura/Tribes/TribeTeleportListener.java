@@ -45,55 +45,50 @@ public class TribeTeleportListener implements Listener {
 		if (event.getBlock().getType() != Material.DIAMOND_BLOCK) return;
 		if (event.isCancelled()) return;
 		
-		TribePlayer user = Tribes.getPlayer(event.getPlayer());
+		String user = event.getPlayer().getName();
+		Tribe userGroup = Tribes.getPlayersTribe(user);
 		//check if they are in a tribe faction
-		if (user == null) {
+		if (!userGroup.isValid()) {
 			event.getPlayer().sendMessage("You are not in a tribe");
 			return;
 		}
 		//check if we're in our own territory
 		Location loc;
-		Tribe userGroup,group;
-		
-		userGroup = user.getTribe();
-		if (userGroup == null) {
-			event.getPlayer().sendMessage("You are not in a tribe");
-			return;
-		}
+		Tribe group;
 		
 		loc = event.getBlock().getLocation();
 		group = TribeProtect.getBlockOwnership(loc);
 		
-		if (group != null && group != userGroup) {
+		if (!group.isValid() || !group.equals(userGroup)) {
 			
 			event.setCancelled(true);
 			event.getPlayer().sendMessage("You're not on your own land");
 			return;
 		}
 		
-		user.getTribe().addDiamond(event.getBlock(),event.getPlayer());
+		group.addDiamond(event.getBlock(),event.getPlayer());
 		
 	}
 	
 	
 	//catch diamond break events
 	@EventHandler
-	public void emeraldBreak(BlockBreakEvent event) {
+	public void diamondBreak(BlockBreakEvent event) {
 		//check if the block is an diamond
 		if (event.getBlock().getType() != Material.DIAMOND_BLOCK) return;
 		if (event.isCancelled())  return;
 		
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
 		
-		if (group == null) return;
-		TribePlayer user = Tribes.getPlayer(event.getPlayer().getName());
-		if (user == null || user.getTribe() != group) {
+		if (!group.isValid()) return;
+		String user = event.getPlayer().getName();
+		if (!Tribes.getPlayersTribe(user).equals(group)) {
 			event.getPlayer().sendMessage("You are not allowed to break here");
 			event.setCancelled(true);
 			return;
 		}
 
-		Tribes.log("Player " + user.getPlayer() + " broke " + user.getTribe().getName() + "'s diamond at " +
+		Tribes.log("Player " + user + " broke " + group.getName() + "'s diamond at " +
 			event.getBlock().getLocation().getX() + "," + event.getBlock().getLocation().getY() + "," + 
 			event.getBlock().getLocation().getZ());
 		event.setCancelled(false);

@@ -1,0 +1,10 @@
+world: world
+threads: 4
+zombie cap: 2000
+zed per player: 50
+zed distance: 100
+zed y distance: 50
+zed spawn tick length: 70
+zed spawn tick offset: 40
+max light to spawn: 7
+

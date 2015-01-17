@@ -35,8 +35,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class TribeProtectListener implements Listener {
 	
 	public ArrayList<Entity> tntIgnites = new ArrayList<Entity>();
+	private JavaPlugin plugin;
 	
 	public TribeProtectListener(JavaPlugin plugin) {
+		this.plugin = plugin;
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
 	}
 	
@@ -53,8 +55,8 @@ public class TribeProtectListener implements Listener {
 		Tribe toGroup = TribeProtect.getBlockOwnership(to);
 		//if !=, tell the user where
 		//they are entering.
-		if (fromGroup != toGroup) {
-			if (toGroup == null) {
+		if (!fromGroup.equals(toGroup)) {
+			if (!toGroup.isValid()) {
 				move.getPlayer().sendMessage("You are entering " +
 						"the wilderness");
 			} else {
@@ -72,23 +74,20 @@ public class TribeProtectListener implements Listener {
 		if (event.getBlock().getType() != Material.EMERALD_BLOCK) return;
 		if (event.isCancelled()) return;
 		
-		TribePlayer user = Tribes.getPlayer(event.getPlayer());
+		String user = event.getPlayer().getName();
+		Tribe group = Tribes.getPlayersTribe(user);
 		//check if they are in a tribe faction
-		if (user == null) {
+		if (!group.isValid()) {
 			event.getPlayer().sendMessage("You are not in a tribe");
+			event.getPlayer().sendMessage("If you were in a tribe, you could place emeralds to claim land");
 			return;
 		}
+
 		//check if we're in range of another emerald
 		Location loc,corner1,corner2,corner3,corner4;
-		Tribe userGroup,group1,group2,group3,group4;
+		Tribe group1,group2,group3,group4;
 		
-		userGroup = user.getTribe();
-		if (userGroup == null) {
-			event.getPlayer().sendMessage("You are not in a tribe");
-			return;
-		}
-		
-		long claimSize = (long) Tribes.getConf().getConf("ClaimSize");
+		long claimSize = plugin.getConfig().getLong("ClaimSize");
 		loc = event.getBlock().getLocation();
 		corner1 = loc.clone().add(claimSize,0, claimSize);
 		corner2 = loc.clone().add(-claimSize,0,claimSize);
@@ -99,17 +98,17 @@ public class TribeProtectListener implements Listener {
 		group3 = TribeProtect.getBlockOwnership(corner3);
 		group4 = TribeProtect.getBlockOwnership(corner4);
 		
-		if ((group1 != null && group1 != userGroup) ||
-			(group2 != null && group2 != userGroup) ||
-			(group3 != null && group3 != userGroup) ||
-			(group4 != null && group4 != userGroup)) {
+		if ((group1.isValid() && ! group1.equals(group)) ||
+			(group2.isValid() && ! group2.equals(group)) ||
+			(group3.isValid() && ! group3.equals(group)) ||
+			(group4.isValid() && ! group4.equals(group))) {
 			
 			event.setCancelled(true);
 			event.getPlayer().sendMessage("You're too close to another tribe");
 			return;
 		}
 		
-		user.getTribe().addEmerald(event.getBlock());
+		group.addEmerald(event.getBlock());
 		event.getPlayer().sendMessage("You've claimed land for your tribe");
 		
 	}
@@ -118,9 +117,9 @@ public class TribeProtectListener implements Listener {
 	public void blockPlace(BlockPlaceEvent event) {
 		if (event.isCancelled()) return;
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
-		TribePlayer user = Tribes.getPlayer(event.getPlayer());
-		if (group != null) {
-			if (user == null || user.getTribe() != group) {
+		if (group.isValid()) {
+			//TODO verify this works
+			if (!Tribes.getPlayersTribe(event.getPlayer().getName()).equals(group)) {
 				event.setCancelled(true);
 				event.getPlayer().sendMessage("You are not allowed to build here");
 			}
@@ -131,9 +130,8 @@ public class TribeProtectListener implements Listener {
 	@EventHandler (priority = EventPriority.HIGHEST)
 	public void blockPlace(PlayerBucketEmptyEvent event) {
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlockClicked().getRelative(event.getBlockFace()).getLocation());
-		TribePlayer user = Tribes.getPlayer(event.getPlayer());
-		if (group != null) {
-			if (user == null || user.getTribe() != group) {
+		if (group.isValid()) {
+			if (!Tribes.getPlayersTribe(event.getPlayer().getName()).equals(group)) {
 				event.setCancelled(true);
 				event.getPlayer().sendMessage("You are not allowed to build here");
 			}
@@ -145,9 +143,8 @@ public class TribeProtectListener implements Listener {
 	public void blockBreak(BlockBreakEvent event) {
 		if (event.isCancelled()) return;
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
-		TribePlayer user = Tribes.getPlayer(event.getPlayer());
-		if (group != null) {
-			if (user == null || user.getTribe() != group) {
+		if (group.isValid()) {
+			if (!Tribes.getPlayersTribe(event.getPlayer().getName()).equals(group)) {
 				event.setCancelled(true);
 				event.getPlayer().sendMessage("You are not allowed to destroy here");
 			}
@@ -167,18 +164,18 @@ public class TribeProtectListener implements Listener {
 		
 		Tribe group = TribeProtect.getBlockOwnership(event.getBlock().getLocation());
 		
-		if (group == null) {
+		if (!group.isValid()) {
 			event.setCancelled(false);
 			return;
 		}
-		TribePlayer user = Tribes.getPlayer(event.getPlayer().getName());
-		if (user == null || user.getTribe() != group) {
+		String user = event.getPlayer().getName();
+		if (!Tribes.getPlayersTribe(user).equals(group)) {
 			event.getPlayer().sendMessage("You are not allowed to break here");
 			event.setCancelled(true);
 			return;
 		}
 
-		Tribes.log("Player " + user.getPlayer() + " broke " + user.getTribe().getName() + "'s emerald at " +
+		Tribes.log("Player " + user + " broke " + group.getName() + "'s emerald at " +
 			event.getBlock().getLocation().getX() + "," + event.getBlock().getLocation().getY() + "," + 
 			event.getBlock().getLocation().getZ());
 		event.setCancelled(false);
@@ -206,7 +203,7 @@ public class TribeProtectListener implements Listener {
 			event.getEntityType().equals(EntityType.MINECART_TNT)) {
                        for (Block item : array) {
                                group = TribeProtect.getBlockOwnership(item.getLocation());
-                               if (group != null) {
+                               if (group.isValid()) {
                                        //Tribes.log("blocking creeper");
                                        blockList.remove(item);
                                }
@@ -223,7 +220,7 @@ public class TribeProtectListener implements Listener {
 				for(Block item : array) {
 					group = TribeProtect.getBlockOwnership(item.getLocation());
 					
-					if (group != null) {
+					if (group.isValid()) {
 						//Tribes.log("blocking tnt");
 						blockList.remove(item);
 					}
@@ -246,11 +243,11 @@ public class TribeProtectListener implements Listener {
 		//if spreadgroup == null, allow
 		//if sourcegroup == null, do not allow where spreadgroup != null
 
-		if (sourceGroup == null) {
-			if (spreadGroup == null) return;
+		if (!sourceGroup.isValid()) {
+			if (!spreadGroup.isValid()) return;
 			else event.setCancelled(true);
 		} else {
-			if (spreadGroup == null) return;
+			if (!spreadGroup.isValid()) return;
 			else {
 				if (sourceGroup != spreadGroup)
 					event.setCancelled(true);
@@ -267,13 +264,13 @@ public class TribeProtectListener implements Listener {
 		
 		//if spreadgroup == null, allow
 		//if sourcegroup == null, do not allow where spreadgroup != null
-		if (sourceGroup == null) {
-			if (spreadGroup == null) return;
+		if (!sourceGroup.isValid()) {
+			if (!spreadGroup.isValid()) return;
 			else event.setCancelled(true);
 		} else {
-			if (spreadGroup == null) return;
+			if (!spreadGroup.isValid()) return;
 			else {
-				if (sourceGroup != spreadGroup)
+				if (!sourceGroup.equals(spreadGroup))
 					event.setCancelled(true);
 			}
 		}

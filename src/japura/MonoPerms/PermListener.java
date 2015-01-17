@@ -8,7 +8,7 @@
 
 package japura.MonoPerms;
 
-import java.util.Set;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,8 +19,6 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.ChatColor;
-
-import org.json.simple.JSONArray;
 
 
 public class PermListener implements Listener {
@@ -36,24 +34,29 @@ public class PermListener implements Listener {
 	public void login(PlayerLoginEvent event) {
 		Player user = event.getPlayer();
 		
-		//TODO:
-		//should have 1 method in the main class that is called to do this
-		//and the time this is done on plugin startup should call the smae method
-		Set<String> keys = MonoPerms.getData().getKeys();
+		//TODO: should be refactored with setAdmins()
+		List<String> keys = plugin.getConfig().getStringList("groups.admin");
 		
 		for (String key : keys) {
 			if (user.getName().equals(key)) {
-				JSONArray permList = (JSONArray) MonoPerms.getData().getConf(key);
-				for (int i = 0; i < permList.size(); i++) {
-					MonoPerms.addPerm(user, (String) permList.get(i));
-				}
+				//TODO add proper defining groups
+				MonoPerms.addPerm(user,"tribes.admin");
+				MonoPerms.addPerm(user,"nowither.admin");
+				MonoPerms.addPerm(user,"monoperms.admin");
+				MonoPerms.addPerm(user,"monolocks.admin");
+				MonoPerms.addPerm(user,"monobugs.admin");
+				MonoPerms.addPerm(user,"monochat.admin");
+				MonoPerms.addPerm(user,"monocities.admin");
 			}
 		}
 
 		//update player list color
-		String[] donors = MonoPerms.getDonors();
+		List<String> donors = plugin.getConfig().getStringList("groups.donors");
 		for (String person : donors) {
 			if (person.equalsIgnoreCase(user.getName())) {
+				MonoPerms.addPerm(user,"donor");
+				//BECAUSE MONOFUEL ROCKS
+				//should probably be re-done for all admin users. (if there's ever more)
 				if (user.getName().equalsIgnoreCase("monofuel"))
 					user.setPlayerListName(ChatColor.YELLOW + user.getName());
 				else user.setPlayerListName(ChatColor.BLUE + user.getName());
@@ -68,7 +71,7 @@ public class PermListener implements Listener {
 	@EventHandler
 	public void chat(AsyncPlayerChatEvent e) {
 		Player user = e.getPlayer();
-		String[] donors = MonoPerms.getDonors();
+		List<String> donors = plugin.getConfig().getStringList("groups.donors");
 		for (String person : donors) {
 			if (user.getName().equalsIgnoreCase("monofuel")) {
 				e.setFormat("<" + ChatColor.YELLOW +"%s" + ChatColor.WHITE + "> %s");
@@ -85,7 +88,6 @@ public class PermListener implements Listener {
 	}
 
 	public void close() {
-		// TODO Auto-generated method stub
-		
+
 	}
 }

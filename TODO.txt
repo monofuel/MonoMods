@@ -1,8 +1,10 @@
-configs not always loading default settings right //done, needs testing
+THINGS TO TEST:
+everything
 
-BIG ONE: unify command output paging. currently several plugins
-do it in several different ways. a unique solution should be created in
-monoutil.
+test how bugs and tribes react when the db isn't running
+fail-safe to lock the server down if tribes doesn't load right
+
+pistons moving emeralds
 
 Bug help
 

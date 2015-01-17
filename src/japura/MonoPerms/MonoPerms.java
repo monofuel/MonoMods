@@ -8,12 +8,7 @@
 
 package japura.MonoPerms;
 
-import japura.MonoUtil.MonoConf;
-
-import org.json.simple.JSONObject;
-import org.json.simple.JSONArray;
-
-import java.util.Set;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -36,44 +31,27 @@ public class MonoPerms extends JavaPlugin{
 	
 	private static Logger templateLogger = null;
 	
-	private static MonoConf config = null;
-	private static PermData data = null;
-	
 	private static PermListener listener;
 	private static JavaPlugin plugin;
-	private static final String configLoc = "plugins/MonoPerms";
-
-	private static String[] donors;
-
-	public JSONObject genDefaultConf() {
-		JSONObject defaults = new JSONObject();
-
-		return defaults;
-	}
 
 	public void onEnable() {
 		templateLogger = getLogger();
 		plugin = this;
 		
 		//load configuration
-		config = new MonoConf(this,genDefaultConf());
-		PermData.init();
-		data = new PermData(configLoc);
+		//TODO should use separate yaml file for permissions
+		saveDefaultConfig();
 		
-		loadData();
 		listener = new PermListener(this);
+		setDonors();
+		setAdmins();
 		log("MonoPerms has been enabled");
 
-		setDonors();
 	}
 	
 	public void onDisable() {
 		
-		
-		//write config back out to file
-		//if there were no errors reading config in
-		config.close();
-		data.close();
+		saveConfig();
 		listener.close();
 		
 		log("MonoPerms has been disabled");
@@ -81,26 +59,18 @@ public class MonoPerms extends JavaPlugin{
 	}
 	
 	public void loadData() {
-		Set<String> keys = MonoPerms.getData().getKeys();
+		List<String> keys = this.getConfig().getStringList("groups.admin");
 		
 		for (String key : keys) {
 			Player user = Bukkit.getPlayer(key);
 			if (user == null) continue;
 			if (user.getName().equals(key)) {
-				JSONArray permList = (JSONArray) data.getConf(key);
-				for (int i = 0; i < permList.size(); i++) {
-					if (((String) permList.get(i)).length() > 16) {
-						log("got invalid username " + permList.get(i));
-						continue;
-					}
-					addPerm(user,(String) permList.get(i));
-				}
+				//TODO why is this so wierd? why is all this in the listener too?
+				//does this not work for offline players? why did i do it like this?
+				//try this with Bukkit.getOfflinePlayer.
+				addPerm(user,(String) "tribes.admin");
 			}
 		}
-	}
-	
-	public static PermData getData() {
-		return data;
 	}
 	
 	public static void addPerm(Player user,String perm) {
@@ -118,15 +88,14 @@ public class MonoPerms extends JavaPlugin{
 				this.getServer().getPluginManager().disablePlugin(this);
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
-				//GARBAGE EVERYWHERE
-				config = new MonoConf(this,genDefaultConf());
+				reloadConfig();
 				loadData();
 				return true;
 			} else if (args[0].equalsIgnoreCase("save")) {
-				config.close();
-				config = new MonoConf(this,genDefaultConf());
+				saveConfig();
 				return true;
 			} else if (args[0].equalsIgnoreCase("help")) {
+				//TODO fix this up
 				String help = "Help stuff goes here";
 				sender.sendMessage(help);
 				
@@ -138,29 +107,40 @@ public class MonoPerms extends JavaPlugin{
 		return false;
 	}
 	
-	public static String[] getDonors() {
-		
-		return donors;
-	}
-
 	//let other objects call our logger
 	public static void log(String line) {
 		templateLogger.info(line);
 	}
 
+	public static void setAdmins() {
+		List<String> keys = plugin.getConfig().getStringList("groups.admin");
+	
+		for (String key : keys){
+			Player user = Bukkit.getPlayer(key);
+			if (user != null) {
+				addPerm(user,"tribes.admin");
+				addPerm(user,"nowither.admin");
+				addPerm(user,"monoperms.admin");
+				addPerm(user,"monolocks.admin");
+				addPerm(user,"monobugs.admin");
+				addPerm(user,"monochat.admin");
+				addPerm(user,"monocities.admin");
+			}
+		}
+	}
+
 	public static void setDonors() {
 
-		//for each player under donor in the config
-		JSONArray jsonDonors = (JSONArray) data.getConf("donors");
-		//hold them in an array
-		donors = new String[jsonDonors.size()];
-		for (int i = 0; i < jsonDonors.size(); i++) {
-			donors[i] = (String) jsonDonors.get(i);
-			OfflinePlayer offlineDonor = Bukkit.getOfflinePlayer((String) donors[i]);
-			Player donor = offlineDonor.getPlayer();
+		List<String> donors = plugin.getConfig().getStringList("groups.donors");
+
+		for (String donorName : donors) {
+			Player user = Bukkit.getPlayer(donorName);
+			if (user != null) addPerm(user,"donor");
+			Player donor = Bukkit.getPlayer(donorName);
 			if (donor == null) continue; //that means they are offline
 			if (donor.getName().equalsIgnoreCase("monofuel"))
 				donor.setPlayerListName(ChatColor.YELLOW + donor.getName());
+			//TODO 14 characters is silly and doesn't work with everyone. alternatives that don't crash the server?
 			else if (donor.getName().length() < 14) //fix bug where chatcolor makes their name too long
 			        donor.setPlayerListName(ChatColor.BLUE + donor.getName());
 

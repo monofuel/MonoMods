@@ -34,17 +34,18 @@ public class IRCListener implements Listener {
 	private BufferedWriter out;
 	private IRCRunner runner;
 	private ChannelQuery query;
+
+	//TODO does this have to be final? i'm just copying from MonoMobs.
+	private final JavaPlugin chatPlugin;
 	
 	public IRCListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
-		init(plugin);
-	}
-	
-	private void init(JavaPlugin plugin) {
-		nick = (String) MonoChat.getConf().getConf("username");
-		port = (int) (long) MonoChat.getConf().getConf("port");
-		host = (String) MonoChat.getConf().getConf("server");
-		channel = (String) MonoChat.getConf().getConf("channel");
+		chatPlugin = plugin;
+
+		nick = chatPlugin.getConfig().getString("username");
+		port = chatPlugin.getConfig().getInt("port");
+		host = chatPlugin.getConfig().getString("server");
+		channel = "#" + chatPlugin.getConfig().getString("channel");
 		
 		reconnect();
 		runner = new IRCRunner();
@@ -55,7 +56,7 @@ public class IRCListener implements Listener {
 	
 	private void reconnect() {
 		
-		MonoChat.log("connecting to " + host + ":" + port);
+		MonoChat.log("connecting to " + host + ":" + port + " on channel " + channel + " with username " + nick);
 		try {
 		socket = new Socket(host,port);
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -106,7 +107,7 @@ public class IRCListener implements Listener {
 	private void sendMessage(String user, String message) {
 		
 		StringBuilder line = new StringBuilder("PRIVMSG ");
-		line.append(" #minecraft :");
+		line.append(" " + channel + " :");
 		line.append(user);
 		line.append(": ");
 		line.append(message);
@@ -128,6 +129,10 @@ public class IRCListener implements Listener {
 						return;
 					}
 					String line = in.readLine();
+					if (line == null) {
+						MonoChat.log("invalid line received");
+						continue;
+					}
 					if (line.startsWith("PING")) {
 						//MonoChat.log("PING");
 						writeLine(line.replace("PING", "PONG"));

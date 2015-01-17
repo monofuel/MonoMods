@@ -36,6 +36,3 @@ Anything in src/japura/* is included under the modified BSD license included.
 all software in src/japura/* was written by monofuel for japura.net, with the exception of one
 or two lines that may have been shamelessly stolen from stackoverflow. EG: crazy regular expressions or
 the like. I'd rather not burden myself with the horror of inventing and debugging my own regexes.
-Anything in src/org/json/simple/* is included under the apache license included at 
-src/org/json/simple/LICENSE.txt. json-simple is entirely unmodified and is only included
-for a simplified build process and documetation.

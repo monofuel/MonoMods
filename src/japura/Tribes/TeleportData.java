@@ -1,35 +1,101 @@
 /**
- *  *      author: Monofuel
- *   *      website: japura.net
- *    *      this file is distributed under the modified BSD license
- *     *      that should have been included with it.
- *      */
+ *      author: Monofuel
+ *      website: japura.net
+ *      this file is distributed under the modified BSD license
+ *      that should have been included with it.
+ */
 
 
 package japura.Tribes;
 
+import com.mongodb.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+//TODO this class, and emeralds and tribes should probably extend DBObject
 public class TeleportData {
 
-	Block spot;
 	String name;
 	Tribe owner;
-	ArrayList<Tribe> allowed;
+	Block spot;
+	private BasicDBObject myTeleport;
+	private BasicDBList allowed;
 
+	//for making a new teleport (or getting an existing once if you know the name)
 	public TeleportData(Block spot, String name,Tribe owner) {
-		this.spot = spot;
 		this.name = name;
 		this.owner = owner;
-		allowed = new ArrayList<Tribe>();
+		this.spot = spot;
+
+		BasicDBObject query = new BasicDBObject();
+		query.put("tribe",owner.getName());
+		query.put("name",name);
+		myTeleport = (BasicDBObject) Tribes.getDiamondTable().findOne(query);
+
+		if (myTeleport != null) {
+			allowed = (BasicDBList) myTeleport.get("allowed");
+			long x = myTeleport.getLong("X");
+			long y = myTeleport.getLong("Y");
+			long z = myTeleport.getLong("Z");
+			World myWorld = Bukkit.getWorld((String)myTeleport.get("world"));
+			Location loc1 = new Location(myWorld,x,y,z);
+			if (!spot.equals(loc1.getBlock())) {
+				Tribes.log("invalid diamond in DB");
+			}
+			return;
+		}
+		//else, create this teleport
+		myTeleport = new BasicDBObject();
+		myTeleport.put("tribe",owner.getName());
+		myTeleport.put("name",name);
+		myTeleport.put("X",spot.getLocation().getBlockX());
+		myTeleport.put("Y",spot.getLocation().getBlockY());
+		myTeleport.put("Z",spot.getLocation().getBlockZ());
+		myTeleport.put("world",spot.getLocation().getWorld().getName());
+		allowed = new BasicDBList();
+		allowed.add(owner.getName());
+		myTeleport.put("allowed",allowed);
+
+		Tribes.getDiamondTable().insert(myTeleport);
 	}
 
+	//for making a new teleport (or getting an existing once if you know the name)
+	public TeleportData(Block spot) {
+		//this.name = name;
+		//this.owner = owner;
+		this.spot = spot;
+
+		long x = spot.getX();
+		long y = spot.getY();
+		long z = spot.getZ();
+
+		BasicDBObject query = new BasicDBObject();
+		query.put("X",x);
+		query.put("Y",y);
+		query.put("Z",z);
+		query.put("world",spot.getWorld().getName());
+		myTeleport = (BasicDBObject) Tribes.getDiamondTable().findOne(query);
+
+		if (myTeleport != null) {
+			allowed = (BasicDBList) myTeleport.get("allowed");
+			this.owner = Tribes.getTribe(myTeleport.getString("tribe"));
+			this.name = myTeleport.getString("name");
+			World myWorld = Bukkit.getWorld(myTeleport.getString("world"));
+		} else {
+			this.name = "invalid teleport";
+			this.owner = new Tribe("invalid owner");
+			Tribes.log("invalid teleport");
+		}
+
+	}
 	public Tribe getOwner() {
 		return owner;
 	}
@@ -42,19 +108,30 @@ public class TeleportData {
 		return spot;
 	}
 
+	public boolean equals(Tribe other) {
+		return name.equals(other.getName());
+	}
+
 	public void rename(String name) {
 		this.name = name;
+		myTeleport.put("name",name);
+		Tribes.getDiamondTable().save(myTeleport);
 	}
 
 	public void addAllowed(Tribe group) {
-		if (!allowed.contains(group))
-			allowed.add(group);
+		//TODO should this also be in the constructor?
+		if (!allowed.contains(group.getName()))
+			allowed.add(group.getName());
+		myTeleport.put("allowed",allowed); //TODO: is this required?
+		Tribes.getDiamondTable().save(myTeleport);
 	}
 	public void rmAllowed(Tribe group) {
-		allowed.remove(group);
+		allowed.remove(group.getName());
+		myTeleport.put("allowed",allowed);
+		Tribes.getDiamondTable().save(myTeleport);
 	}
 	public boolean isAllowed(Tribe group) {
-		return allowed.contains(group);
+		return allowed.contains(group.getName());
 	}
 
 	public Tribe[] getAllowed() {

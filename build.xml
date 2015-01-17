@@ -24,7 +24,7 @@
 	</target>
 
 	<target name="build" depends="init">
-		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" fork="yes" >
+		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" fork="yes" debug="true" >
 			<classpath refid="compile.classpath"/>
 		</javac>
 	</target>
@@ -39,8 +39,6 @@
 			<link href="http://jd.bukkit.org/rb/apidocs/"/>
 			<fileset dir="${src.dir}">
 				<include name="japura/*/*.java" />
-				<include name="org/json/simple/*.java" />
-				<include name="org/json/simple/parser/*.java" />
 			</fileset>
 		</javadoc>
 	</target>
@@ -52,6 +50,9 @@
 	        <jar destfile="${dist.dir}/MonoBugs.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/MonoBugs/*">
 			<fileset file="${src.dir}/japura/MonoBugs/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoBugs/config.yml"/>
+			<!-- ATM both monobugs and tribes load the entire driver into their jars. perhaps there is a more elegant solution? -->
+			<zipgroupfileset dir="${bin.dir}" includes="mongo-java-driver-2.13.0-rc1.jar"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoBugs.classpath}"/>
                         </manifest>
@@ -66,6 +67,7 @@
 	        <jar destfile="${dist.dir}/MonoChat.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/MonoChat/*">
 			<fileset file="${src.dir}/japura/MonoChat/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoChat/config.yml"/>
 
                         <manifest>
 				<attribute name="Class-Path" value="${MonoChat.classpath}"/>
@@ -81,6 +83,7 @@
 	        <jar destfile="${dist.dir}/MonoCities.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/MonoCities/*">
 			<fileset file="${src.dir}/japura/MonoCities/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoCities/config.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoCities.classpath}"/>
                         </manifest>
@@ -95,6 +98,7 @@
 	        <jar destfile="${dist.dir}/MonoLocks.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/MonoLocks/*">
 			<fileset file="${src.dir}/japura/MonoLocks/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoLocks/config.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoLocks.classpath}"/>
                         </manifest>
@@ -109,6 +113,7 @@
 	        <jar destfile="${dist.dir}/MonoMobs.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/MonoMobs/*">
 			<fileset file="${src.dir}/japura/MonoMobs/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoMobs/config.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoMobs.classpath}"/>
                         </manifest>
@@ -123,6 +128,7 @@
 	        <jar destfile="${dist.dir}/MonoPerms.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/MonoPerms/*">
 			<fileset file="${src.dir}/japura/MonoPerms/plugin.yml"/>
+			<fileset file="${src.dir}/japura/MonoPerms/config.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoPerms.classpath}"/>
                         </manifest>
@@ -137,6 +143,7 @@
 	        <jar destfile="${dist.dir}/NoWither.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/NoWither/*">
 			<fileset file="${src.dir}/japura/NoWither/plugin.yml"/>
+			<fileset file="${src.dir}/japura/NoWither/config.yml"/>
                         <manifest>
 				<attribute name="Class-Path" value="${NoWither.classpath}"/>
                         </manifest>
@@ -151,6 +158,9 @@
 	        <jar destfile="${dist.dir}/Tribes.jar" basedir="${build.dir}"
 		     defaultexcludes="yes" includes="japura/Tribes/*">
 			<fileset file="${src.dir}/japura/Tribes/plugin.yml"/>
+			<fileset file="${src.dir}/japura/Tribes/config.yml"/>
+			<!-- ATM both monobugs and tribes load the entire driver into their jars. perhaps there is a more elegant solution? -->
+			<zipgroupfileset dir="${bin.dir}" includes="mongo-java-driver-2.13.0-rc1.jar"/>
                         <manifest>
 				<attribute name="Class-Path" value="${Tribes.classpath}"/>
                         </manifest>
@@ -158,17 +168,8 @@
         </target>
 
 
-	<target name="MonoUtil" depends="build">
-		<manifestclasspath property="MonoUtil.classpath" jarfile="${dist.dir}/MonoUtil.jar">
-			<classpath refid="compile.classpath"/>
-     		</manifestclasspath>		
-	        <jar destfile="${dist.dir}/MonoUtil.jar" basedir="${build.dir}"
-		     defaultexcludes="yes" includes="japura/MonoUtil/*">
-			<fileset file="${src.dir}/japura/MonoUtil/plugin.yml"/>
-                </jar>
-        </target>
-
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,MonoUtil,docs">
+	<!--<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,docs">-->
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,docs">
 		<description> Main target</description>
 	</target>
 

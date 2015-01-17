@@ -25,12 +25,11 @@ public class TribeTeleport extends BukkitRunnable {
 	}
 	
 	public void updateDiamonds() {
-		Tribe[] all = Tribes.getTribes();
-		for (Tribe group : all) {
-			Block[] diamonds = group.getDiamonds();
-			for (Block item : diamonds) {
-				group.checkDiamond(item);
-			}	
-		}
+		//TODO
+		//pull up the diamond database
+		//and review that all the diamonds on currently-loaded chunks are indeed diamonds
+		//if (!em.getChunk().isLoaded()) return;
+		//if (em.getType() != Material.EMERALD_BLOCK) emeralds.remove(em);
+
 	}
 }

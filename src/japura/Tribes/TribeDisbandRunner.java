@@ -7,14 +7,14 @@
 
 package japura.Tribes;
 
-import japura.MonoUtil.MonoConf;
-
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.json.simple.JSONObject;
+
+import com.mongodb.*;
 
 public class TribeDisbandRunner extends BukkitRunnable{
 
@@ -27,20 +27,24 @@ public class TribeDisbandRunner extends BukkitRunnable{
 		//60 seconds in a minute
 		//60 minutes in an hour
 		//24 hours in a day
-		timeDeltaInMillis = 1000 * 60 * 60 * 24 * (long) Tribes.getConf().getConf("Days before disband");
+		timeDeltaInMillis = 1000 * 60 * 60 * 24 * plugin.getConfig().getInt("Days before disband");
 		Tribes.log("Tribe Disband spawned");
 		
 	}
 	
 	public void run() {
-		Tribe[] currentTribes = Tribes.getTribes();
+		DBCursor currentTribes = Tribes.getTribes();
 		long currentTime = System.currentTimeMillis();
-		for (Tribe item : currentTribes) {
-			if (currentTime - item.getLastLogTime() > timeDeltaInMillis) {
-				Tribes.log("Tribe " + item.getName() + " has exceeded the time since last login limit");
-				Tribes.destroyTribe(item);
+		for (DBObject item : currentTribes) {
+			if ("safezone".equalsIgnoreCase((String) item.get("name"))) {
+				continue;
+			}
+			if (currentTime - (long) item.get("getLastLogTime") > timeDeltaInMillis) {
+				Tribes.log("Tribe " + (String) item.get("name") + " has exceeded the time since last login limit");
+				Tribes.getTribe((String) item.get("name")).destroy();
 			}
 
 		}
 	}
+	
 }

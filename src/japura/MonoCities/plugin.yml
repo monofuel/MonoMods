@@ -1,10 +1,13 @@
 name: MonoCities
 main: japura.MonoCities.MonoCities
-version: 0.01
+version: 2.0
 load: startup
 commands:
     MonoCities:
         description: primary MonoCities command. use /MonoCities help for info
-        usage: /MonoCities
-        permission: monocities
-        permissions-message: You don't have permission
+        usage: /MonoCities help
+
+permissions:
+    monocities.admin:
+        description: permission to use monocities admin commands
+        default: false

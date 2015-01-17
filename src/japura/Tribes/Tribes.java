@@ -20,6 +20,7 @@ import java.net.UnknownHostException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -27,6 +28,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.ItemStack;
 
 public class Tribes extends JavaPlugin{
 	
@@ -38,6 +41,7 @@ public class Tribes extends JavaPlugin{
 	private static DBCollection tribeTable = null;
 	private static DBCollection emeraldTable = null;
 	private static DBCollection diamondTable = null;
+	private static DBCollection kitTable = null;
 	
 	private static TribeProtect protector;
 	private static LoginListener loginListener;
@@ -60,6 +64,7 @@ public class Tribes extends JavaPlugin{
 		String tribeTableName = getConfig().getString("mongo tribe table");
 		String emeraldTableName = getConfig().getString("mongo emerald table");
 		String diamondTableName = getConfig().getString("mongo diamond table");
+		String kitTableName = getConfig().getString("mongo kit table");
 
 		try {
 			mongo = new MongoClient(mongoHost,port);
@@ -72,6 +77,7 @@ public class Tribes extends JavaPlugin{
 		tribeTable = db.getCollection(tribeTableName);
 		emeraldTable = db.getCollection(emeraldTableName);
 		diamondTable = db.getCollection(diamondTableName);
+		kitTable = db.getCollection(kitTableName);
 		
 		//protector checks all emerald blocks
 		//and starts listeners
@@ -113,7 +119,7 @@ public class Tribes extends JavaPlugin{
 
 		//create the safezone tribe if it does not exit
 		Tribe group = getTribe("safezone");
-		if (group.isValid()) {
+		if (!group.isValid()) {
 			TribeFactory.createNewTribe("safezone");
 			getLogger().info("safezone tribe created");
 		}
@@ -183,9 +189,52 @@ public class Tribes extends JavaPlugin{
 		}else if ("spawn".equalsIgnoreCase(cmd.getName())) {
 			//TODO name of this teleport should be in the config
 			return ttp(sender,cmd,label,new String[] {"spawn"});
+		} else if ("kit".equalsIgnoreCase(cmd.getName())) {
+			return kit(sender,cmd,label,args);
 		}
 		
 		return false;
+	}
+
+	public boolean kit(CommandSender sender, Command cmd, String label, String[] args) {
+
+		if (sender instanceof ConsoleCommandSender) {
+			sender.sendMessage("silly console, kit is for players");
+			return true;
+		}else if (sender instanceof Player) {
+			Player user = (Player) sender;
+			PlayerInventory inv = user.getInventory();
+			BasicDBObject query = new BasicDBObject();
+			query.put("user",user.getName());
+
+			DBObject userObject = kitTable.findOne(query);
+			if (userObject == null) {
+				inv.addItem(new ItemStack(Material.EMERALD_BLOCK,3));
+				inv.addItem(new ItemStack(Material.DIAMOND_BLOCK,3));
+				inv.addItem(new ItemStack(Material.IRON_HELMET,1));
+				inv.addItem(new ItemStack(Material.IRON_CHESTPLATE,1));
+				inv.addItem(new ItemStack(Material.IRON_LEGGINGS,1));
+				inv.addItem(new ItemStack(Material.IRON_BOOTS,1));
+				inv.addItem(new ItemStack(Material.IRON_SWORD,1));
+				inv.addItem(new ItemStack(Material.IRON_PICKAXE,1));
+				inv.addItem(new ItemStack(Material.IRON_PICKAXE,1));
+				inv.addItem(new ItemStack(Material.IRON_PICKAXE,1));
+				inv.addItem(new ItemStack(Material.TORCH,32));
+				inv.addItem(new ItemStack(Material.SAPLING,8));
+				inv.addItem(new ItemStack(Material.LOG,16));
+
+
+				kitTable.insert(query);
+				sender.sendMessage("the starter kit has been added to your inventory");
+
+			} else {
+				sender.sendMessage("you have already recieved your kit");
+			}
+
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public boolean ttp(CommandSender sender, Command cmd, String label, String[] args) {

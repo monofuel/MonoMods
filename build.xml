@@ -55,6 +55,7 @@
 			<zipgroupfileset dir="${bin.dir}" includes="mongo-java-driver-2.13.0-rc1.jar"/>
                         <manifest>
 				<attribute name="Class-Path" value="${MonoBugs.classpath}"/>
+				<attribute name="Permissions" value="all-permissions"/>
                         </manifest>
                 </jar>
         </target>
@@ -163,6 +164,7 @@
 			<zipgroupfileset dir="${bin.dir}" includes="mongo-java-driver-2.13.0-rc1.jar"/>
                         <manifest>
 				<attribute name="Class-Path" value="${Tribes.classpath}"/>
+				<attribute name="Permissions" value="all-permissions"/>
                         </manifest>
                 </jar>
         </target>

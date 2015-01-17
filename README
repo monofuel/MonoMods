@@ -7,6 +7,28 @@ Unfortunately, some of this code was rushed together with the hopes to 'just get
 
 requires java 1.7
 
+tweaks:
+depending on which version of bukkit or cauldron you're using, you may need to make a few tweaks
+
+security tweaks:
+for cauldron, java.policy will have to be tweaked for some reason.
+jre/lib/security/java.policy
+
+needs the lines:
+	//for minecraft
+	permission javax.management.MBeanTrustPermission "register";
+
+code tweaks:
+you can either build the mongodb driver into the jar or include it on the classpath at runtime.
+This can be set in build.xml for the relevent plugins.
+It would be nice if the plugins using it could automatically download and load it or something.
+Bukkit.getOnlinePlayers() is called by MonoChat, and there are multiple kinds of craftbukkit 1.7.10
+floating around. The one i started working with returned Player[], but apparently they decided to scrap
+that function with no backwards compatability. the latest bukkit api (and the latest cauldron) return
+a collection. I've included lines for both, with one commented out depending on which API you're using.
+I mean, it's not like they could have just left the one that returned Player[] and marked it as depricated or something, right?
+
+
 included files and directories:
 
 TODO.txt: list of things on the to-do list

@@ -10,8 +10,9 @@ Disband after time: true
 Days before disband: 60
 mongo host: localhost
 mongo port: 27017
-mongo database: Tribes
+mongo database: MonoMods
 mongo tribe table: tribes
 mongo emerald table: emeralds
 mongo diamond table: diamonds
+mongo kit table: kit
 

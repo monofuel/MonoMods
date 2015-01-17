@@ -9,6 +9,7 @@
 package japura.Tribes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.PlayerInventory;
@@ -52,9 +54,55 @@ public class TribeProtectListener implements Listener {
 
 	static final Material[] DEATH_WHITELIST = {
 		Material.TORCH,
-		Material.IRON_SWORD
-
+		Material.IRON_SWORD,
+		Material.WOOD_SWORD,
+		Material.STONE_SWORD,
+		Material.DIAMOND_SWORD,
+		Material.GOLD_SWORD,
+		Material.WOOD_SPADE,
+		Material.WOOD_PICKAXE,
+		Material.WOOD_AXE,
+		Material.STONE_SPADE,
+		Material.STONE_PICKAXE,
+		Material.STONE_AXE,
+		Material.DIAMOND_SPADE,
+		Material.DIAMOND_PICKAXE,
+		Material.DIAMOND_AXE,
+		Material.GOLD_SPADE,
+		Material.GOLD_PICKAXE,
+		Material.GOLD_AXE,
+		Material.WOOD_HOE,
+		Material.STONE_HOE,
+		Material.IRON_HOE,
+		Material.DIAMOND_HOE,
+		Material.GOLD_HOE,
+		Material.LEATHER_HELMET,
+		Material.LEATHER_CHESTPLATE,
+		Material.LEATHER_LEGGINGS,
+		Material.LEATHER_BOOTS,
+		Material.CHAINMAIL_HELMET,
+		Material.CHAINMAIL_CHESTPLATE,
+		Material.CHAINMAIL_LEGGINGS,
+		Material.CHAINMAIL_BOOTS,
+		Material.IRON_HELMET,
+		Material.IRON_CHESTPLATE,
+		Material.IRON_LEGGINGS,
+		Material.IRON_BOOTS,
+		Material.DIAMOND_HELMET,
+		Material.DIAMOND_CHESTPLATE,
+		Material.DIAMOND_LEGGINGS,
+		Material.DIAMOND_BOOTS,
+		Material.GOLD_HELMET,
+		Material.GOLD_CHESTPLATE,
+		Material.GOLD_LEGGINGS,
+		Material.GOLD_BOOTS,
+		Material.FLINT,
+		Material.COMPASS,
+		Material.FISHING_ROD,
+		Material.WATCH
 	};
+
+	HashMap<String,ArrayList<ItemStack>> restoreInventories = new HashMap<String,ArrayList<ItemStack>>();
 
 	//TODO setup a permission with this
 	@EventHandler
@@ -63,12 +111,38 @@ public class TribeProtectListener implements Listener {
 
 		Player user = event.getEntity();
 		PlayerInventory inv = user.getInventory();
+		List<ItemStack> drops = event.getDrops();
+		ArrayList<ItemStack> dropsToRemove = new ArrayList<ItemStack>();
+		ArrayList<ItemStack> dropsToKeep = new ArrayList<ItemStack>();
 
-		for (ItemStack item : inv.getContents()) {
-			if (!Arrays.asList(DEATH_WHITELIST).contains(item.getType())) {
-				inv.remove(item);
-				user.getWorld().dropItemNaturally(user.getLocation(),item);
+		for (ItemStack item : drops) {
+			if (Arrays.asList(DEATH_WHITELIST).contains(item.getType())) {
+				dropsToKeep.add(item);
+				dropsToRemove.add(item);
 			}
+		}
+		drops.removeAll(dropsToRemove);
+		restoreInventories.put(user.getName(),dropsToKeep);
+
+		//TODO:
+		//maybe set respawn location to tribe spawn?
+	}
+
+	//TODO: maybe fix? would have to remember this
+	//shit in the database.
+	//note: if the server crashes or goes offline while a 
+	//player is dead and has not respawned, they
+	//will lose their inventories.
+	@EventHandler
+	public void getRespawn(PlayerRespawnEvent event) {
+		Player user = event.getPlayer();
+		ArrayList<ItemStack> restoreInv = restoreInventories.get(user.getName());
+		PlayerInventory inv = user.getInventory();
+		if (restoreInv != null) {
+			for (ItemStack item : restoreInv) {
+				inv.addItem(item);
+			}
+			restoreInventories.remove(user.getName());
 		}
 	}
 

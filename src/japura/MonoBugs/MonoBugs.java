@@ -33,8 +33,17 @@ public class MonoBugs extends JavaPlugin{
 	private static DB db = null;
 	private static DBCollection table = null;
 
-	private static final String adminHelp = "";
-	private static final String userHelp = "";
+	private static final String adminHelp = "/bug reload to reload the plugin\n" +
+						"/bug unload to disable the plugin\n" +
+						"/bug load to reload the config\n" +
+						"/bug save to save the config" +
+						"/bug fixed [id] [reason] to fix a bug\n" +
+						"/bug closed [id] [reason] to close a report\n" +
+						"/bug spam [id] to mark a report as spam\n";
+	private static final String userHelp = "/bug report [issue] to report a bug\n" +
+						"/bug list to list your bugs\n" +
+						"/bug unresolved to list all unfixed bugs\n" +
+						"/bug help to show this help";
 
 	//number of arguments to skip at the start of each command
 	private static final int CMD_ARGS = 2;

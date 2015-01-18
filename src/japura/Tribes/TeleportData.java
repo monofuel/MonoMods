@@ -131,6 +131,7 @@ public class TeleportData {
 		Tribes.getDiamondTable().save(myTeleport);
 	}
 	public boolean isAllowed(Tribe group) {
+		if ("safezone".equals(owner.getName())) return true;
 		return allowed.contains(group.getName());
 	}
 

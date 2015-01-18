@@ -31,6 +31,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
 
+import org.bukkit.util.ChatPaginator;
+import org.bukkit.util.ChatPaginator.ChatPage;
+
 public class Tribes extends JavaPlugin{
 	
 
@@ -222,6 +225,7 @@ public class Tribes extends JavaPlugin{
 				inv.addItem(new ItemStack(Material.TORCH,32));
 				inv.addItem(new ItemStack(Material.SAPLING,8));
 				inv.addItem(new ItemStack(Material.LOG,16));
+				inv.addItem(new ItemStack(Material.BREAD,16));
 
 
 				kitTable.insert(query);
@@ -396,22 +400,55 @@ public class Tribes extends JavaPlugin{
 				return true;
 			case "list":
 
-				sender.sendMessage("You are allowed to use the following teleports:");
-				String teleportNames = "from the tribe safezone: ";
-				Tribe safeTribe = getTribe("safezone");
-			
-			
-				Block[] diamonds = safeTribe.getDiamonds();
-				for (Block item : diamonds) {
-					teleData = safeTribe.getTeleData(item);
-					if (teleData == null) {
-						log("error in looking up a tribe teleport location");
+				String teleportNames = "";
+				if (group.isValid()) {
+					teleportNames += "from your tribe: ";
+					Block[] diamonds = group.getDiamonds();
+					for (Block item : diamonds) {
+						teleData = group.getTeleData(item);
+						teleportNames += " " + teleData.getName();
 					}
-					teleportNames += " " +  teleData.getName();	
+					teleportNames += "\n";
 				}
-				sender.sendMessage(teleportNames);
-				sender.sendMessage("command WIP: only shows safezone's teleports");
-				//TODO add listing for all allowed teleports from the user
+
+				DBCursor cursor = getTribes();
+				String checkGroup;
+				while (cursor.hasNext()) {
+					checkGroup = (String) cursor.next().get("name");
+					if (checkGroup.equals(group.getName())) continue;
+					otherGroup = getTribe(checkGroup);
+					
+					String teleports = "";
+					Block[] diamonds = otherGroup.getDiamonds();
+					for (Block item : diamonds) {
+						teleData = otherGroup.getTeleData(item);
+						if (teleData.isAllowed(group)) {
+							teleports += " " +  teleData.getName();	
+						}
+					}
+					if (!teleports.equals("")) {
+						teleportNames += "from the tribe " + otherGroup.getName() + ": " +
+								teleports + "\n";
+					}
+				}
+				int myPage;
+				if (args.length < 2) {
+					myPage = 1;
+				} else {
+					try {
+						myPage = Integer.parseInt(args[1]);
+					} catch (NumberFormatException e) {
+						return false;
+					}
+				}
+
+				ChatPage page = ChatPaginator.paginate(teleportNames,myPage);
+
+				sender.sendMessage("You are allowed to use the following teleports (page " + page.getPageNumber() + " of " + page.getTotalPages() + "): ");
+
+				for (String line : page.getLines()) {
+					sender.sendMessage(line);
+				}
 
 				return true;
 			default:
@@ -635,8 +672,9 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			String name = args[1];
-			if (getTribe(name) != null) {
+			if (getTribe(name).isValid()) {
 				sender.sendMessage("Tribe already exists");
+				return true;
 			}
 			
 			TribeFactory.createNewTribe(name,sender.getName());
@@ -651,7 +689,7 @@ public class Tribes extends JavaPlugin{
 			
 			group = getTribe(args[1]);
 			
-			if (group == null) {
+			if (!group.isValid()) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			} else if (!user.equals(group.getLeader())) {
@@ -674,7 +712,7 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			
-			if (group == null) {
+			if (!group.isValid()) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			}
@@ -687,12 +725,43 @@ public class Tribes extends JavaPlugin{
 			if (user.equals(group.getLeader())) {
 				group.invite(invited);
 				sender.sendMessage(invited + " invited successfully");
+
+				Player newUser = Bukkit.getPlayer(invited);
+				if (newUser != null) {
+					newUser.sendMessage("You have been invited to " + group.getName());
+					newUser.sendMessage("if you want to join, use /t join " + group.getName());
+				}
+
 				return true;
 			} else {
 				sender.sendMessage("You are not leader of this tribe");
 				return true;
 			}
 			
+		} else if (args[0].equalsIgnoreCase("uninvite")) {
+
+			if (args.length < 2) {
+				sender.sendMessage("You must specify who to uninvite");
+				return true;
+			}
+			if (!group.isValid()) {
+				sender.sendMessage("You are not in a tribe");
+				return true;
+			}
+
+			if (!user.equals(group.getLeader())) {
+				sender.sendMessage("you are not leader of your tribe");
+				return true;
+			}
+
+			String uninvited = args[1].toLowerCase();
+			if (group.isInvited(uninvited)) {
+				group.unInvite(uninvited);
+				return true;
+			} else {
+				sender.sendMessage("they are not invited");
+				return true;
+			}
 		} else if (args[0].equalsIgnoreCase("join")) {
 			
 			if (args.length < 2) {
@@ -706,11 +775,12 @@ public class Tribes extends JavaPlugin{
 					return true;
 				}
 			}
-			Tribe newGroup = getTribe(args[1]);
+			Tribe newGroup = getTribe(args[1].toLowerCase());
 			if (!newGroup.isValid()) {
 				sender.sendMessage("invalid tribe name");
 				return true;
 			}
+
 			if (newGroup.isInvited(user)) {
 				if (group.isValid()) {
 					group.delPlayer(user);
@@ -764,7 +834,6 @@ public class Tribes extends JavaPlugin{
 			group.delPlayer(user);
 			return true;
 			
-			
 		} else if (args[0].equalsIgnoreCase("giveLeader")) {
 			if (args.length < 2) {
 				sender.sendMessage("You need to specify who to give leadership to");
@@ -793,6 +862,18 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("You need to specify a faction or player to show");
 				return true;
 			}
+
+			DBCursor cursor = Tribes.getTribes();
+			String name;
+			while (cursor.hasNext()) {
+				name = (String) cursor.next().get("name");
+				group = Tribes.getTribe(name);
+				if (group.hasPlayer(args[1])) {
+					sender.sendMessage(group.toString());
+					return true;
+				}
+			}
+
 			group = getTribe(args[1]);
 			if (group != null) {
 				sender.sendMessage(group.toString()); 
@@ -816,32 +897,36 @@ public class Tribes extends JavaPlugin{
 	}
 	
 	public boolean thelp(CommandSender sender, String[] args) {
-		short page;
-		if (args.length < 2) page = 0;
+		int myPage;
+		if (args.length < 2) myPage = 1;
 		else {
 			try {
-				page = Short.parseShort(args[1]);
+				myPage = Integer.parseInt(args[1]);
 			} catch (NumberFormatException e) {
-				page = 0;
+				myPage = 1;
 			}
 		}
 		String message;
-		switch (page) {
-		case 1:
-			message = "Page 1/2 TODO";
-			break;
-		case 2:
-			message = "Page 2/2 TODO";
-			break;
-		default:
-			message = "Page 0/2: You can specify a number when using help to view a page.\n" +
-					  "EG: /t help 1 would display page 1.\n" +
-					  "/t create [tribe] can be used to create a tribe\n" +
-					  "/t destroy [yourtribe] can be used to dissolve your tribe\n" +
-					  "/t help shows this help information";
-			break;
+			message = "/kit for a starter kit of gear\n" +
+				  "/spawn to teleport to the spawn point, or to your tribe's 'spawn' teleport\n" + 
+				  "/ttp help for help with ttp and teleporting\n" +
+				  "/t create [tribe] can be used to create a tribe\n" +
+				  "/t destroy [yourtribe] can be used to dissolve your tribe\n" +
+				  "/t invite [player] to invite them to your tribe\n" +
+				  "/t uninvite [player] to remove them from your invitese\n" +
+				  "/t join [tribe] to join a tribe you have been invited to\n" +
+				  "/t kick [player] to kick someone from your tribe\n" +
+				  "/t leave to leave your tribe (you cannot be the leader)\n" +
+				  "/t giveLeader [player] to transfer your leadership to another player\n" +
+				  "/t show [tribe] show information about a tribe\n" +
+				  "/t show [player] show what tribe a player belongs to\n" +
+				  "/t help shows this help information";
+		ChatPage page = ChatPaginator.paginate(message,myPage);
+		sender.sendMessage("Tribes help (page " + page.getPageNumber() + " of " + page.getTotalPages() + "): ");
+		for (String line : page.getLines()) {
+			sender.sendMessage(line);
 		}
-		sender.sendMessage(message);
+
 		return true;
 	}
 	
@@ -862,7 +947,7 @@ public class Tribes extends JavaPlugin{
 	 *
 	 */
 	public static Tribe getTribe(String name) {
-		return new Tribe(name);
+		return new Tribe(name.toLowerCase());
 	}
 	
 	public static DBCursor getTribes() {

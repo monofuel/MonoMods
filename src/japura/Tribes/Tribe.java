@@ -26,7 +26,7 @@ public class Tribe {
 	private String name = "invalid tribe";
 	private String leader = "invalid leader";
 	private boolean valid = false;
-	ArrayList<String> invites = new ArrayList<String>();
+	BasicDBList invites;
 	BasicDBList users;
 
 
@@ -53,6 +53,12 @@ public class Tribe {
 			if (users == null) {
 				users = new BasicDBList();
 			} 
+			invites = (BasicDBList) myTribe.get("invites");
+			if (invites == null) {
+				invites = new BasicDBList();
+			}
+
+
 			leader = (String) myTribe.get("leader");
 			if (leader == null) {
 				leader = "invalid leader";
@@ -252,17 +258,18 @@ public class Tribe {
 			}
 		}
 		
-		users.add(user);
+		users.add(user.toLowerCase());
+		invites.remove(user.toLowerCase());
 		myTribe.put("members",users);
+		myTribe.put("invites",invites);
 
 		
 		Tribes.getTribeTable().save(myTribe);
 		
-		invites.remove(user);
 	}
 	
 	public void delPlayer(String user) {
-
+		users.remove(user.toLowerCase());
 		users.remove(user);
 		myTribe.put("members",users);
 		Tribes.getTribeTable().save(myTribe);
@@ -270,7 +277,10 @@ public class Tribe {
 	}
 	
 	public void unInvite(String user) {
+		invites.remove(user.toLowerCase());
 		invites.remove(user);
+		myTribe.put("invites",invites);
+		Tribes.getTribeTable().save(myTribe);
 	}
 	
 	//returns if successful
@@ -280,19 +290,21 @@ public class Tribe {
 			if(name.equals(check.getName()))
 				return false;
 		}
+		if (isInvited(user)) return true;
 		//TODO check if player exists?
-		invites.add(user);
+		invites.add(user.toLowerCase());
+		myTribe.put("invites",invites);
+		Tribes.getTribeTable().save(myTribe);
 		return true;
 	}
 	
 	public boolean isInvited(String user) {
-		//TODO: maybe this should be equals ignore case?
-		return invites.contains(user);
+		return invites.contains(user.toLowerCase());
 	}
 	
 	public boolean hasPlayer(String user) {
 
-		return users.contains(user) || user.equalsIgnoreCase(leader);
+		return users.contains(user.toLowerCase()) || user.equalsIgnoreCase(leader);
 	}
 
 	public void destroy() {
@@ -334,6 +346,23 @@ public class Tribe {
 
 		return list;
 	}
+
+	public String[] getInvites() {
+		
+		String[] list;
+		if (myTribe == null) {
+			Tribes.log("getInvites ran on null tribe");
+			return new String[0];
+		}
+		BasicDBList players = (BasicDBList) myTribe.get("invites");
+		if (players == null) {
+			list = new String[0];
+		} else {
+			list = players.toArray(new String[players.size()]);
+		}
+
+		return list;
+	}
 	
 	public String[] getAll() {
 		String[] list;
@@ -357,14 +386,33 @@ public class Tribe {
 		info.append("Tribe: ");
 		info.append(name);
 		info.append("\n");
+
+		if ("invalid tribe".equals(name)) {
+			return info.toString();
+		}
 		if (leader != null) {
 			info.append("Leader: ");
 			info.append(leader);
 			info.append("\n");
 		}
+
 		String[] list = getMembers();
 		if (list.length > 1) {
 			info.append("Members: ");
+			boolean first = true;
+			for (String user : list) {
+				if (!first) {
+					info.append(",");
+				} else {
+					first = false;
+				}
+				info.append(user);
+			}
+		}
+		
+		list = getInvites();
+		if (list.length > 1) {
+			info.append("\nInvites: ");
 			boolean first = true;
 			for (String user : list) {
 				if (!first) {

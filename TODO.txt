@@ -12,6 +12,10 @@ selective inventory restore on death should be
 definable in the config
 tribes should let players respawn at spawn diamond
 
+invites should notify players
+
+multiple tribe leaders
+
 custom or stub commands
 	/kit should either give a kit or not, i'm not the boss
 

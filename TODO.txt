@@ -15,6 +15,7 @@ tribes should let players respawn at spawn diamond
 invites should notify players
 
 multiple tribe leaders
+tribe description
 
 custom or stub commands
 	/kit should either give a kit or not, i'm not the boss

@@ -1,6 +1,11 @@
 THINGS TO TEST:
 everything
 
+fix null error for the command /monochat
+fix null error for the command /monomobs
+fix null error for the command /perm
+fix monomobs reload for non-ops
+
 test how bugs and tribes react when the db isn't running
 fail-safe to lock the server down if tribes doesn't load right
 

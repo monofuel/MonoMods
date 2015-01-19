@@ -185,8 +185,8 @@ public class IRCListener implements Listener {
 
 			//comment whichever one you do not want to use
 			//because dumbasses like to break API's in minor version changes.
-			//online = Bukkit.getOnlinePlayers().toArray(new Player[Bukkit.getOnlinePlayers().size()]);
-			online = (Player[]) Bukkit.getOnlinePlayers();
+			online = Bukkit.getOnlinePlayers().toArray(new Player[Bukkit.getOnlinePlayers().size()]);
+			//online = (Player[]) Bukkit.getOnlinePlayers();
 
 			if (online.length == 0) {
 				return "nobody";

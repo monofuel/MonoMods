@@ -94,14 +94,14 @@ public class CityPopulator extends BlockPopulator{
 		//otherwise, let's place a building.
 		//MonoCities.log("found valid chunk at " + chunk.getX() + "," + chunk.getZ());
 		
-		if (chunk.getX() % 3 == 0 && chunk.getZ() % 3 == 0) {
+		if (chunk.getX() % 4 == 0 && chunk.getZ() % 4 == 0) {
 			//place 4way
 			//MonoCities.log("placing 4way");
 			placeBuilding("4way.schematic",chunk,rand);
-		} else if (chunk.getX() % 3 == 0) {
+		} else if (chunk.getX() % 4 == 0) {
 			//MonoCities.log("placing a straight road");
 			placeBuilding("straightroad.schematic",chunk,rand);
-		}else if (chunk.getZ() % 3 == 0) {
+		}else if (chunk.getZ() % 4 == 0) {
 			//MonoCities.log("placing a rotated road");
 			placeBuilding("rightroad.schematic",chunk,rand);
 		} else {
@@ -186,13 +186,8 @@ public class CityPopulator extends BlockPopulator{
 				Material.APPLE,
 				Material.BOW,
 				Material.STICK,
-				Material.MUSHROOM_SOUP,
-				Material.BROWN_MUSHROOM,
-				Material.RED_MUSHROOM,
-				Material.BUCKET,
 				Material.EXP_BOTTLE,
 				Material.REDSTONE,
-				Material.BOOK,
 				Material.COAL_ORE,
 				Material.TORCH,
 				Material.IRON_AXE,
@@ -218,23 +213,17 @@ public class CityPopulator extends BlockPopulator{
 				Material.LEATHER_LEGGINGS,
 				Material.LEATHER_BOOTS,
 				Material.DIAMOND,
+				Material.DIAMOND_BLOCK,
 				Material.OBSIDIAN,
 				Material.MELON_SEEDS,
 				Material.PUMPKIN_SEEDS,
 				Material.SUGAR_CANE,
 				Material.CARROT_ITEM,
 				Material.COCOA,
-				Material.EGG,
-				Material.ENDER_PEARL,
 				Material.FIREWORK,
 				Material.FISHING_ROD,
 				Material.INK_SACK,
-				Material.LAVA_BUCKET,
-				Material.WATER_BUCKET,
-				Material.MILK_BUCKET,
 				Material.POTATO_ITEM,
-				Material.YELLOW_FLOWER,
-				Material.RED_ROSE,
 				Material.EMERALD,
 				Material.EMERALD_BLOCK
 				};
@@ -245,12 +234,12 @@ public class CityPopulator extends BlockPopulator{
 		Chest c = (Chest) item.getState();
 		Inventory inv = c.getInventory();
 		
-		int count = Math.abs(rand.nextInt()) % 3;
+		int count = Math.abs(rand.nextInt()) % 6;
 		
 		
 		for (int i = 1; i < count; i++) {
 			int chance = Math.abs(rand.nextInt()) % chestLoot.length;
-			int amount = Math.abs(rand.nextInt()) % 1;
+			int amount = Math.abs(rand.nextInt()) % 5;
 			amount++;
 			ItemStack is = new ItemStack(chestLoot[chance],amount);
 			inv.addItem(is);
@@ -290,8 +279,8 @@ public class CityPopulator extends BlockPopulator{
 					if (building.getName().equals("4way.schematic") ||
 							building.getName().equals("straightroad.schematic") ||
 							building.getName().equals("rightroad.schematic")) {
-						if (avg + i - 6 < 0) continue;
-						Block tmp = chunk.getBlock(k,(int)(avg + i - 6),j);
+						if (avg + i - 3 < 0) continue;
+						Block tmp = chunk.getBlock(k,(int)(avg + i - 3),j);
 						int type = blocks[k][j][i].getType();
 						if (type < 0) type += 256;
 						tmp.setTypeId(type);
@@ -300,6 +289,12 @@ public class CityPopulator extends BlockPopulator{
 							//MonoCities.log("populating road chest");
 							popChest(tmp,rand);
 						}
+
+						if (type == 1 && tmp.getData() == 0) {
+							//replace smoothstone with stone bricks
+							tmp.setTypeId(98);
+						}
+
 						//TODO some of this should be modularized between road/building code
 						if (type == 52) { //if it's a spawner
 							CreatureSpawner spawner = (CreatureSpawner) tmp.getState();
@@ -326,6 +321,10 @@ public class CityPopulator extends BlockPopulator{
 						if (type == 54) {
 							//MonoCities.log("populating building chest");
 							popChest(tmp,rand);
+						}
+						if (type == 1 && tmp.getData() == 0) {
+							//replace smoothstone with stone bricks
+							tmp.setTypeId(98);
 						}
 						if (type == 52) { //if it's a spawner
 							CreatureSpawner spawner = (CreatureSpawner) tmp.getState();

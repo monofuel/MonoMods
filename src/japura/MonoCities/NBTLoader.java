@@ -100,7 +100,7 @@ public class NBTLoader {
 		short width = fetchWidth();
 		short height = fetchHeight();
 		
-		//MonoCities.log("imported object is " + length + "," + width + "," + height);
+		MonoCities.log("imported object " + file + " is " + length + "," + width + "," + height);
 		
 		if (length > 16 || width > 16) {
 			MonoCities.log("ERROR: schematic too large");

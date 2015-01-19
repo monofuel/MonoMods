@@ -11,6 +11,7 @@ package japura.Tribes;
 import com.mongodb.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -938,7 +939,8 @@ public class Tribes extends JavaPlugin{
 		Tribes.log("STUB add Tribe method called");
 	}
 	
-
+	//TODO: move to top of file
+	private static HashMap<String,Tribe> tribeCache = new HashMap<String,Tribe>();
 	/*
 	 * the getTribe function is alot simpler than it used to,
 	 * you could really just call a new tribe object instead.
@@ -947,7 +949,12 @@ public class Tribes extends JavaPlugin{
 	 *
 	 */
 	public static Tribe getTribe(String name) {
-		return new Tribe(name.toLowerCase());
+		Tribe cacheCheck = tribeCache.get(name.toLowerCase());
+		if (cacheCheck == null) {
+			return new Tribe(name.toLowerCase());
+		} else {
+			return cacheCheck;
+		}
 	}
 	
 	public static DBCursor getTribes() {

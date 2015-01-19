@@ -31,11 +31,8 @@ public class TribeProtect extends BukkitRunnable {
 	}
 	
 	public void updateEmeralds() {
-		DBCursor cursor = Tribes.getTribes();
 		Tribe group;
-		String name;
-		while (cursor.hasNext()) {
-			name = (String) cursor.next().get("name");
+		for (String name : Tribes.getTribeNames()) {
 			group = Tribes.getTribe(name);
 			if (group == null) {
 				Tribes.log("Emerald updater found tribe with name set to null");
@@ -52,13 +49,12 @@ public class TribeProtect extends BukkitRunnable {
 	}
 	
 	public static Tribe getBlockOwnership(Location loc) {
-		DBCursor cursor = Tribes.getTribes();
 		Tribe group;
-		while (cursor.hasNext()) {
-			group = Tribes.getTribe((String) cursor.next().get("name"));
+		for (String name : Tribes.getTribeNames()) {
+			group = Tribes.getTribe(name);
 			if (group.checkLocOwnership(loc)) return group;
 		}
-		return new Tribe("invalid tribe");
+		return Tribes.getTribe("invalid tribe");
 	}
 	
 	public void stop() {

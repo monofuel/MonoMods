@@ -50,6 +50,7 @@ public class Tribe {
 			leader = "invalid tribe leader";
 			valid = false;
 		} else {
+			Tribes.invalidateTribeNames();
 			valid = true;
 			users = (BasicDBList) myTribe.get("members");
 			if (users == null) {
@@ -333,6 +334,7 @@ public class Tribe {
 
                 Tribes.getTribeTable().remove(item);
 		Tribes.log("tribe " + name + " destroyed");
+		Tribes.invalidateTribeNames();
 	}
 	
 	public String getName() {

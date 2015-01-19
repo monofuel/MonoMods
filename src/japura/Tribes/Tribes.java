@@ -412,10 +412,7 @@ public class Tribes extends JavaPlugin{
 					teleportNames += "\n";
 				}
 
-				DBCursor cursor = getTribes();
-				String checkGroup;
-				while (cursor.hasNext()) {
-					checkGroup = (String) cursor.next().get("name");
+				for (String checkGroup : getTribeNames()) {
 					if (checkGroup.equals(group.getName())) continue;
 					otherGroup = getTribe(checkGroup);
 					
@@ -988,7 +985,7 @@ public class Tribes extends JavaPlugin{
 
 	public static Tribe getPlayersTribe(String name) {
 		//garbage in garbage out
-		if (name == null) return new Tribe("invalid tribe");
+		if (name == null) return getTribe("invalid tribe");
 
 		Tribe group = playerCache.get(name.toLowerCase());
 		if (group != null) return group;
@@ -1007,19 +1004,41 @@ public class Tribes extends JavaPlugin{
 				return group;
 			}
 		}
-		return new Tribe("invalid tribe");
+		return getTribe("invalid tribe");
 
 	}
 
 	public static Tribe getPlayersTribe(Player user) {
 		//garbage in garbage out
-		if (user == null) return new Tribe("invalid tribe");
+		if (user == null) return getTribe("invalid tribe");
 		return getPlayersTribe(user.getName());
 		
 	}
 	
 	public static DBCollection getTribeTable() {
 		return tribeTable;
+	}
+
+	private static String[] tribeNameCache;
+
+	public static void invalidateTribeNames() {
+		log("invalidating tribe names");
+		tribeNameCache = null;
+	}
+
+	public static String[] getTribeNames() {
+		if (tribeNameCache == null) {
+			log("rebuilding tribe name cache");
+			DBCursor cursor = Tribes.getTribes();
+			Tribe group;
+			tribeNameCache = new String[cursor.count()];
+			int index = 0;
+			while (cursor.hasNext()) {
+				tribeNameCache[index++] = (String) cursor.next().get("name");
+			}
+		}
+
+		return tribeNameCache;
 	}
 	
 	public static DBCollection getEmeraldTable() {

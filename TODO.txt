@@ -10,14 +10,14 @@ test how bugs and tribes react when the db isn't running
 fail-safe to lock the server down if tribes doesn't load right
 
 MonoCities respawning chests
+MonoCities lighting issues
+monocities torches/doors popping off (general issue with worldedit too)
 
 vote rewards
 
 selective inventory restore on death should be
 definable in the config
 tribes should let players respawn at spawn diamond
-
-invites should notify players
 
 multiple tribe leaders
 tribe description

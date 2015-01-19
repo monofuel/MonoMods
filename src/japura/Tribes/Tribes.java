@@ -90,7 +90,7 @@ public class Tribes extends JavaPlugin{
 		//TODO listener is not actually set to run?
 		//there's a method in it for removing diamonds that don't exist anymore
 		teleportListener = new TribeTeleportListener(this);
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,200,200);
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,protector,2000,2000);
 
 		//trigger events on player login
 		loginListener = new LoginListener(this);
@@ -951,10 +951,11 @@ public class Tribes extends JavaPlugin{
 	public static Tribe getTribe(String name) {
 		Tribe cacheCheck = tribeCache.get(name.toLowerCase());
 		if (cacheCheck == null) {
-			return new Tribe(name.toLowerCase());
-		} else {
-			return cacheCheck;
+			log("cache misssed, loading " + name);
+			cacheCheck = new Tribe(name.toLowerCase());
+			tribeCache.put(name.toLowerCase(),cacheCheck);
 		}
+		return cacheCheck;
 	}
 	
 	public static DBCursor getTribes() {
@@ -977,21 +978,32 @@ public class Tribes extends JavaPlugin{
 		
 	}*/
 
+	//TODO move to top of file
+	private static HashMap<String,Tribe> playerCache = new HashMap<String,Tribe>();
+
+	public static void invalidatePlayer(String name) {
+		log("invalidating " + name + "'s cache");
+		playerCache.remove(name.toLowerCase());
+	}
+
 	public static Tribe getPlayersTribe(String name) {
 		//garbage in garbage out
 		if (name == null) return new Tribe("invalid tribe");
 
+		Tribe group = playerCache.get(name.toLowerCase());
+		if (group != null) return group;
+		log("missed player " + name + " in cache");
 		BasicDBList members = new BasicDBList();
 		members.add(name);
 
 		DBCursor cursor = Tribes.getTribes();
-		Tribe group;
 		String tribeName;
 		while (cursor.hasNext()) {
 			tribeName = (String) cursor.next().get("name");
 			group = getTribe(tribeName);
 
 			if (group.hasPlayer(name)) {
+				playerCache.put(name.toLowerCase(),group);
 				return group;
 			}
 		}

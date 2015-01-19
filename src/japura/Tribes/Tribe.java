@@ -29,6 +29,8 @@ public class Tribe {
 	BasicDBList invites;
 	BasicDBList users;
 
+	Block[] emeraldCache;
+	Block[] diamondCache;
 
 
 	public Tribe(String name) {
@@ -81,6 +83,8 @@ public class Tribe {
 	}
 	
 	public Block[] getEmeralds() {
+		if (emeraldCache != null) return emeraldCache;
+		Tribes.log("rebuilding emerald table for " + name);
 		BasicDBObject query = new BasicDBObject();
 		query.put("tribe",name);
 		DBCursor cursor = Tribes.getEmeraldTable().find(query);
@@ -103,12 +107,14 @@ public class Tribe {
 			blocks[i] = loc.getBlock();
 		}
 
-
+		emeraldCache = blocks;
 		return blocks;
 	}
 
 	public Block[] getDiamonds() {
 
+		if (diamondCache != null) return diamondCache;
+		Tribes.log("rebuilding diamond table for " + name);
 		BasicDBObject query = new BasicDBObject();
 		query.put("tribe",name);
 		DBCursor cursor = Tribes.getDiamondTable().find(query);
@@ -130,7 +136,7 @@ public class Tribe {
 			blocks[i] = loc.getBlock();
 		}
 
-
+		diamondCache = blocks;
 		return blocks;
 	}
 	public TeleportData getTeleData(Block em) {
@@ -150,6 +156,7 @@ public class Tribe {
 		emerald.put("Z",em.getLocation().getBlockZ());
 		emerald.put("world",em.getLocation().getWorld().getName());
 		Tribes.getPlugin().getEmeraldTable().insert(emerald);
+		emeraldCache = null;
 	}
 	public void addDiamond(Block em,Player user) {
 		if (em.getType() != Material.DIAMOND_BLOCK) return;
@@ -162,6 +169,7 @@ public class Tribe {
 		TeleportData data = new TeleportData(em,name,this);
 		data.addAllowed(this); //TODO why is this needed?
 		user.sendMessage("created new teleporter named " + name);
+		diamondCache = null;
 	}
 
 	//TODO what is this used for
@@ -190,6 +198,7 @@ public class Tribe {
 		query.put("Z",em.getZ());
 
 		Tribes.getEmeraldTable().remove(query);
+		emeraldCache = null;
 	}
 	public void delDiamond(Block em) {
 		BasicDBObject query = new BasicDBObject();
@@ -199,8 +208,8 @@ public class Tribe {
 		query.put("Y",em.getY());
 		query.put("Z",em.getZ());
 
-
 		Tribes.getDiamondTable().remove(query);
+		diamondCache = null;
 	}
 	
 	public boolean checkLocOwnership(Location loc) {
@@ -230,6 +239,7 @@ public class Tribe {
 	}
 	
 	public void setLeader(String user) {
+		Tribes.invalidatePlayer(user);
 		if (!"invalid leader".equals(leader)) {
 			String oldLeader = leader;
 			this.leader = user;
@@ -264,7 +274,7 @@ public class Tribe {
 		myTribe.put("members",users);
 		myTribe.put("invites",invites);
 
-		
+		Tribes.invalidatePlayer(user);
 		Tribes.getTribeTable().save(myTribe);
 		
 	}
@@ -273,6 +283,7 @@ public class Tribe {
 		users.remove(user.toLowerCase());
 		users.remove(user);
 		myTribe.put("members",users);
+		Tribes.invalidatePlayer(user);
 		Tribes.getTribeTable().save(myTribe);
 		
 	}

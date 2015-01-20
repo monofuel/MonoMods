@@ -33,9 +33,9 @@ public class MonoLocks extends JavaPlugin{
 
 		saveDefaultConfig();
 		
-		new LockCreateListener(this);
-		new LockAccessListener(this);
-		new LockBreakListener(this);
+		getServer().getPluginManager().registerEvents(new LockCreateListener(),this);
+		getServer().getPluginManager().registerEvents(new LockAccessListener(),this);
+		getServer().getPluginManager().registerEvents(new LockBreakListener(),this);
 		
 		log("MonoLocks has been enabled");
 		

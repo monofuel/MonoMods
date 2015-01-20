@@ -20,9 +20,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class LockBreakListener implements Listener{
 
-	public LockBreakListener(JavaPlugin plugin) {
+	/*public LockBreakListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
-	}
+	}*/
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void protectBreak(BlockBreakEvent e) {

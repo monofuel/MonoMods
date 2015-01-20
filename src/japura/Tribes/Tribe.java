@@ -342,8 +342,11 @@ public class Tribe {
 		return name;
 	}
 
-	public boolean equals(Tribe other) {
-		return name.equals(other.getName());
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) return false;
+		if (! (other instanceof Tribe)) return false;
+		return name.equals(((Tribe) other).getName());
 	}
 
 	public String[] getMembers() {

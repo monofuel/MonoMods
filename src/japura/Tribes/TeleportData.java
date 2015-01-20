@@ -107,10 +107,10 @@ public class TeleportData {
 	public Block getSpot() {
 		return spot;
 	}
-
-	public boolean equals(Tribe other) {
+	
+	/*public boolean equals(Tribe other) {
 		return name.equals(other.getName());
-	}
+	}*/
 
 	public void rename(String name) {
 		this.name = name;

@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -71,7 +73,7 @@ public class IRCListener implements Listener {
 			try {
 				Thread.sleep(5000l);
 			} catch (InterruptedException e1) {
-				e1.printStackTrace();
+				chatPlugin.getLogger().log(Level.SEVERE,"failed to connect to irc server",e1);
 			}
 			reconnect();
 		}
@@ -82,8 +84,7 @@ public class IRCListener implements Listener {
 		try {
 			socket.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			chatPlugin.getLogger().log(Level.SEVERE,"failed to close connection to irc server",e);
 		}
 	}
 	

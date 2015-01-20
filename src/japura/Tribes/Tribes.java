@@ -659,6 +659,7 @@ public class Tribes extends JavaPlugin{
 				if (user.equals(group.getLeader())) {
 					sender.sendMessage("You will have to either disband or pass on leadership");
 				}
+				return true;
 			}
 
 			if (args.length < 2){
@@ -985,7 +986,7 @@ public class Tribes extends JavaPlugin{
 
 	public static Tribe getPlayersTribe(String name) {
 		//garbage in garbage out
-		if (name == null) return getTribe("invalid tribe");
+		if (name == null) return new Tribe("invalid tribe");
 
 		Tribe group = playerCache.get(name.toLowerCase());
 		if (group != null) return group;
@@ -1004,13 +1005,13 @@ public class Tribes extends JavaPlugin{
 				return group;
 			}
 		}
-		return getTribe("invalid tribe");
+		return new Tribe("invalid tribe");
 
 	}
 
 	public static Tribe getPlayersTribe(Player user) {
 		//garbage in garbage out
-		if (user == null) return getTribe("invalid tribe");
+		if (user == null) return new Tribe("invalid tribe");
 		return getPlayersTribe(user.getName());
 		
 	}

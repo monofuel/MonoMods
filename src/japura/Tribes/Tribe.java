@@ -316,6 +316,7 @@ public class Tribe {
 	}
 	
 	public boolean hasPlayer(String user) {
+		if (users == null) return false;
 
 		return users.contains(user.toLowerCase()) || user.equalsIgnoreCase(leader);
 	}

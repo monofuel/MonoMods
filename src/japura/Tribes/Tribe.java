@@ -255,6 +255,8 @@ public class Tribe {
 	}
 	
 	public void setName(String name) {
+		Tribes.rmTribeCache(name);
+		Tribes.invalidateTribeNames();
 		this.name = name;
 	}
 	

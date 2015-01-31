@@ -9,15 +9,25 @@
 package japura.MonoCities;
 
 import java.util.logging.Logger;
+import java.util.logging.Level;
+
+import java.net.UnknownHostException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.Chunk;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.mongodb.*;
+
 public class MonoCities extends JavaPlugin{
 	
+	private static MongoClient mongo = null;
+	private static DB db = null;
+	private static DBCollection table = null;
+
 	private static Logger citiesLogger = null;
 	
 	private static CityPopulator pop = null;
@@ -28,12 +38,26 @@ public class MonoCities extends JavaPlugin{
 	private boolean disabled = true;
 
 	public void onEnable() {
-		citiesLogger = getLogger();
-		
-		
 
 		//save defaults if they do not exist
 		saveDefaultConfig();
+		citiesLogger = getLogger();
+
+		String mongoHost = getConfig().getString("mongo host");
+		int port = getConfig().getInt("mongo port");
+		String databaseName = getConfig().getString("mongo database");
+		String tableName = getConfig().getString("mongo table");
+		
+		try {
+			mongo = new MongoClient(mongoHost,port);
+		} catch (UnknownHostException e) {
+			getLogger().log(Level.SEVERE,"Error connecting to database, bailing out",e);
+			this.getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+
+		db = mongo.getDB(databaseName);
+		table = db.getCollection(tableName);
 
 		disabled = false;
 		pop = new CityPopulator(this);
@@ -44,32 +68,20 @@ public class MonoCities extends JavaPlugin{
 		//(without CityPopulator disabling the plugin)
 		if (disabled) return;
 		
-		//TODO: read world from config
-		World world = Bukkit.getWorld("World");
-		if (world == null) {
-			listener = new WorldInit(this,pop);
-		} else {
-			Bukkit.getWorld("World").getPopulators().add(pop);
-		}
-		
+		getServer().getPluginManager().registerEvents(pop, this);
 		log("MonoCities has been enabled");
 	}
 	
 	public void onDisable() {
 		
-		//remove populator
-		//do an extra check to make sure we aren't being disabled
-		//before the world is initialized
-		if (Bukkit.getWorld("World") != null)
-			Bukkit.getWorld("World").getPopulators().remove(pop);
+		if (mongo != null) {
+			mongo.close();
+		}
+
 		
 		//check if we aren't being disabled before fully initializing
 		if (listener != null)
 			listener.stop();
-		
-		//If no schematics are found, pop will not have been initialized.
-		if (pop != null)
-			pop.close();
 		
 		saveConfig();
 
@@ -105,6 +117,36 @@ public class MonoCities extends JavaPlugin{
 		}
 		
 		return false;
+	}
+
+
+	public static void recordNewBuilding(String name, Chunk myChunk, long seed) {
+		String chunkyString = myChunk.getWorld().getName();
+		chunkyString += "," + myChunk.getX();
+		chunkyString += "," + myChunk.getZ();
+
+		BasicDBObject building = new BasicDBObject();
+		building.put("location",chunkyString);
+		building.put("seed",seed);
+		building.put("type",name);
+		table.insert(building);
+
+	}
+
+	public static boolean wasChunkPopulated(Chunk myChunk) {
+		String chunkyString = myChunk.getWorld().getName();
+		chunkyString += "," + myChunk.getX();
+		chunkyString += "," + myChunk.getZ();
+
+		BasicDBObject query = new BasicDBObject();
+		query.put("location",chunkyString);
+
+		DBObject chunk = table.findOne(query);
+		if (chunk == null) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
 	//let other objects call our logger

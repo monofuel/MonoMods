@@ -168,19 +168,30 @@ public class Tribes extends JavaPlugin{
 
 		//TODO
 		//verify that safezone exists
-
-		//verify that every tribe other than safezone has a leader
+		Tribe safezone = getTribe("safezone");
+		if (!safezone.isValid()) {
+			log("safezone does not exist!");
+		}
 
 		//check that no user is in multiple tribes
-		
-
-
+		ArrayList<String> users = new ArrayList<String>();
+		for (String tribe : getTribeNames()) {
+			Tribe myTribe = getTribe(tribe);
+			for (String user : myTribe.getAll()) {
+				if (users.contains(user)) {
+					log("user: " + user + " is in multiple tribes");
+				}
+				users.add(user);
+			}
+		}
 
 		return result;
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
+
+		//TODO set up permissions with their actual commands
 		if ("tadmin".equalsIgnoreCase(cmd.getName()) &&
 		    (sender instanceof ConsoleCommandSender ||
 		    (sender instanceof Player && ((Player) sender).hasPermission("tribes.admin")))){
@@ -349,7 +360,7 @@ public class Tribes extends JavaPlugin{
 					sender.sendMessage("You are not in a tribe");
 					return true;
 				}
-
+				//check if they are the leader of their tribe
 				if (!group.getLeader().equals(player.getName())) {
 					sender.sendMessage("You are not the leader of your tribe");
 					return true;
@@ -625,7 +636,6 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("tribe " + args[2] + " already exists!");
 				return true;
 			}
-
 			tribe.setName(args[2]);
 			return true;
 		} else if (args[0].equalsIgnoreCase("help")) {

@@ -30,6 +30,8 @@ public class MonoCities extends JavaPlugin{
 	public void onEnable() {
 		citiesLogger = getLogger();
 		
+		
+
 		//save defaults if they do not exist
 		saveDefaultConfig();
 
@@ -117,5 +119,9 @@ public class MonoCities extends JavaPlugin{
          */
 	public static void log(String line) {
 		citiesLogger.info(line);
+	}
+
+	public static Logger getCitiesLogger() {
+		return citiesLogger;
 	}
 }

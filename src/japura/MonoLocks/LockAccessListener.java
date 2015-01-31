@@ -27,9 +27,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class LockAccessListener implements Listener{
 
-	public LockAccessListener(JavaPlugin plugin) {
+	/*public LockAccessListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
-	}
+	}*/
 	
 	/*@EventHandler(priority = EventPriority.HIGHEST)
 	public void getChestAccess(InventoryOpenEvent e) {

@@ -24,9 +24,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class LockCreateListener implements Listener{
 
-	public LockCreateListener(JavaPlugin plugin) {
+	/*public LockCreateListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
-	}
+	}*/
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onSignChange(SignChangeEvent e) {

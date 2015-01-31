@@ -52,7 +52,7 @@ public class TribeProtectListener implements Listener {
 	}
 	
 
-	static final Material[] DEATH_WHITELIST = {
+	private static final Material[] DEATH_WHITELIST = {
 		Material.TORCH,
 		Material.IRON_SWORD,
 		Material.WOOD_SWORD,

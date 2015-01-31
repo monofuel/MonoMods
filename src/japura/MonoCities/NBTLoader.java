@@ -16,6 +16,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.bukkit.block.Block;
 import org.bukkit.Material;
@@ -90,8 +92,7 @@ public class NBTLoader {
 			}
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			MonoCities.getCitiesLogger().log(Level.SEVERE,"failed to read building file for " + file,e);
 			return null;
 		}
 		//MonoCities.log("Byte buffer filled");

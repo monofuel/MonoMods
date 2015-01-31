@@ -88,5 +88,4 @@ public class MonoChat extends JavaPlugin{
         protected static void log(Level level, String line) {
                 chatLogger.log(level,line);
         }   
-
 }

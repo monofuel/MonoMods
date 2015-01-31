@@ -42,6 +42,7 @@ public class TeleportData {
 
 		if (myTeleport != null) {
 			allowed = (BasicDBList) myTeleport.get("allowed");
+			
 			long x = myTeleport.getLong("X");
 			long y = myTeleport.getLong("Y");
 			long z = myTeleport.getLong("Z");
@@ -132,11 +133,12 @@ public class TeleportData {
 	}
 	public boolean isAllowed(Tribe group) {
 		if ("safezone".equals(owner.getName())) return true;
+		if (allowed.contains("safezone")) return true;
 		return allowed.contains(group.getName());
 	}
 
-	public Tribe[] getAllowed() {
-		return allowed.toArray(new Tribe[allowed.size()]);
+	public String[] getAllowed() {
+		return allowed.toArray(new String[allowed.size()]);
 	}
 
 	public void teleportPlayer(Player user) {

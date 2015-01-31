@@ -391,10 +391,10 @@ public class Tribes extends JavaPlugin{
 					return true;
 				}
 				sender.sendMessage(teleData.getName() + " is owned by " + teleData.getOwner().getName());
-				Tribe[] allowed = teleData.getAllowed();
-				String allowedTribes = allowed[0].getName();
+				String[] allowed = teleData.getAllowed();
+				String allowedTribes = allowed[0];
 				for (int i = 1; i < allowed.length; i++) {
-					allowedTribes += "," + allowed[i].getName();
+					allowedTribes += "," + allowed[i];
 				}
 				sender.sendMessage("The tribes that may use this are: " + allowedTribes);
 	
@@ -955,6 +955,10 @@ public class Tribes extends JavaPlugin{
 		}
 		return cacheCheck;
 	}
+
+	public static void rmTribeCache(String name) {
+		tribeCache.remove(name);
+	}
 	
 	public static DBCursor getTribes() {
 		DBCursor cursor = tribeTable.find();
@@ -991,16 +995,12 @@ public class Tribes extends JavaPlugin{
 		Tribe group = playerCache.get(name.toLowerCase());
 		if (group != null) return group;
 		log("missed player " + name + " in cache");
-		BasicDBList members = new BasicDBList();
-		members.add(name);
 
-		DBCursor cursor = Tribes.getTribes();
-		String tribeName;
-		while (cursor.hasNext()) {
-			tribeName = (String) cursor.next().get("name");
+		for (String tribeName : getTribeNames()) {
 			group = getTribe(tribeName);
 
 			if (group.hasPlayer(name)) {
+				log("adding " + name + " back to cache");
 				playerCache.put(name.toLowerCase(),group);
 				return group;
 			}

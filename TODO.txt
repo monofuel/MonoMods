@@ -13,6 +13,8 @@ MonoCities respawning chests
 MonoCities lighting issues
 monocities torches/doors popping off (general issue with worldedit too)
 
+monolock doors can be avoided by spamming
+
 vote rewards
 
 selective inventory restore on death should be

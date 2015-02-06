@@ -349,6 +349,11 @@ public class Tribe {
 		return name.equals(((Tribe) other).getName());
 	}
 
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
+
 	public String[] getMembers() {
 		String[] list;
 		if (myTribe == null) {

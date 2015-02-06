@@ -40,7 +40,7 @@ public class Tribe {
 		}
 		this.name = name.toLowerCase();
 		BasicDBObject query = new BasicDBObject();
-		query.put("name",name);
+		query.put("name",this.name);
 
 		myTribe = Tribes.getTribeTable().findOne(query);
 
@@ -255,6 +255,8 @@ public class Tribe {
 	}
 	
 	public void setName(String name) {
+		Tribes.rmTribeCache(name);
+		Tribes.invalidateTribeNames();
 		this.name = name;
 	}
 	
@@ -334,6 +336,7 @@ public class Tribe {
                 Tribes.getDiamondTable().remove(blockQuery);
 
                 Tribes.getTribeTable().remove(item);
+		Tribes.rmTribeCache(name);
 		Tribes.log("tribe " + name + " destroyed");
 		Tribes.invalidateTribeNames();
 	}

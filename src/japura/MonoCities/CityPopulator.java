@@ -28,8 +28,12 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.EventPriority;
 
-public class CityPopulator extends BlockPopulator{
+public class CityPopulator implements Listener{
 
 
 	//TODO: If there are no schematics, shut off the plugin.
@@ -67,9 +71,29 @@ public class CityPopulator extends BlockPopulator{
 
 	//the chunks on each side of this chunk exist
 	//chunk corners might not
-	@Override
-	public void populate(World world, Random rand, Chunk chunk) {
-		
+	//@Override
+	//public void populate(World world, Random rand, Chunk chunk) {
+	@EventHandler
+	public void getChunkLoad(ChunkLoadEvent event) {
+
+		Chunk chunk = event.getChunk();
+		World world = chunk.getWorld();
+		Random rand;
+
+		//only load for world
+		//TODO read this from config
+		if (!world.getName().equals("World")) {
+			return;
+		}
+		if (MonoCities.wasChunkPopulated(chunk)) {
+			return;
+		}
+
+		rand = new Random();
+		long seed = rand.nextLong();
+		//set the seed to we can record it
+		rand.setSeed(seed);
+
 		int good = 0;
 		//check if good biome
 		Biome[] doPop = new Biome[]
@@ -91,6 +115,11 @@ public class CityPopulator extends BlockPopulator{
 		//check if it's flat
 		if (!checkFlat(chunk)) return;
 		
+		//check if it's in good biomes and flat
+		if (good < 4 && !checkFlat(chunk)) {
+			MonoCities.recordNewBuilding("invalid",chunk,seed);
+			return;
+		}
 		//otherwise, let's place a building.
 		//MonoCities.log("found valid chunk at " + chunk.getX() + "," + chunk.getZ());
 		
@@ -98,18 +127,22 @@ public class CityPopulator extends BlockPopulator{
 			//place 4way
 			//MonoCities.log("placing 4way");
 			placeBuilding("4way.schematic",chunk,rand);
+			MonoCities.recordNewBuilding("4way.schematic",chunk,seed);
 		} else if (chunk.getX() % 4 == 0) {
 			//MonoCities.log("placing a straight road");
 			placeBuilding("straightroad.schematic",chunk,rand);
+			MonoCities.recordNewBuilding("straightroad.schematic",chunk,seed);
 		}else if (chunk.getZ() % 4 == 0) {
 			//MonoCities.log("placing a rotated road");
 			placeBuilding("rightroad.schematic",chunk,rand);
+			MonoCities.recordNewBuilding("straightroad.schematic",chunk,seed);
 		} else {
 			//place random building
 			//TODO rotate to curb?
 			String name = getRandomBuilding(rand);
 			//MonoCities.log("placing a " + name);
 			placeBuilding(name,chunk,rand);
+			MonoCities.recordNewBuilding(name,chunk,seed);
 		}
 		
 	}
@@ -336,12 +369,6 @@ public class CityPopulator extends BlockPopulator{
 			}
 		}
 		//MonoCities.log("placed building");
-	}
-	
-
-	public void close() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

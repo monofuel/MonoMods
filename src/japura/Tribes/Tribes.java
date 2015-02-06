@@ -168,19 +168,30 @@ public class Tribes extends JavaPlugin{
 
 		//TODO
 		//verify that safezone exists
-
-		//verify that every tribe other than safezone has a leader
+		Tribe safezone = getTribe("safezone");
+		if (!safezone.isValid()) {
+			log("safezone does not exist!");
+		}
 
 		//check that no user is in multiple tribes
-		
-
-
+		ArrayList<String> users = new ArrayList<String>();
+		for (String tribe : getTribeNames()) {
+			Tribe myTribe = getTribe(tribe);
+			for (String user : myTribe.getAll()) {
+				if (users.contains(user)) {
+					log("user: " + user + " is in multiple tribes");
+				}
+				users.add(user);
+			}
+		}
 
 		return result;
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
+
+		//TODO set up permissions with their actual commands
 		if ("tadmin".equalsIgnoreCase(cmd.getName()) &&
 		    (sender instanceof ConsoleCommandSender ||
 		    (sender instanceof Player && ((Player) sender).hasPermission("tribes.admin")))){
@@ -349,7 +360,7 @@ public class Tribes extends JavaPlugin{
 					sender.sendMessage("You are not in a tribe");
 					return true;
 				}
-
+				//check if they are the leader of their tribe
 				if (!group.getLeader().equals(player.getName())) {
 					sender.sendMessage("You are not the leader of your tribe");
 					return true;
@@ -391,10 +402,10 @@ public class Tribes extends JavaPlugin{
 					return true;
 				}
 				sender.sendMessage(teleData.getName() + " is owned by " + teleData.getOwner().getName());
-				Tribe[] allowed = teleData.getAllowed();
-				String allowedTribes = allowed[0].getName();
+				String[] allowed = teleData.getAllowed();
+				String allowedTribes = allowed[0];
 				for (int i = 1; i < allowed.length; i++) {
-					allowedTribes += "," + allowed[i].getName();
+					allowedTribes += "," + allowed[i];
 				}
 				sender.sendMessage("The tribes that may use this are: " + allowedTribes);
 	
@@ -625,7 +636,6 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("tribe " + args[2] + " already exists!");
 				return true;
 			}
-
 			tribe.setName(args[2]);
 			return true;
 		} else if (args[0].equalsIgnoreCase("help")) {
@@ -955,6 +965,10 @@ public class Tribes extends JavaPlugin{
 		}
 		return cacheCheck;
 	}
+
+	public static void rmTribeCache(String name) {
+		tribeCache.remove(name);
+	}
 	
 	public static DBCursor getTribes() {
 		DBCursor cursor = tribeTable.find();
@@ -991,16 +1005,12 @@ public class Tribes extends JavaPlugin{
 		Tribe group = playerCache.get(name.toLowerCase());
 		if (group != null) return group;
 		log("missed player " + name + " in cache");
-		BasicDBList members = new BasicDBList();
-		members.add(name);
 
-		DBCursor cursor = Tribes.getTribes();
-		String tribeName;
-		while (cursor.hasNext()) {
-			tribeName = (String) cursor.next().get("name");
+		for (String tribeName : getTribeNames()) {
 			group = getTribe(tribeName);
 
 			if (group.hasPlayer(name)) {
+				log("adding " + name + " back to cache");
 				playerCache.put(name.toLowerCase(),group);
 				return group;
 			}

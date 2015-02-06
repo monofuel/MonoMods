@@ -22,10 +22,13 @@ public class TribeFactory {
 	public static void createNewTribe(String name, String founder) {
 
 		if (name == null) {
-			Tribes.log("attempted find a tribe named null");
+			Tribes.log("attempted make a tribe named null");
 			return;
 		}
 		name = name.toLowerCase();
+
+		Tribes.invalidateTribeNames();
+		Tribes.invalidatePlayer(name);
 
 		//check if it already exists
 		BasicDBObject query = new BasicDBObject();
@@ -51,6 +54,7 @@ public class TribeFactory {
 			return;
 		}
 		name = name.toLowerCase();
+		Tribes.invalidateTribeNames();
 		//check if it already exists
 		BasicDBObject query = new BasicDBObject();
 		query.put("name",name);

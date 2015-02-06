@@ -19,19 +19,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class WitherListener implements Listener{
 
-	private JavaPlugin plugin;
+	//private JavaPlugin plugin;
 
-	public WitherListener(JavaPlugin plugin) {
+	/*public WitherListener(JavaPlugin plugin) {
 		this.plugin = plugin;
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
-	}
+	}*/
 	
 	@EventHandler
 	public void onMobSpawn(CreatureSpawnEvent event) {
 		LivingEntity mob = event.getEntity();
 		
 		if (mob instanceof Wither) {
-			if (plugin.getConfig().getBoolean("wither disabled")) {
+			if (NoWither.getWitherSetting()) {
 				//TODO display message to player
 				event.setCancelled(true);
 				NoWither.log("Wither spawn averted");

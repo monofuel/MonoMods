@@ -24,14 +24,17 @@ import org.bukkit.event.HandlerList;
 public class NoWither extends JavaPlugin{
 
 	
-	private static Logger WitherLogger = null;
+	private static Logger witherLogger = null;
 	private boolean enabled = true;
-	public WitherListener blocker = null;
+
+	private static JavaPlugin witherPlugin = null;
 
 	public void onEnable() {
-		WitherLogger = getLogger();
+		witherLogger = getLogger();
+		witherPlugin = this;
 		
-		new WitherListener(this);
+		//new witherListener(this);
+		getServer().getPluginManager().registerEvents(new WitherListener(),this);
 		
 		//set defaults if they do not exist
 		saveDefaultConfig();
@@ -39,24 +42,18 @@ public class NoWither extends JavaPlugin{
 		
 		//check if we want wither disabled, and if so, disable
 		if(enabled) {
-			//create anti-wither listener
 			log("wither spawning disabled");
-			blocker = new WitherListener(this);
 		} else {
 			log("wither spawning enabled");
 		}
 	}
 	
 	public void onDisable() {
-		//saving configs on unload is annoying.
-		//config should be saved on config changes.
 
-		if (blocker != null) {
-			HandlerList.unregisterAll(this);
-		}
+		HandlerList.unregisterAll(this);
 
 		log("NoWither has been disabled");
-		WitherLogger = null;
+		witherLogger = null;
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -122,6 +119,10 @@ public class NoWither extends JavaPlugin{
 		return false;
 	}
 	
+	protected static boolean getWitherSetting() {
+		return witherPlugin.getConfig().getBoolean("wither disabled");
+	}
+
 	//let other objects call our logger
 	/**
 	 * easy method any class in this plugin can use to log information.
@@ -129,7 +130,7 @@ public class NoWither extends JavaPlugin{
 	 *
 	 */
 	protected static void log(String line) {
-		WitherLogger.info(line);
+		witherLogger.info(line);
 	}
 
 	/**
@@ -139,6 +140,7 @@ public class NoWither extends JavaPlugin{
 	 *
 	 */
 	protected static void log(Level level, String line) {
-		WitherLogger.log(level,line);
+		witherLogger.log(level,line);
 	}
+
 }

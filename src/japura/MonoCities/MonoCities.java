@@ -31,7 +31,6 @@ public class MonoCities extends JavaPlugin{
 	private static Logger citiesLogger = null;
 	
 	private static CityPopulator pop = null;
-	private static WorldInit listener = null;
 
 	//used to disable the plugin before it fully loads if it 
 	//cannot find any schematic files.
@@ -78,10 +77,6 @@ public class MonoCities extends JavaPlugin{
 			mongo.close();
 		}
 
-		
-		//check if we aren't being disabled before fully initializing
-		if (listener != null)
-			listener.stop();
 		
 		saveConfig();
 

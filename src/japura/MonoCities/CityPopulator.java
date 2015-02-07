@@ -40,6 +40,7 @@ public class CityPopulator extends BukkitRunnable{
 
 	//TODO: If there are no schematics, shut off the plugin.
 	HashMap<String,Schematic> schems = new HashMap<String,Schematic>();
+	String[] keySet;
 
 	public CityPopulator(JavaPlugin plugin) {
 		File folder = new File("plugins/MonoCities/schematics/");
@@ -67,19 +68,25 @@ public class CityPopulator extends BukkitRunnable{
 			if (tmp == null) continue;
 			tmp.setName(fileName);
 			schems.put(fileName,tmp);
-		}
+		}	
+		keySet = schems.keySet().toArray(new String[schems.keySet().size()]);
 		
 	}
 
 	int loadDistance = 7;
+	int parkSize = 3;
 
 	public void setLoadDistance(int distance) {
 		loadDistance = distance;
 	}
 
+	public void setParkSize(int size) {
+		parkSize = size;
+	}
+
 	public void run() {
 
-		MonoCities.log("running Chunk Update");
+		//MonoCities.log("running Chunk Update");
 
 		for (Player user : Bukkit.getOnlinePlayers()) {
 			Chunk theirChunk = user.getLocation().getChunk();
@@ -154,19 +161,31 @@ public class CityPopulator extends BukkitRunnable{
 		//otherwise, let's place a building.
 		//MonoCities.log("found valid chunk at " + chunk.getX() + "," + chunk.getZ());
 		
-		if (chunk.getX() % 4 == 0 && chunk.getZ() % 4 == 0) {
+		int mod = 3 + parkSize;
+		int X = chunk.getX();
+		int Z = chunk.getZ();
+		if (X < 0) X = X * -1;
+		if (Z < 0) Z = Z * -1;
+
+		if (chunk.getX() % mod == 0 && chunk.getZ() % mod == 0) {
 			//place 4way
 			//MonoCities.log("placing 4way");
 			MonoCities.recordNewBuilding("4way.schematic",chunk,seed);
 			placeBuilding("4way.schematic",chunk,rand);
-		} else if (chunk.getX() % 4 == 0) {
+		} else if (chunk.getX() % mod == 0) {
 			//MonoCities.log("placing a straight road");
 			MonoCities.recordNewBuilding("straightroad.schematic",chunk,seed);
 			placeBuilding("straightroad.schematic",chunk,rand);
-		}else if (chunk.getZ() % 4 == 0) {
+		}else if (chunk.getZ() % mod == 0) {
 			//MonoCities.log("placing a rotated road");
 			MonoCities.recordNewBuilding("straightroad.schematic",chunk,seed);
 			placeBuilding("rightroad.schematic",chunk,rand);
+		}else if (((Z % mod) > 1) && ((Z % mod) != (mod -1)) && 
+			  ((X % mod) > 1) && ((X % mod) != (mod -1))) {
+			String name = getRandomPark(rand);
+			//MonoCities.log("placing a park");
+			MonoCities.recordNewBuilding(name,chunk,seed);
+			placeBuilding(name,chunk,rand);
 		} else {
 			//place random building
 			//TODO rotate to curb?
@@ -180,14 +199,27 @@ public class CityPopulator extends BukkitRunnable{
 	
 	private String getRandomBuilding(Random rand) {
 		int building = Math.abs(rand.nextInt() % schems.size());
-		String[] keySet = schems.keySet().toArray(new String[schems.keySet().size()]);
 		
 		while (schems.get(keySet[building]).getName().equals("4way.schematic") || 
 				schems.get(keySet[building]).getName().equals("straightroad.schematic") || 
+				schems.get(keySet[building]).getName().startsWith("park") || 
 				schems.get(keySet[building]).getName().equals("rightroad.schematic")){
 			building = Math.abs(rand.nextInt() % schems.size());
 		}
 		return keySet[building];
+	}
+
+	private String getRandomPark(Random rand) {
+		int building = Math.abs(rand.nextInt() % schems.size());
+		
+		//TODO
+		//this is the worst park selector of freaking ever
+		//seriously, why do i even use this
+		while (!schems.get(keySet[building]).getName().startsWith("park")) {
+			building = Math.abs(rand.nextInt() % schems.size());
+		}
+		return keySet[building];
+
 	}
 	
 	private boolean checkFlat(Chunk chunk) {
@@ -354,8 +386,8 @@ public class CityPopulator extends BukkitRunnable{
 							popChest(tmp,rand);
 						}
 
-						if (type == 1 && tmp.getData() == 0) {
-							//replace smoothstone with stone bricks
+						if (type == 97) {
+							//replace stone brick monster eggs with stone bricks
 							tmp.setTypeId(98);
 						}
 

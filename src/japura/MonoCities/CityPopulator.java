@@ -32,8 +32,10 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventPriority;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.entity.Player;
 
-public class CityPopulator implements Listener{
+public class CityPopulator extends BukkitRunnable{
 
 
 	//TODO: If there are no schematics, shut off the plugin.
@@ -69,20 +71,49 @@ public class CityPopulator implements Listener{
 		
 	}
 
+	int loadDistance = 7;
+
+	public void setLoadDistance(int distance) {
+		loadDistance = distance;
+	}
+
+	public void run() {
+
+		MonoCities.log("running Chunk Update");
+
+		for (Player user : Bukkit.getOnlinePlayers()) {
+			Chunk theirChunk = user.getLocation().getChunk();
+			Chunk tmp;
+			for (int i = theirChunk.getX() - loadDistance;
+				i < theirChunk.getX() + loadDistance; i++) {
+				for (int j = theirChunk.getZ() - loadDistance;
+					j < theirChunk.getZ() + loadDistance; j++) {
+					tmp = Bukkit.getWorld("world").getChunkAt(i,j);
+					checkChunk(tmp);
+
+				}	
+			}
+			
+		}
+
+
+	}
+
+
 	//the chunks on each side of this chunk exist
 	//chunk corners might not
 	//@Override
 	//public void populate(World world, Random rand, Chunk chunk) {
-	@EventHandler
-	public void getChunkLoad(ChunkLoadEvent event) {
+	//@EventHandler
+	//public void getChunkLoad(ChunkLoadEvent event) {
 
-		Chunk chunk = event.getChunk();
+	public void checkChunk(Chunk chunk) {
 		World world = chunk.getWorld();
 		Random rand;
-
+		
 		//only load for world
 		//TODO read this from config
-		if (!world.getName().equals("World")) {
+		if (!world.getName().equalsIgnoreCase("world")) {
 			return;
 		}
 		if (MonoCities.wasChunkPopulated(chunk)) {
@@ -126,23 +157,23 @@ public class CityPopulator implements Listener{
 		if (chunk.getX() % 4 == 0 && chunk.getZ() % 4 == 0) {
 			//place 4way
 			//MonoCities.log("placing 4way");
-			placeBuilding("4way.schematic",chunk,rand);
 			MonoCities.recordNewBuilding("4way.schematic",chunk,seed);
+			placeBuilding("4way.schematic",chunk,rand);
 		} else if (chunk.getX() % 4 == 0) {
 			//MonoCities.log("placing a straight road");
-			placeBuilding("straightroad.schematic",chunk,rand);
 			MonoCities.recordNewBuilding("straightroad.schematic",chunk,seed);
+			placeBuilding("straightroad.schematic",chunk,rand);
 		}else if (chunk.getZ() % 4 == 0) {
 			//MonoCities.log("placing a rotated road");
-			placeBuilding("rightroad.schematic",chunk,rand);
 			MonoCities.recordNewBuilding("straightroad.schematic",chunk,seed);
+			placeBuilding("rightroad.schematic",chunk,rand);
 		} else {
 			//place random building
 			//TODO rotate to curb?
 			String name = getRandomBuilding(rand);
 			//MonoCities.log("placing a " + name);
-			placeBuilding(name,chunk,rand);
 			MonoCities.recordNewBuilding(name,chunk,seed);
+			placeBuilding(name,chunk,rand);
 		}
 		
 	}

@@ -66,8 +66,11 @@ public class MonoCities extends JavaPlugin{
 		//runs and succesfully runs CityPopulator
 		//(without CityPopulator disabling the plugin)
 		if (disabled) return;
+
+		pop.setLoadDistance(getConfig().getInt("load distance in chunks"));
+		int chunkRate = getConfig().getInt("chunk generate rate in ticks");
 		
-		getServer().getPluginManager().registerEvents(pop, this);
+		getServer().getScheduler().scheduleSyncRepeatingTask(this,pop,0,chunkRate);
 		log("MonoCities has been enabled");
 	}
 	
@@ -125,7 +128,6 @@ public class MonoCities extends JavaPlugin{
 		building.put("seed",seed);
 		building.put("type",name);
 		table.insert(building);
-
 	}
 
 	public static boolean wasChunkPopulated(Chunk myChunk) {

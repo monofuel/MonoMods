@@ -309,7 +309,6 @@ public class CityPopulator extends BukkitRunnable{
 				Material.LEATHER_LEGGINGS,
 				Material.LEATHER_BOOTS,
 				Material.DIAMOND,
-				Material.DIAMOND_BLOCK,
 				Material.OBSIDIAN,
 				Material.MELON_SEEDS,
 				Material.PUMPKIN_SEEDS,

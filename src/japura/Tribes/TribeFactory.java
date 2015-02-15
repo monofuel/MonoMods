@@ -28,7 +28,7 @@ public class TribeFactory {
 		name = name.toLowerCase();
 
 		Tribes.invalidateTribeNames();
-		Tribes.invalidatePlayer(name);
+		Tribes.invalidatePlayer(founder);
 
 		//check if it already exists
 		BasicDBObject query = new BasicDBObject();

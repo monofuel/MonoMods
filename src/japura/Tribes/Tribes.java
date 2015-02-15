@@ -687,7 +687,16 @@ public class Tribes extends JavaPlugin{
 			}
 			
 			TribeFactory.createNewTribe(name,sender.getName());
-			sender.sendMessage("Tribe " + name + " created");
+			Tribe newGroup = getPlayersTribe(user);
+			if (newGroup.getName().equals(name)) {
+
+				sender.sendMessage("Tribe " + name + " created");
+
+			} else {
+				sender.sendMessage("Error creating tribe");
+				log("error creating tribe " + name);
+
+			}
 			return true;
 			
 		} else if (args[0].equalsIgnoreCase("destroy")) {
@@ -958,8 +967,8 @@ public class Tribes extends JavaPlugin{
 	 */
 	public static Tribe getTribe(String name) {
 		Tribe cacheCheck = tribeCache.get(name.toLowerCase());
-		if (cacheCheck == null) {
-			log("cache misssed, loading " + name);
+		if (cacheCheck == null || cacheCheck.getName().equals("invalid tribe")) {
+			//log("cache missed, loading " + name);
 			cacheCheck = new Tribe(name.toLowerCase());
 			tribeCache.put(name.toLowerCase(),cacheCheck);
 		}
@@ -967,7 +976,7 @@ public class Tribes extends JavaPlugin{
 	}
 
 	public static void rmTribeCache(String name) {
-		tribeCache.remove(name);
+		tribeCache.remove(name.toLowerCase());
 	}
 	
 	public static DBCursor getTribes() {
@@ -994,7 +1003,7 @@ public class Tribes extends JavaPlugin{
 	private static HashMap<String,Tribe> playerCache = new HashMap<String,Tribe>();
 
 	public static void invalidatePlayer(String name) {
-		log("invalidating " + name + "'s cache");
+		//log("invalidating " + name + "'s cache");
 		playerCache.remove(name.toLowerCase());
 	}
 
@@ -1004,11 +1013,10 @@ public class Tribes extends JavaPlugin{
 
 		Tribe group = playerCache.get(name.toLowerCase());
 		if (group != null) return group;
-		log("missed player " + name + " in cache");
+		//log("missed player " + name + " in cache");
 
 		for (String tribeName : getTribeNames()) {
 			group = getTribe(tribeName);
-
 			if (group.hasPlayer(name)) {
 				log("adding " + name + " back to cache");
 				playerCache.put(name.toLowerCase(),group);

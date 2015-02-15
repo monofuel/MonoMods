@@ -339,6 +339,10 @@ public class Tribe {
 		Tribes.rmTribeCache(name);
 		Tribes.log("tribe " + name + " destroyed");
 		Tribes.invalidateTribeNames();
+		this.valid = false;
+
+		this.name = "invalid tribe";
+		this.leader = "invalid leader";
 	}
 	
 	public String getName() {

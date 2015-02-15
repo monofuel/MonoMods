@@ -10,6 +10,7 @@ package japura.MonoCities;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.Random;
 
 import java.net.UnknownHostException;
 
@@ -19,6 +20,7 @@ import org.bukkit.Chunk;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.entity.Player;
 
 import com.mongodb.*;
 
@@ -88,16 +90,39 @@ public class MonoCities extends JavaPlugin{
 		disabled = true;
 	}
 	
-	
+	public void regen(Player user) {
+		Chunk myChunk = user.getLocation().getChunk();
+		String chunkyString = myChunk.getWorld().getName();
+		chunkyString += "," + myChunk.getX();
+		chunkyString += "," + myChunk.getZ();
+
+		BasicDBObject query = new BasicDBObject();
+		query.put("location",chunkyString);
+
+		DBObject item = table.findOne(query);
+
+		String buildingType = (String) item.get("type");
+		long seed = (long) item.get("seed");
+		Random rand = new Random();
+		rand.setSeed(seed);
+		pop.placeBuilding(buildingType,myChunk,rand);
+	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("plugintemplate")) {
+		if (cmd.getName().equalsIgnoreCase("monocities")) {
 			if (args[0].equalsIgnoreCase("reload")) {
 				this.getServer().getPluginManager().disablePlugin(this);
 				this.getServer().getPluginManager().enablePlugin(this);
 				return true;
 			} else if (args[0].equalsIgnoreCase("unload")) {
 				this.getServer().getPluginManager().disablePlugin(this);
+				return true;
+			} else if (args[0].equalsIgnoreCase("regen")) {
+				if (sender instanceof Player) {
+					regen((Player)sender);
+				} else {
+					sender.sendMessage("cannot be used by console");
+				}
 				return true;
 			} else if (args[0].equalsIgnoreCase("load")) {
 				reloadConfig();

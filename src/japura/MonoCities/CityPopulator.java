@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
+import java.util.Stack;
 import java.io.File;
 
 import org.bukkit.Bukkit;
@@ -343,12 +344,25 @@ public class CityPopulator extends BukkitRunnable{
 		c.update();
 		
 	}
+
+	private final Material[] specialMaterials = {
+		Material.TORCH,
+		Material.LADDER,
+		Material.WOOD_DOOR,
+		Material.WOODEN_DOOR,
+		Material.BIRCH_DOOR,
+		Material.DARK_OAK_DOOR,
+		Material.IRON_DOOR,
+		Material.JUNGLE_DOOR,
+		Material.SPRUCE_DOOR,
+		Material.ACACIA_DOOR
+	};
 	
-	private void placeBuilding(String building, Chunk chunk,Random rand) {
+	public void placeBuilding(String building, Chunk chunk,Random rand) {
 		placeBuilding(schems.get(building),chunk,rand);
 	}
 	
-	private void placeBuilding(Schematic building, Chunk chunk,Random rand) {
+	public void placeBuilding(Schematic building, Chunk chunk,Random rand) {
 		float avg = getAverage(chunk);
 		//place foundation
 		//MonoCities.log("placing foundation");
@@ -364,7 +378,8 @@ public class CityPopulator extends BukkitRunnable{
 		//place schematic
 		boolean flip = true;
 
-		
+		Stack<int[]> specialBlocks = new Stack<int[]>();		
+
 		MonoBlock[][][] blocks = building.getBuilding();
 		for (int i = 0; i < building.getHeight(); i++) {
 			for (int j = 0; j < building.getLength(); j++) {
@@ -378,6 +393,15 @@ public class CityPopulator extends BukkitRunnable{
 						Block tmp = chunk.getBlock(k,(int)(avg + i - 3),j);
 						int type = blocks[k][j][i].getType();
 						if (type < 0) type += 256;
+						boolean special = false;
+						for (Material mat : specialMaterials) {
+							if (mat.getId() == type) {
+								specialBlocks.push(new int[]{k,j,i});
+								break;
+							}
+						}
+						if (special) continue;
+
 						tmp.setTypeId(type);
 						tmp.setData(blocks[k][j][i].getData());
 						if (type == 54){
@@ -410,6 +434,14 @@ public class CityPopulator extends BukkitRunnable{
 						}
 						int type = blocks[k][j][i].getType();
 						if (type < 0) type += 256;
+						boolean special = false;
+						for (Material mat : specialMaterials) {
+							if (mat.getId() == type) {
+								specialBlocks.push(new int[]{k,j,i});
+								break;
+							}
+						}
+						if (special) continue;
 						
 						tmp.setTypeId(type);
 						tmp.setData(blocks[k][j][i].getData());
@@ -430,6 +462,26 @@ public class CityPopulator extends BukkitRunnable{
 				}
 			}
 		}
+
+	while (!specialBlocks.isEmpty()) {
+		int[] loc = specialBlocks.pop();
+		int k = loc[0];
+		int j = loc[1];
+		int i = loc[2];
+		Block tmp;
+
+		if (building.getName().equals("4way.schematic") ||
+			building.getName().equals("straightroad.schematic") ||
+			building.getName().equals("rightroad.schematic")) {
+			tmp = chunk.getBlock(k,(int)(avg + i -3),j);
+		} else {
+			tmp = chunk.getBlock(k,(int)(avg + i + 2),j);
+		}
+		int type = blocks[k][j][i].getType();
+		if (type < 0) type += 256;
+		tmp.setTypeId(type);
+		tmp.setData(blocks[k][j][i].getData());
+	}
 		//MonoCities.log("placed building");
 	}
 

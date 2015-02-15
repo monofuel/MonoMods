@@ -680,7 +680,7 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("Spaces are not allowed in a tribe name");
 				return true;
 			}
-			String name = args[1];
+			String name = args[1].toLowerCase();
 			if (getTribe(name).isValid()) {
 				sender.sendMessage("Tribe already exists");
 				return true;

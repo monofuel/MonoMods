@@ -26,7 +26,7 @@ public class TribeDisbandRunner extends BukkitRunnable{
 		//60 seconds in a minute
 		//60 minutes in an hour
 		//24 hours in a day
-		timeDeltaInMillis = 1000 * 60 * 60 * 24 * plugin.getConfig().getInt("Days before disband");
+		timeDeltaInMillis = 1000 * 60 * 60 * 24 * (long) plugin.getConfig().getInt("Days before disband");
 		Tribes.log("Tribe Disband spawned");
 		
 	}
@@ -40,6 +40,7 @@ public class TribeDisbandRunner extends BukkitRunnable{
 			}
 			if (currentTime - (long) item.get("getLastLogTime") > timeDeltaInMillis) {
 				Tribes.log("Tribe " + (String) item.get("name") + " has exceeded the time since last login limit");
+				Tribes.log("current time: " + currentTime + " last log time: " + (long) item.get("getLastLogTime"));
 				Tribes.getTribe((String) item.get("name")).destroy();
 			}
 

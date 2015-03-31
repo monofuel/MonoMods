@@ -76,6 +76,7 @@ public class CityPopulator extends BukkitRunnable{
 
 	int loadDistance = 7;
 	int parkSize = 3;
+	int gennedChunks = 0;
 
 	public void setLoadDistance(int distance) {
 		loadDistance = distance;
@@ -88,6 +89,7 @@ public class CityPopulator extends BukkitRunnable{
 	public void run() {
 
 		//MonoCities.log("running Chunk Update");
+		ArrayList<Chunk> chunkList = new ArrayList<Chunk>();
 
 		for (Player user : Bukkit.getOnlinePlayers()) {
 			Chunk theirChunk = user.getLocation().getChunk();
@@ -97,13 +99,21 @@ public class CityPopulator extends BukkitRunnable{
 				for (int j = theirChunk.getZ() - loadDistance;
 					j < theirChunk.getZ() + loadDistance; j++) {
 					tmp = Bukkit.getWorld("world").getChunkAt(i,j);
-					checkChunk(tmp);
+					//checkChunk(tmp);
+					if (!chunkList.contains(tmp)) {
+						chunkList.add(tmp);
+					}
 
 				}	
 			}
-			
 		}
 
+		for (Chunk tmp : chunkList) {
+			checkChunk(tmp);
+			if (gennedChunks > 1) break;
+		}
+
+		gennedChunks = 0;
 
 	}
 
@@ -161,6 +171,7 @@ public class CityPopulator extends BukkitRunnable{
 		}
 		//otherwise, let's place a building.
 		//MonoCities.log("found valid chunk at " + chunk.getX() + "," + chunk.getZ());
+		gennedChunks++;
 		
 		int mod = 3 + parkSize;
 		int X = chunk.getX();
@@ -347,7 +358,6 @@ public class CityPopulator extends BukkitRunnable{
 
 	private final Material[] specialMaterials = {
 		Material.TORCH,
-		Material.LADDER,
 		Material.WOOD_DOOR,
 		Material.WOODEN_DOOR,
 		Material.BIRCH_DOOR,
@@ -397,6 +407,7 @@ public class CityPopulator extends BukkitRunnable{
 						for (Material mat : specialMaterials) {
 							if (mat.getId() == type) {
 								specialBlocks.push(new int[]{k,j,i});
+								special = true;
 								break;
 							}
 						}
@@ -438,6 +449,7 @@ public class CityPopulator extends BukkitRunnable{
 						for (Material mat : specialMaterials) {
 							if (mat.getId() == type) {
 								specialBlocks.push(new int[]{k,j,i});
+								special = true;
 								break;
 							}
 						}
@@ -462,7 +474,7 @@ public class CityPopulator extends BukkitRunnable{
 				}
 			}
 		}
-
+	/*TODO bukkit sucks so none of this works
 	while (!specialBlocks.isEmpty()) {
 		int[] loc = specialBlocks.pop();
 		int k = loc[0];
@@ -481,7 +493,8 @@ public class CityPopulator extends BukkitRunnable{
 		if (type < 0) type += 256;
 		tmp.setTypeId(type);
 		tmp.setData(blocks[k][j][i].getData());
-	}
+	}*/
+
 		//MonoCities.log("placed building");
 	}
 

@@ -19,7 +19,7 @@ public class TribeDisbandRunner extends BukkitRunnable{
 
 	private final JavaPlugin plugin;
 	long timeDeltaInMillis = 0;
-	
+
 	public TribeDisbandRunner(JavaPlugin plugin) {
 		this.plugin = plugin;
 		//1000 milliseconds in a second
@@ -28,14 +28,19 @@ public class TribeDisbandRunner extends BukkitRunnable{
 		//24 hours in a day
 		timeDeltaInMillis = 1000 * 60 * 60 * 24 * (long) plugin.getConfig().getInt("Days before disband");
 		Tribes.log("Tribe Disband spawned");
-		
+
 	}
-	
+
 	public void run() {
 		DBCursor currentTribes = Tribes.getTribes();
 		long currentTime = System.currentTimeMillis();
 		for (DBObject item : currentTribes) {
 			if ("safezone".equalsIgnoreCase((String) item.get("name"))) {
+				continue;
+			}
+			if ((long) item.get("getLastLogTime") <= 0) {
+				Tribes.log("Invalid last log time for " + item.get("name"));
+				Tribes.log("time was: " + item.get("getLastLogTime"));
 				continue;
 			}
 			if (currentTime - (long) item.get("getLastLogTime") > timeDeltaInMillis) {
@@ -46,5 +51,5 @@ public class TribeDisbandRunner extends BukkitRunnable{
 
 		}
 	}
-	
+
 }

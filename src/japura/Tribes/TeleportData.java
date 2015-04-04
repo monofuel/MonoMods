@@ -148,7 +148,7 @@ public class TeleportData {
 			user.sendMessage("teleporter was destroyed");
 			return;
 		}
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 3; i++) {
 			myloc = myloc.add(0,1,0);
 			if (myloc.getBlock().getType() != Material.AIR) {
 				user.sendMessage("teleporter is covered");

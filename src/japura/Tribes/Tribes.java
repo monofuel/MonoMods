@@ -556,6 +556,7 @@ public class Tribes extends JavaPlugin{
 			//TODO stub
 			//use paginator n shit
 		} else if (args[0].equalsIgnoreCase("put")) {
+			//TODO fix this
 			if (args.length != 3) {
 				sender.sendMessage("/tadmin put player tribe");
 				return true;
@@ -666,7 +667,7 @@ public class Tribes extends JavaPlugin{
 
 			if (group.isValid()) {
 				sender.sendMessage("you are already in a tribe. Please leave first");
-				if (user.equals(group.getLeader())) {
+				if (user.equalsIgnoreCase(group.getLeader())) {
 					sender.sendMessage("You will have to either disband or pass on leadership");
 				}
 				return true;
@@ -688,7 +689,7 @@ public class Tribes extends JavaPlugin{
 			
 			TribeFactory.createNewTribe(name,sender.getName());
 			Tribe newGroup = getPlayersTribe(user);
-			if (newGroup.getName().equals(name)) {
+			if (newGroup.getName().equalsIgnoreCase(name)) {
 
 				sender.sendMessage("Tribe " + name + " created");
 
@@ -710,12 +711,12 @@ public class Tribes extends JavaPlugin{
 			if (!group.isValid()) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
-			} else if (!user.equals(group.getLeader())) {
+			} else if (!user.equalsIgnoreCase(group.getLeader())) {
 				sender.sendMessage("You are not leader of that tribe");
 				return true;
 			}
 			
-			if (user.equals(group.getLeader())) {
+			if (user.equalsIgnoreCase(group.getLeader())) {
 				group.destroy();
 				sender.sendMessage("Your tribe has been destroyed");
 				return true;
@@ -740,7 +741,7 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 
-			if (user.equals(group.getLeader())) {
+			if (user.equalsIgnoreCase(group.getLeader())) {
 				group.invite(invited);
 				sender.sendMessage(invited + " invited successfully");
 
@@ -767,7 +768,7 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 
-			if (!user.equals(group.getLeader())) {
+			if (!user.equalsIgnoreCase(group.getLeader())) {
 				sender.sendMessage("you are not leader of your tribe");
 				return true;
 			}
@@ -788,7 +789,7 @@ public class Tribes extends JavaPlugin{
 			}
 			
 			if (group.isValid()) {
-				if (user.equals(group.getLeader())) {
+				if (user.equalsIgnoreCase(group.getLeader())) {
 					sender.sendMessage("You cannot leave without transfering leadership");
 					return true;
 				}
@@ -816,7 +817,7 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			
-			if (!user.equals(group.getLeader())) {
+			if (!user.equalsIgnoreCase(group.getLeader())) {
 				sender.sendMessage("You are not leader of this tribe");
 				return true;
 			}
@@ -857,16 +858,16 @@ public class Tribes extends JavaPlugin{
 				sender.sendMessage("You need to specify who to give leadership to");
 				return true;
 			}
-			String otherPlayer = args[1];
+			String otherPlayer = args[1].toLowerCase();
 			if (group == null) {
 				sender.sendMessage("You are not in a tribe");
 				return true;
 			}
-			if (otherPlayer == null) {
+			if (!group.hasPlayer(otherPlayer)) {
 				sender.sendMessage("They are not in your tribe");
 				return true;
 			}
-			if (user.equals(group.getLeader())) {
+			if (user.equalsIgnoreCase(group.getLeader())) {
 				group.setLeader(otherPlayer);
 				sender.sendMessage("leadership transfered");
 				//TODO send the other player a message that leadership is transferred

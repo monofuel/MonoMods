@@ -167,7 +167,7 @@ public class ZedCheckRunner extends BukkitRunnable{
 	}
 
 
-	private class ZedFinder extends Thread {
+	private static class ZedFinder extends Thread {
 		
 		Random rand = new Random();
 		ZedCheckRunner parent;

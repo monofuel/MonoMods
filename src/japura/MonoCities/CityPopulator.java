@@ -48,8 +48,18 @@ public class CityPopulator extends BukkitRunnable{
 		File[] listOfFiles = folder.listFiles();
 		if (listOfFiles == null) {
 			MonoCities.log("creating schematics directory");
-			folder.mkdirs();
-			return;
+			Bool result = folder.mkdirs();
+			if (result) {
+				MonoCities.log("Created schematics folder. please add schematics to plugins/MonoCities/schematics");
+				MonoCities.log("Disabling MonoCities");
+				Bukkit.getPluginManager().disablePlugin(plugin);
+				return;
+			} else {
+				//could not create folder properly
+				MonoCities.log("plugins/MonoCities/schematics folder not found, Disabling MonoCities");
+				Bukkit.getPluginManager().disablePlugin(plugin);
+				return;
+			}
 		}
 		MonoCities.log("found " + listOfFiles.length + " files");
 		//If there are no schematics, report this and exit.
@@ -285,7 +295,6 @@ public class CityPopulator extends BukkitRunnable{
 	Material[] chestLoot = new Material[] {
 				Material.COAL,
 				Material.CACTUS,
-				Material.INK_SACK,
 				Material.FLINT_AND_STEEL,
 				Material.APPLE,
 				Material.BOW,
@@ -337,12 +346,12 @@ public class CityPopulator extends BukkitRunnable{
 		Chest c = (Chest) item.getState();
 		Inventory inv = c.getInventory();
 		
-		int count = Math.abs(rand.nextInt()) % 6;
+		int count = rand.nextInt(6);
 		
 		
 		for (int i = 1; i < count; i++) {
-			int chance = Math.abs(rand.nextInt()) % chestLoot.length;
-			int amount = Math.abs(rand.nextInt()) % 5;
+			int chance = rand.nextInt(chestLoot.length);
+			int amount = rand.nextInt(5);
 			amount++;
 			ItemStack is = new ItemStack(chestLoot[chance],amount);
 			inv.addItem(is);

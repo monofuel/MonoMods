@@ -48,7 +48,7 @@ public class CityPopulator extends BukkitRunnable{
 		File[] listOfFiles = folder.listFiles();
 		if (listOfFiles == null) {
 			MonoCities.log("creating schematics directory");
-			Bool result = folder.mkdirs();
+			Boolean result = folder.mkdirs();
 			if (result) {
 				MonoCities.log("Created schematics folder. please add schematics to plugins/MonoCities/schematics");
 				MonoCities.log("Disabling MonoCities");

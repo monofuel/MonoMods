@@ -10,6 +10,7 @@ package japura.MonoLocks;
 
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -38,13 +39,24 @@ public class LockCreateListener implements Listener{
 			return;
 		}
 		
+		//check if it is near a chest or a door,
+		//and if it is locked.
+			
+		Block chest = MonoLocks.findChest(sign);
+		Block door = MonoLocks.findDoor(sign);
+		Sign[] signs = new Sign[0];
+		
+		if (chest != null) {
+			signs = MonoLocks.getSigns(chest);
+		} else if (door != null) {
+			signs = MonoLocks.getSigns(door);
+		}
+			
+			
+		Player[] players = MonoLocks.getAllowed(signs);
 		String[] lines = e.getLines();
-		if (lines[0].toLowerCase().contains("[private]")) {
+		if (lines[0].toLowerCase().contains("[private]") && players.length == 0) {
 			//this is a lock sign
-			
-			
-			Block chest = MonoLocks.findChest(e.getBlock());
-			Block door = MonoLocks.findDoor(e.getBlock());
 			
 			//if there is only a chest or a door nearby
 			if (chest != null ^ door != null) {
@@ -91,27 +103,12 @@ public class LockCreateListener implements Listener{
 			}
 			
 		} else {
-			//check if it is near a chest or a door,
-			//and if it is locked.
-			
-			Block chest = MonoLocks.findChest(sign);
-			Block door = MonoLocks.findDoor(sign);
-			Sign[] signs = new Sign[0];
-			
-			if (chest != null) {
-				signs = MonoLocks.getSigns(chest);
-			} else if (door != null) {
-				signs = MonoLocks.getSigns(door);
-			}
-			
-			
-			Player[] players = MonoLocks.getAllowed(signs);
 			
 			//if players is empty, then there must be
 			//no other locks on this chest.
 			if (players.length == 0) return;
 			
-			
+			if (!Arrays.asList(players).contains(e.getPlayer())) return;
 			sign.setType(Material.WALL_SIGN);
 			BlockFace dir = MonoLocks.getDirection(sign);
 			

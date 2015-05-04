@@ -85,11 +85,10 @@ public class CityPopulator extends BukkitRunnable{
 	public void setParkSize(int size) {
 		parkSize = size;
 	}
-
+	Stack<Chunk> chunkList = new Stack<Chunk>();
 	public void run() {
 
 		//MonoCities.log("running Chunk Update");
-		ArrayList<Chunk> chunkList = new ArrayList<Chunk>();
 
 		for (Player user : Bukkit.getOnlinePlayers()) {
 			Chunk theirChunk = user.getLocation().getChunk();
@@ -100,20 +99,15 @@ public class CityPopulator extends BukkitRunnable{
 					j < theirChunk.getZ() + loadDistance; j++) {
 					tmp = Bukkit.getWorld("world").getChunkAt(i,j);
 					//checkChunk(tmp);
-					if (!chunkList.contains(tmp)) {
+					if (!chunkList.contains(tmp) && !MonoCities.wasChunkPopulated(tmp)) {
 						chunkList.add(tmp);
 					}
-
 				}	
 			}
 		}
-
-		for (Chunk tmp : chunkList) {
-			checkChunk(tmp);
-			if (gennedChunks > 1) break;
+		if (chunkList.size() > 0) {
+			checkChunk(chunkList.pop());
 		}
-
-		gennedChunks = 0;
 
 	}
 
@@ -290,6 +284,8 @@ public class CityPopulator extends BukkitRunnable{
 	
 	Material[] chestLoot = new Material[] {
 				Material.COAL,
+				Material.CACTUS,
+				Material.INK_SACK,
 				Material.FLINT_AND_STEEL,
 				Material.APPLE,
 				Material.BOW,

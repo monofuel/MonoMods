@@ -16,6 +16,8 @@ monocities torches/doors popping off (general issue with worldedit too)
 monolocks should say in chat if successful
 monolock doors can be avoided by spamming
 
+donors can choose colored name
+
 vote rewards
 
 selective inventory restore on death should be

@@ -31,13 +31,13 @@ public class LoginListener implements Listener {
 	}
 	
 	@EventHandler
-	public void PlayerLogin(PlayerJoinEvent user) {
+	public void playerLogin(PlayerJoinEvent user) {
 		String motd = plugin.getConfig().getString("MOTD");
 		user.getPlayer().sendMessage(motd);	
 
 	}
 
-	public void TimestampLogin(PlayerLoginEvent event) {
+	public void timestampLogin(PlayerLoginEvent event) {
                 String user = event.getPlayer().getName();
                 Tribe group = Tribes.getPlayersTribe(user);
                 if (group == null) return;

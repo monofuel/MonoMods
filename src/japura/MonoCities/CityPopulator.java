@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.io.File;
 
 import org.bukkit.Bukkit;
@@ -61,6 +63,7 @@ public class CityPopulator extends BukkitRunnable{
 				return;
 			}
 		}
+		
 		MonoCities.log("found " + listOfFiles.length + " files");
 		//If there are no schematics, report this and exit.
 		if (listOfFiles.length == 0) {
@@ -68,6 +71,7 @@ public class CityPopulator extends BukkitRunnable{
 			Bukkit.getPluginManager().disablePlugin(plugin);
 			return;
 		}
+		
 		//load all the schematics	
 		for (File item : listOfFiles) {
 			String fileName = item.getName();
@@ -82,11 +86,14 @@ public class CityPopulator extends BukkitRunnable{
 		}	
 		keySet = schems.keySet().toArray(new String[schems.keySet().size()]);
 		
+		//add database chunk runner
+		plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new checkChunksInDB(), 0, 20);
+		
+		
 	}
 
 	int loadDistance = 7;
 	int parkSize = 3;
-	int gennedChunks = 0;
 
 	public void setLoadDistance(int distance) {
 		loadDistance = distance;
@@ -95,30 +102,39 @@ public class CityPopulator extends BukkitRunnable{
 	public void setParkSize(int size) {
 		parkSize = size;
 	}
-	Stack<Chunk> chunkList = new Stack<Chunk>();
+	
+	BlockingQueue<Chunk> chunkList = new ArrayBlockingQueue<Chunk>(50);
+	
 	public void run() {
 
-		//MonoCities.log("running Chunk Update");
-
-		for (Player user : Bukkit.getOnlinePlayers()) {
-			Chunk theirChunk = user.getLocation().getChunk();
-			Chunk tmp;
-			for (int i = theirChunk.getX() - loadDistance;
-				i < theirChunk.getX() + loadDistance; i++) {
-				for (int j = theirChunk.getZ() - loadDistance;
-					j < theirChunk.getZ() + loadDistance; j++) {
-					tmp = Bukkit.getWorld("world").getChunkAt(i,j);
-					//checkChunk(tmp);
-					if (!chunkList.contains(tmp) && !MonoCities.wasChunkPopulated(tmp)) {
-						chunkList.add(tmp);
-					}
-				}	
+		if (chunkList.size() > 0) {
+			try {
+				checkChunk(chunkList.take());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-		if (chunkList.size() > 0) {
-			checkChunk(chunkList.pop());
-		}
 
+	}
+	
+	public class checkChunksInDB extends BukkitRunnable {
+		public void run() {
+			for (Player user : Bukkit.getOnlinePlayers()) {
+				Chunk theirChunk = user.getLocation().getChunk();
+				Chunk tmp;
+				for (int i = theirChunk.getX() - loadDistance;
+					i < theirChunk.getX() + loadDistance; i++) {
+					for (int j = theirChunk.getZ() - loadDistance;
+						j < theirChunk.getZ() + loadDistance; j++) {
+						tmp = Bukkit.getWorld("world").getChunkAt(i,j);
+						if (!chunkList.contains(tmp) && !MonoCities.wasChunkPopulated(tmp)) {
+							chunkList.add(tmp);
+						}
+					}	
+				}
+			}
+		}
 	}
 
 
@@ -175,7 +191,6 @@ public class CityPopulator extends BukkitRunnable{
 		}
 		//otherwise, let's place a building.
 		//MonoCities.log("found valid chunk at " + chunk.getX() + "," + chunk.getZ());
-		gennedChunks++;
 		
 		int mod = 3 + parkSize;
 		int X = chunk.getX();

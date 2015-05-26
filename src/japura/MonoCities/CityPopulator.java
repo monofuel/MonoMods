@@ -44,8 +44,9 @@ public class CityPopulator extends BukkitRunnable{
 	//TODO: If there are no schematics, shut off the plugin.
 	HashMap<String,Schematic> schems = new HashMap<String,Schematic>();
 	String[] keySet;
-
+	JavaPlugin plugin = null;
 	public CityPopulator(JavaPlugin plugin) {
+		this.plugin = plugin;
 		File folder = new File("plugins/MonoCities/schematics/");
 		File[] listOfFiles = folder.listFiles();
 		if (listOfFiles == null) {
@@ -87,7 +88,7 @@ public class CityPopulator extends BukkitRunnable{
 		keySet = schems.keySet().toArray(new String[schems.keySet().size()]);
 		
 		//add database chunk runner
-		plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new checkChunksInDB(), 0, 20);
+		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new checkChunksInDB(), 0, 20);
 		
 		
 	}
@@ -103,7 +104,7 @@ public class CityPopulator extends BukkitRunnable{
 		parkSize = size;
 	}
 	
-	BlockingQueue<Chunk> chunkList = new ArrayBlockingQueue<Chunk>(50);
+	BlockingQueue<Chunk> chunkList = new ArrayBlockingQueue<Chunk>(500);
 	
 	public void run() {
 
@@ -111,8 +112,7 @@ public class CityPopulator extends BukkitRunnable{
 			try {
 				checkChunk(chunkList.take());
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 
@@ -122,15 +122,19 @@ public class CityPopulator extends BukkitRunnable{
 		public void run() {
 			for (Player user : Bukkit.getOnlinePlayers()) {
 				Chunk theirChunk = user.getLocation().getChunk();
-				Chunk tmp;
 				for (int i = theirChunk.getX() - loadDistance;
 					i < theirChunk.getX() + loadDistance; i++) {
 					for (int j = theirChunk.getZ() - loadDistance;
 						j < theirChunk.getZ() + loadDistance; j++) {
-						tmp = Bukkit.getWorld("world").getChunkAt(i,j);
-						if (!chunkList.contains(tmp) && !MonoCities.wasChunkPopulated(tmp)) {
-							chunkList.add(tmp);
-						}
+						final Chunk tmp = Bukkit.getWorld("world").getChunkAt(i,j);
+						new BukkitRunnable() {
+							@Override
+							public void run() {
+								if (!chunkList.contains(tmp) && !MonoCities.wasChunkPopulated(tmp)) {
+									chunkList.add(tmp);
+								}
+							}
+						}.runTaskAsynchronously(plugin);
 					}	
 				}
 			}

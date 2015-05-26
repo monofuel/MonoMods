@@ -11,6 +11,7 @@ package japura.MonoCities;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.Random;
+import java.util.HashMap;
 
 import java.net.UnknownHostException;
 
@@ -37,6 +38,8 @@ public class MonoCities extends JavaPlugin{
 	//used to disable the plugin before it fully loads if it 
 	//cannot find any schematic files.
 	private boolean disabled = true;
+
+	
 
 	public void onEnable() {
 
@@ -155,6 +158,8 @@ public class MonoCities extends JavaPlugin{
 		table.insert(building);
 	}
 
+	static HashMap<String,Boolean> chunkCache = new HashMap<String,Boolean>();
+
 	public static boolean wasChunkPopulated(Chunk myChunk) {
 		String chunkyString = myChunk.getWorld().getName();
 		chunkyString += "," + myChunk.getX();
@@ -163,10 +168,13 @@ public class MonoCities extends JavaPlugin{
 		BasicDBObject query = new BasicDBObject();
 		query.put("location",chunkyString);
 
+		if (chunkCache.containsKey(chunkyString)) return true;
+
 		DBObject chunk = table.findOne(query);
 		if (chunk == null) {
 			return false;
 		} else {
+			chunkCache.put(chunkyString,true);
 			return true;
 		}
 	}

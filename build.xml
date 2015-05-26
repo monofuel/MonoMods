@@ -27,7 +27,7 @@
 	<target name="build" depends="init">
 		<javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" fork="yes" debug="true" >
 			<classpath refid="compile.classpath"/>
-			<compilerarg value="-Xlint"/>
+			<!--<compilerarg value="-Xlint"/>-->
 		</javac>
 	</target>
 
@@ -174,7 +174,7 @@
 
 
 	<!--<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,docs">-->
-	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes,docs">
+	<target name="main" depends="build,MonoBugs,MonoChat,MonoCities,MonoLocks,MonoMobs,MonoPerms,NoWither,Tribes">
 		<description> Main target</description>
 	</target>
 

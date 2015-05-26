@@ -3,4 +3,4 @@ mongo port: 27017
 mongo database: MonoMods
 mongo table: MonoCities
 load distance in chunks: 5
-chunk generate rate in ticks: 200
+chunk generate rate in ticks: 5

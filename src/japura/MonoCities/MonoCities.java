@@ -10,6 +10,7 @@ package japura.MonoCities;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.HashMap;
 import java.util.Random;
 import java.net.UnknownHostException;
 
@@ -155,8 +156,13 @@ public class MonoCities extends JavaPlugin{
 			table.insert(building);
 		});
 	}
+	
+	HashMap<Chunk,Boolean> chunkCache = new HashMap<Chunk,Boolean>();
 
 	public boolean wasChunkPopulated(Chunk myChunk) {
+		if (chunkCache.containsKey(myChunk))
+			return chunkCache.get(myChunk);
+		
 		String chunkyString = myChunk.getWorld().getName();
 		chunkyString += "," + myChunk.getX();
 		chunkyString += "," + myChunk.getZ();
@@ -165,9 +171,12 @@ public class MonoCities extends JavaPlugin{
 		query.put("location",chunkyString);
 
 		DBObject chunk = table.findOne(query);
+		
 		if (chunk == null) {
+			chunkCache.put(myChunk, false);
 			return false;
 		} else {
+			chunkCache.put(myChunk, true);
 			return true;
 		}
 	}

@@ -55,7 +55,8 @@ public class LockCreateListener implements Listener{
 			
 		Player[] players = MonoLocks.getAllowed(signs);
 		String[] lines = e.getLines();
-		if (lines[0].toLowerCase().contains("[private]") && players.length == 0) {
+		if ((lines[0].toLowerCase().contains("[private]")
+				|| lines[0].toLowerCase().contains("private")) && players.length == 0) {
 			//this is a lock sign
 			
 			//if there is only a chest or a door nearby

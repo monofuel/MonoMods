@@ -86,7 +86,7 @@ public class Tribes extends JavaPlugin{
 		//protector checks all emerald blocks
 		//and starts listeners
 		protector = new TribeProtect(this);
-		disbander = new TribeDisbandRunner(this);
+		//disbander = new TribeDisbandRunner(this);
 		//TODO listener is not actually set to run?
 		//there's a method in it for removing diamonds that don't exist anymore
 		teleportListener = new TribeTeleportListener(this);

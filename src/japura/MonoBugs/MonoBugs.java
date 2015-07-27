@@ -172,9 +172,13 @@ public class MonoBugs extends JavaPlugin{
 		bugReport.put("issue",error);
 		bugReport.put("status","unresolved");
 		bugReport.put("createdDate",new Date());
-		table.insert(bugReport);
-
-		sender.sendMessage("Bug reported successfully");
+		
+		AsyncTask(() -> {
+			table.insert(bugReport);
+			SyncTask(() ->
+				sender.sendMessage("Bug reported successfully")
+			);
+		});
 		return;
 	}
 	
@@ -193,36 +197,47 @@ public class MonoBugs extends JavaPlugin{
 			return false;
 		}
 
-		//query all of our user's bug reports
-		BasicDBObject query = new BasicDBObject();
-		query.put("user",sender.getName());
-		DBCursor cursor = table.find(query);
+		final int MY_PAGE = myPage; //appease the java 8 lambda gods
+		
+		final String USERNAME = sender.getName();
+		
+		AsyncTask(() -> {
+			//query all of our user's bug reports
+			BasicDBObject query = new BasicDBObject();
+			query.put("user",USERNAME);
+			DBCursor cursor = table.find(query);
 
-		//if there are none to show..
-		if (cursor.count() == 0) {
-			sender.sendMessage("there are no reports to show");
-			return true;
-		}
-		//otherwise, list them all together separated by newlines.
-		String userReports = "";
-
-		while (cursor.hasNext()) {
-			DBObject element = cursor.next();
-			userReports += "ID: " + element.get("bugID") + " | " + element.get("status") + " | " + element.get("issue") + " | date: " + element.get("createdDate");
-			if (element.containsField("reason")) {
-				userReports += " | reason: " + element.get("reason");
+			//if there are none to show..
+			if (cursor.count() == 0) {
+				SyncTask(
+					() -> sender.sendMessage("there are no reports to show")
+				);
+				return;
 			}
-			userReports += "\n";
-		}
+			//otherwise, list them all together separated by newlines.
+			String userReports = "";
 
-		//divy the report into pages and get the desired page
-		ChatPage page = ChatPaginator.paginate(userReports,myPage);
+			while (cursor.hasNext()) {
+				DBObject element = cursor.next();
+				userReports += "ID: " + element.get("bugID") + " | " + element.get("status") + " | " + element.get("issue") + " | date: " + element.get("createdDate");
+				if (element.containsField("reason")) {
+					userReports += " | reason: " + element.get("reason");
+				}
+				userReports += "\n";
+			}
 
-		//send each line of our page to the user
-		sender.sendMessage("Page " + page.getPageNumber() + " of " + page.getTotalPages() + " for reports:");	
-		for (String line : page.getLines()) {
-			sender.sendMessage(line);
-		}
+			final String USER_REPORTS = userReports;
+			SyncTask(() -> {
+				//divy the report into pages and get the desired page
+				ChatPage page = ChatPaginator.paginate(USER_REPORTS,MY_PAGE);
+
+				//send each line of our page to the user
+				sender.sendMessage("Page " + page.getPageNumber() + " of " + page.getTotalPages() + " for reports:");	
+				for (String line : page.getLines()) {
+					sender.sendMessage(line);
+				}
+			});
+		});
 		
 		return true;
 	}
@@ -240,25 +255,32 @@ public class MonoBugs extends JavaPlugin{
 		} else if (args.length > CMD_ARGS) {
 			return false;
 		}
+		final int MY_PAGE = myPage;
+		
+		AsyncTask(() -> {
+			String userReports = "unresolved reports:\n";
 
-		String userReports = "unresolved reports:\n";
+			BasicDBObject query = new BasicDBObject();
+			query.put("status","unresolved");
 
-		BasicDBObject query = new BasicDBObject();
-		query.put("status","unresolved");
+			DBCursor cursor = table.find(query);
 
-		DBCursor cursor = table.find(query);
+			while (cursor.hasNext()) {
+				DBObject element = cursor.next();
+				//TODO should probably use a stringbuilder? depends if you believe in them
+				userReports += "ID: " + element.get("bugID") + " | user: " + element.get("user") + " | issue: " +  element.get("issue") + " | date: " + element.get("createdDate") + "\n";
+			}
+		
+			final String USER_REPORTS = userReports;
+			SyncTask(() -> {
+				ChatPage page = ChatPaginator.paginate(USER_REPORTS,MY_PAGE);
 
-		while (cursor.hasNext()) {
-			DBObject element = cursor.next();
-			//TODO should probably use a stringbuilder? depends if you believe in them
-			userReports += "ID: " + element.get("bugID") + " | user: " + element.get("user") + " | issue: " +  element.get("issue") + " | date: " + element.get("createdDate") + "\n";
-		}
-	
-		ChatPage page = ChatPaginator.paginate(userReports,myPage);
-
-		for (String line : page.getLines()) {
-			sender.sendMessage(line);
-		}
+				for (String line : page.getLines()) {
+					sender.sendMessage(line);
+				}
+			});
+		});
+		
 
 		return true;
 	}
@@ -271,8 +293,6 @@ public class MonoBugs extends JavaPlugin{
 			sender.sendMessage("Syntax: /bug fixed index reason");
 		}
 		update("fixed",sender,args);
-		//TODO make this message helpful
-		sender.sendMessage("success");
 		return;
 	}
 	//TODO Javadocs stuff
@@ -282,8 +302,6 @@ public class MonoBugs extends JavaPlugin{
 			sender.sendMessage("Syntax: /bug closed index reason");
 		}
 		update("closed",sender,args);
-		//TODO make this helpful
-		sender.sendMessage("success");
 		return;
 	}
 	//TODO Javadocs stuff
@@ -293,8 +311,6 @@ public class MonoBugs extends JavaPlugin{
 			sender.sendMessage("Syntax: /bug spam index reason");
 		}
 		update("spam",sender,args);
-		//TODO make this helpful
-		sender.sendMessage("success");
 		return;
 	}
 	
@@ -333,11 +349,31 @@ public class MonoBugs extends JavaPlugin{
 			if (result.length() > 0) {
 				myBug.put("reason",result.toString());
 			}
-			table.save(myBug);
+			AsyncTask(() -> {
+				table.save(myBug);
+				
+				SyncTask(() ->
+					sender.sendMessage("success")
+				);
+			});
 
 
 		}
 		
+	}
+	
+	/**
+	 *  Asynchronous runnable task helper
+	 */
+	private void AsyncTask(Runnable run) {
+		getServer().getScheduler().runTaskAsynchronously(this, run);
+	}
+	
+	/**
+	 *  Runnable task helper
+	 */
+	private void SyncTask(Runnable run) {
+		getServer().getScheduler().runTask(this, run);
 	}
 	
 }

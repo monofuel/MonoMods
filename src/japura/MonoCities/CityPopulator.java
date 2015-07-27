@@ -132,13 +132,13 @@ public class CityPopulator extends BukkitRunnable{
 						j < theirChunk.getZ() + loadDistance; j++) {
 						tmp = Bukkit.getWorld("world").getChunkAt(i,j);
 						final Chunk CHECK = tmp;
-						if (chunkList.size() < 49) {
-							plugin.AsyncTask(() -> {
-								if (!chunkList.contains(CHECK) && !plugin.wasChunkPopulated(CHECK)) {
+						plugin.AsyncTask(() -> {
+							try {
+								if (chunkList.size() < 49 && !chunkList.contains(CHECK) && !plugin.wasChunkPopulated(CHECK)) {
 									chunkList.add(CHECK);
 								}
-							});
-						}
+							} catch (Exception e) {}
+						});
 					}	
 				}
 			}

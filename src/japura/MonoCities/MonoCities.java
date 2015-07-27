@@ -11,7 +11,6 @@ package japura.MonoCities;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.Random;
-
 import java.net.UnknownHostException;
 
 import org.bukkit.Bukkit;
@@ -143,19 +142,21 @@ public class MonoCities extends JavaPlugin{
 	}
 
 
-	public static void recordNewBuilding(String name, Chunk myChunk, long seed) {
-		String chunkyString = myChunk.getWorld().getName();
-		chunkyString += "," + myChunk.getX();
-		chunkyString += "," + myChunk.getZ();
+	public void recordNewBuilding(String name, Chunk myChunk, long seed) {
+		AsyncTask(() -> {
+			String chunkyString = myChunk.getWorld().getName();
+			chunkyString += "," + myChunk.getX();
+			chunkyString += "," + myChunk.getZ();
 
-		BasicDBObject building = new BasicDBObject();
-		building.put("location",chunkyString);
-		building.put("seed",seed);
-		building.put("type",name);
-		table.insert(building);
+			BasicDBObject building = new BasicDBObject();
+			building.put("location",chunkyString);
+			building.put("seed",seed);
+			building.put("type",name);
+			table.insert(building);
+		});
 	}
 
-	public static boolean wasChunkPopulated(Chunk myChunk) {
+	public boolean wasChunkPopulated(Chunk myChunk) {
 		String chunkyString = myChunk.getWorld().getName();
 		chunkyString += "," + myChunk.getX();
 		chunkyString += "," + myChunk.getZ();
@@ -187,5 +188,19 @@ public class MonoCities extends JavaPlugin{
 
 	public static Logger getCitiesLogger() {
 		return citiesLogger;
+	}
+	
+	/**
+	 *  Asynchronous runnable task helper
+	 */
+	protected void AsyncTask(Runnable run) {
+		getServer().getScheduler().runTaskAsynchronously(this, run);
+	}
+	
+	/**
+	 *  Runnable task helper
+	 */
+	protected void SyncTask(Runnable run) {
+		getServer().getScheduler().runTask(this, run);
 	}
 }

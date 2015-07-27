@@ -44,8 +44,11 @@ public class CityPopulator extends BukkitRunnable{
 	//TODO: If there are no schematics, shut off the plugin.
 	HashMap<String,Schematic> schems = new HashMap<String,Schematic>();
 	String[] keySet;
-
-	public CityPopulator(JavaPlugin plugin) {
+	MonoCities plugin;
+	
+	public CityPopulator(MonoCities plugin) {
+		this.plugin = plugin;
+		
 		File folder = new File("plugins/MonoCities/schematics/");
 		File[] listOfFiles = folder.listFiles();
 		if (listOfFiles == null) {
@@ -87,7 +90,7 @@ public class CityPopulator extends BukkitRunnable{
 		keySet = schems.keySet().toArray(new String[schems.keySet().size()]);
 		
 		//add database chunk runner
-		plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new checkChunksInDB(), 0, 20);
+		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new checkChunksInDB(), 0, 20);
 		
 		
 	}
@@ -128,9 +131,12 @@ public class CityPopulator extends BukkitRunnable{
 					for (int j = theirChunk.getZ() - loadDistance;
 						j < theirChunk.getZ() + loadDistance; j++) {
 						tmp = Bukkit.getWorld("world").getChunkAt(i,j);
-						if (!chunkList.contains(tmp) && !MonoCities.wasChunkPopulated(tmp)) {
-							chunkList.add(tmp);
-						}
+						final Chunk CHECK = tmp;
+						plugin.AsyncTask(() -> {
+							if (!chunkList.contains(CHECK) && !plugin.wasChunkPopulated(CHECK)) {
+								chunkList.add(CHECK);
+							}
+						});
 					}	
 				}
 			}
@@ -154,7 +160,7 @@ public class CityPopulator extends BukkitRunnable{
 		if (!world.getName().equalsIgnoreCase("world")) {
 			return;
 		}
-		if (MonoCities.wasChunkPopulated(chunk)) {
+		if (plugin.wasChunkPopulated(chunk)) {
 			return;
 		}
 
@@ -186,7 +192,7 @@ public class CityPopulator extends BukkitRunnable{
 		
 		//check if it's in good biomes and flat
 		if (good < 4 && !checkFlat(chunk)) {
-			MonoCities.recordNewBuilding("invalid",chunk,seed);
+			plugin.recordNewBuilding("invalid",chunk,seed);
 			return;
 		}
 		//otherwise, let's place a building.
@@ -201,28 +207,28 @@ public class CityPopulator extends BukkitRunnable{
 		if (chunk.getX() % mod == 0 && chunk.getZ() % mod == 0) {
 			//place 4way
 			//MonoCities.log("placing 4way");
-			MonoCities.recordNewBuilding("4way.schematic",chunk,seed);
+			plugin.recordNewBuilding("4way.schematic",chunk,seed);
 			placeBuilding("4way.schematic",chunk,rand);
 		} else if (chunk.getX() % mod == 0) {
 			//MonoCities.log("placing a straight road");
-			MonoCities.recordNewBuilding("straightroad.schematic",chunk,seed);
+			plugin.recordNewBuilding("straightroad.schematic",chunk,seed);
 			placeBuilding("straightroad.schematic",chunk,rand);
 		}else if (chunk.getZ() % mod == 0) {
 			//MonoCities.log("placing a rotated road");
-			MonoCities.recordNewBuilding("straightroad.schematic",chunk,seed);
+			plugin.recordNewBuilding("straightroad.schematic",chunk,seed);
 			placeBuilding("rightroad.schematic",chunk,rand);
 		}else if (((Z % mod) > 1) && ((Z % mod) != (mod -1)) && 
 			  ((X % mod) > 1) && ((X % mod) != (mod -1))) {
 			String name = getRandomPark(rand);
 			//MonoCities.log("placing a park");
-			MonoCities.recordNewBuilding(name,chunk,seed);
+			plugin.recordNewBuilding(name,chunk,seed);
 			placeBuilding(name,chunk,rand);
 		} else {
 			//place random building
 			//TODO rotate to curb?
 			String name = getRandomBuilding(rand);
 			//MonoCities.log("placing a " + name);
-			MonoCities.recordNewBuilding(name,chunk,seed);
+			plugin.recordNewBuilding(name,chunk,seed);
 			placeBuilding(name,chunk,rand);
 		}
 		

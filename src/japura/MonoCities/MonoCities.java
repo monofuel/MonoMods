@@ -160,7 +160,7 @@ public class MonoCities extends JavaPlugin{
 	HashMap<Chunk,Boolean> chunkCache = new HashMap<Chunk,Boolean>();
 
 	public boolean wasChunkPopulated(Chunk myChunk) {
-		if (chunkCache.containsKey(myChunk))
+		if (chunkCache.containsKey(myChunk) && chunkCache.get(myChunk))
 			return chunkCache.get(myChunk);
 		
 		String chunkyString = myChunk.getWorld().getName();

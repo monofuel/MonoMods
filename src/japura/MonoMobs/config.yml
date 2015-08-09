@@ -1,4 +1,6 @@
-world: world
+world:
+  - world
+  - cityworld
 threads: 4
 zombie cap: 2000
 zed per player: 50

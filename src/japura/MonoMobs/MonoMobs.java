@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
@@ -33,11 +34,18 @@ public class MonoMobs extends JavaPlugin{
 		
 		long tickTime = getConfig().getLong("zed spawn tick offset");
 		
-		zedChecker = new ZedCheckRunner(this);
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this,zedChecker,tickTime,tickTime);
+		for(String worldName : (List<String>) getConfig().getList("worlds")) {
+			World world = Bukkit.getWorld(worldName);
+			
+			zedChecker = new ZedCheckRunner(this,world);
+			Bukkit.getScheduler().scheduleSyncRepeatingTask(this,zedChecker,tickTime,tickTime);
+			
+			log("MonoMobs has been enabled");
+			log("MonoMobs is loaded for world: " + worldName);
+		}
+		
 		
 		log("MonoMobs has been enabled");
-		log("MonoMobs is loaded for world: " + getConfig().get("world"));
 	}
 	
 	public void onDisable() {

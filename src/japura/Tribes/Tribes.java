@@ -97,7 +97,7 @@ public class Tribes extends JavaPlugin{
 
 		//TODO double check the disband stuff
 		if (getConfig().getBoolean("Disband after time")) {
-			Bukkit.getScheduler().scheduleSyncRepeatingTask(this,disbander,0,2400);
+			//Bukkit.getScheduler().scheduleSyncRepeatingTask(this,disbander,0,2400);
 			log("Tribes will disband after " + 1000 * 60 * 60 * 24 * getConfig().getInt("Days before disband"));
 		} else {
 			log("Tribes will be lasting forever");

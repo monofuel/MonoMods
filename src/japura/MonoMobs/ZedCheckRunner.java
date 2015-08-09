@@ -32,6 +32,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
 public class ZedCheckRunner extends BukkitRunnable{
@@ -42,7 +43,8 @@ public class ZedCheckRunner extends BukkitRunnable{
 	//ZedFinder finder = null;
 	//private ZedFinder[] finders;
 	
-	public ZedCheckRunner(JavaPlugin plugin) {
+	public ZedCheckRunner(JavaPlugin plugin,World world) {
+		this.world = world;
 		this.plugin = plugin;
 		loc = new ConcurrentLinkedQueue<Location>();
 		adds = new ConcurrentLinkedQueue<Player>();
@@ -75,14 +77,15 @@ public class ZedCheckRunner extends BukkitRunnable{
 	long tickLength;
 	long maxLight;
 	long lastTime;
+	World world;
 	
 	public void run() {
 		//MonoMobs.log("doing zedCheck on world");
 		//TODO update variables only on reload or load and not every tick
 		
 		//only spawn at night
-		if (Bukkit.getWorld(plugin.getConfig().getString("world")).getTime() < 13187 &&
-				Bukkit.getWorld(plugin.getConfig().getString("world")).getTime() > 22812) return;
+		if (world.getTime() < 13187 &&
+				world.getTime() > 22812) return;
 	
 		maxLight = plugin.getConfig().getLong("max light to spawn");
 		
@@ -96,7 +99,7 @@ public class ZedCheckRunner extends BukkitRunnable{
 		}*/
 		
 		//check how many zed there are
-		zed = MonoMobs.countZed(plugin.getConfig().getString("world"));
+		zed = MonoMobs.countZed(world.getName());
 
 		
 		//check max # of zed
@@ -130,7 +133,7 @@ public class ZedCheckRunner extends BukkitRunnable{
 		
 		
 		//add player to add queue
-		List<Player> all = Bukkit.getWorld( plugin.getConfig().getString("world")).getPlayers();
+		List<Player> all = world.getPlayers();
 		for (Player person : all) {
 			//MonoMobs.log("counting zed for " + person.getName());
 			zedCount = 0;
@@ -152,7 +155,7 @@ public class ZedCheckRunner extends BukkitRunnable{
 		//spawn zeds
 		while(!loc.isEmpty()) {
 			Location spawnLoc = loc.remove();
-			Bukkit.getWorld(plugin.getConfig().getString("world")).spawnEntity(spawnLoc, EntityType.ZOMBIE);
+			world.spawnEntity(spawnLoc, EntityType.ZOMBIE);
 			//MonoMobs.log("spawning zed");
 		}
 		

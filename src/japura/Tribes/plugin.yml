@@ -43,6 +43,9 @@ permissions:
     tribes.spawn:
         description: allow use of /spawn
         default: true
+    tribes.donor:
+        description: adds donor privileges
+        default: false
     tribes.admin:
         description: Full admin permissions
         default: false

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cp dist/* ../dev/plugins/
+cp dist/* ../Reloaded/plugins/

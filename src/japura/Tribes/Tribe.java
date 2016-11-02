@@ -251,6 +251,7 @@ public class Tribe {
 			this.leader = user;
 			myTribe.put("leader",user);
 			Tribes.getTribeTable().save(myTribe);
+			delPlayer(user);
 		}
 	}
 	
@@ -302,7 +303,7 @@ public class Tribe {
 	public boolean invite(String user) {
 		Tribe check = Tribes.getPlayersTribe(user);
 		if (check != null) {
-			if(name.equals(check.getName()))
+			if(name.equalsIgnoreCase(check.getName()))
 				return false;
 		}
 		if (isInvited(user)) return true;

@@ -286,7 +286,7 @@ public class Tribes extends JavaPlugin{
 					return true;
 				}
 				//check if they are the leader of their tribe
-				if (!group.getLeader().equals(player.getName())) {
+				if (!group.getLeader().equalsIgnoreCase(player.getName())) {
 					sender.sendMessage("You are not the leader of your tribe");
 					return true;
 				}
@@ -329,7 +329,7 @@ public class Tribes extends JavaPlugin{
 				}
 
 				//check if they are the leader of their tribe
-				if (!group.getLeader().equals(player.getName())) {
+				if (!group.getLeader().equalsIgnoreCase(player.getName())) {
 					sender.sendMessage("You are not the leader of your tribe");
 					return true;
 				}
@@ -361,7 +361,7 @@ public class Tribes extends JavaPlugin{
 					return true;
 				}
 				//check if they are the leader of their tribe
-				if (!group.getLeader().equals(player.getName())) {
+				if (!group.getLeader().equalsIgnoreCase(player.getName())) {
 					sender.sendMessage("You are not the leader of your tribe");
 					return true;
 				}
@@ -585,7 +585,7 @@ public class Tribes extends JavaPlugin{
 			} else {
 				
 				tribe.delPlayer(user);
-				if (user.equals(tribe.getLeader())) {
+				if (user.equalsIgnoreCase(tribe.getLeader())) {
 					tribe.setLeader("");
 				}
 				sender.sendMessage("successfully removed " + user + " from tribe " + tribeName);
@@ -845,7 +845,7 @@ public class Tribes extends JavaPlugin{
 				return true;
 			}
 			
-			if (user.equals(group.getLeader())) {
+			if (user.equalsIgnoreCase(group.getLeader())) {
 				sender.sendMessage("You cannot leave without transfering leadership");
 				return true;
 			}

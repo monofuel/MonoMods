@@ -41,7 +41,7 @@ public class IRCListener implements Listener {
 
 	//TODO does this have to be final? i'm just copying from MonoMobs.
 	private final JavaPlugin chatPlugin;
-	
+
 	public IRCListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this,plugin);
 		chatPlugin = plugin;
@@ -50,36 +50,53 @@ public class IRCListener implements Listener {
 		port = chatPlugin.getConfig().getInt("port");
 		host = chatPlugin.getConfig().getString("server");
 		channel = "#" + chatPlugin.getConfig().getString("channel");
-		
-		reconnect();
+
 		runner = new IRCRunner();
 		query = new ChannelQuery();
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin,runner,0,10);
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin,runner,20,10);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin,query,40,1200);
+
+		//initial connection
+		reconnect();
 	}
-	
+
 	private void reconnect() {
-		
-		MonoChat.log("connecting to " + host + ":" + port + " on channel " + channel + " with username " + nick);
+
+		MonoChat.log("connecting to " + host + ":" + port + " with username " + nick);
 		try {
-		socket = new Socket(host,port);
-		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-		
-		writeLine("NICK " + nick);
-		writeLine("USER " + nick + " 8 * : " + nick);
-		
+			socket = new Socket(host,port);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+
+			writeLine("NICK " + nick);
+			writeLine("USER " + nick + " 8 * : " + nick);
+
+			MonoChat.log("connected!");
+
+			new Thread(() -> {
+				try {
+					MonoChat.log("sleeping");
+					Thread.sleep(5000l);
+					MonoChat.log("Joining channel");
+					writeLine("JOIN " + channel);
+
+				} catch (InterruptedException e1) {
+					chatPlugin.getLogger().log(Level.SEVERE,"sleep interruption",e1);
+				}
+			}).start();
+
 		} catch (Exception e) {
 			try {
-				Thread.sleep(5000l);
+				Thread.sleep(1000l);
 			} catch (InterruptedException e1) {
-				chatPlugin.getLogger().log(Level.SEVERE,"failed to connect to irc server",e1);
+				chatPlugin.getLogger().log(Level.SEVERE,"sleep interruption",e1);
 			}
+			chatPlugin.getLogger().log(Level.SEVERE,"failed to connect to irc server",e);
 			reconnect();
 		}
-		
+
 	}
-	
+
 	public void close() {
 		try {
 			socket.close();
@@ -87,15 +104,15 @@ public class IRCListener implements Listener {
 			chatPlugin.getLogger().log(Level.SEVERE,"failed to close connection to irc server",e);
 		}
 	}
-	
+
 	@EventHandler
 	public void catchChat(AsyncPlayerChatEvent event) {
 		String user = event.getPlayer().getName();
 		String message = event.getMessage();
-		
+
 		sendMessage(user,message);
 	}
-	
+
 	private void writeLine(String line) {
 		line += "\n";
 		//MonoChat.log(line);
@@ -106,9 +123,9 @@ public class IRCListener implements Listener {
 			reconnect();
 		}
 	}
-	
+
 	private void sendMessage(String user, String message) {
-		
+
 		StringBuilder line = new StringBuilder("PRIVMSG ");
 		line.append(" " + channel + " :");
 		line.append(user);
@@ -116,7 +133,7 @@ public class IRCListener implements Listener {
 		line.append(message);
 		writeLine(line.toString());
 	}
-	
+
 	private class IRCRunner extends BukkitRunnable {
 
 		@Override
@@ -125,9 +142,11 @@ public class IRCListener implements Listener {
 			while (true) {
 				try {
 					if (!in.ready()) {
+						//MonoChat.log("not ready");
 						return;
 					}
 					if (socket.isClosed()) {
+						MonoChat.log("socket closed");
 						reconnect();
 						return;
 					}
@@ -136,6 +155,7 @@ public class IRCListener implements Listener {
 						MonoChat.log("invalid line received");
 						continue;
 					}
+					MonoChat.log("DEBUG: " + line);
 					if (line.startsWith("PING")) {
 						//MonoChat.log("PING");
 						writeLine(line.replace("PING", "PONG"));
@@ -153,10 +173,10 @@ public class IRCListener implements Listener {
 							for (int i = 4; i < split.length; i++) {
 								message += " " + split[i];
 							}
-							
+
 							Bukkit.broadcastMessage("#IRC " + user + ": " + message);
 						}
-						
+
 					}else if (line.contains(" 352 ")) {
 
 						boolean inChan = false;
@@ -166,7 +186,7 @@ public class IRCListener implements Listener {
 								line.contains(channel)) inChan = true;
 							line = in.readLine();
 						} while (!line.contains(" 315 "));
-						
+
 						if (!inChan) {
 							MonoChat.log("Joining channel");
 							writeLine("JOIN " + channel);
@@ -174,12 +194,12 @@ public class IRCListener implements Listener {
 					}
 					//MonoChat.log(line);
 				} catch (IOException e) {
-					
+
 					reconnect();
 				}
 			}
 		}
-		
+
 		private String listPlayers() {
 			Player[] online;
 
@@ -199,9 +219,9 @@ public class IRCListener implements Listener {
 			return listPlayers;
 		}
 	}
-	
+
 	private class ChannelQuery extends BukkitRunnable {
-		
+
 		@Override
 		public void run() {
 			writeLine("who");
